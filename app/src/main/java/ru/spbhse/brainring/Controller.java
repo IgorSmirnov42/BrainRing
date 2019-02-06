@@ -15,6 +15,10 @@ public class Controller {
      c) Результат. Просто поле с текстом
     */
 
+    public static void setUI(GameActivity ui) {
+        gameActivity = ui;
+    }
+
     // функция, которую должен вызывать UI при нажатии на кнопку в layout 1
     public static void createOnlineGame() {
         // реализацию писать не надо
@@ -27,8 +31,7 @@ public class Controller {
 
     // функция, которую дергают, чтобы отобразить текст вопроса в layout 2a
     public static void setQuestionText(String question) {
-        // Серёжа, напиши реализацию
-        // Тут тебе скорее всего понадобится static поле у контроллера, хранящее ссылку на ui
+        gameActivity.setQuestionText(question);
     }
 
     // функция, которую должен вызывать UI при нажатии на кнопку в layout 2a
@@ -38,7 +41,7 @@ public class Controller {
 
     // меняет локацию ui на соответствующую номеру locationId
     public static void setLocation(int locationId) {
-        // Серёжа, напиши реализацию
+        gameActivity.setLocation(locationId);
     }
 
     // функция, которую должен вызывать UI при нажатии на кнопку в layout 2b
@@ -49,7 +52,7 @@ public class Controller {
 
     // функция, которую дергают, чтобы отобразить текст ответа в layout 2c
     public static void setAnswer(String answer) {
-        // Серёжа, напиши реализацию
+        gameActivity.setAnswer(answer);
     }
 
     /** Gets question from database */

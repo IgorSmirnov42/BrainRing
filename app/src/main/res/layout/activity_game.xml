@@ -21,8 +21,45 @@
         android:id="@+id/answerReadyButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Button"
+        android:text="ЖМЯК!!"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/questionText" />
+
+    <Button
+        android:id="@+id/answerWrittenButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Кнопка готовности ответа"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/answerReadyButton"
+        app:layout_constraintVertical_bias="0.434" />
+
+    <TextView
+        android:id="@+id/rightAnswerTextField"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Поле с ответом"
+        app:layout_constraintBottom_toTopOf="@+id/questionText"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.84"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.16" />
+
+    <EditText
+        android:id="@+id/answerEditor"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="Сюда вводить текст"
+        android:ems="10"
+        android:inputType="textPersonName"
+        app:layout_constraintBottom_toTopOf="@+id/answerReadyButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
