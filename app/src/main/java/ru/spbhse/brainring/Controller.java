@@ -1,8 +1,11 @@
 package ru.spbhse.brainring;
 
+import ru.spbhse.brainring.ui.GameActivity;
 import ru.spbhse.brainring.utils.Question;
 
 public class Controller {
+
+    private static GameActivity gameActivity;
 
     /* layout 1 -- layout с кнопкой "Начать онлайн игру"
      layout 2 -- layout с 3 локациями
@@ -17,9 +20,9 @@ public class Controller {
         // реализацию писать не надо
     }
 
-    // функция, которую дергают извне, чтобы переключиться из layout 1 в layout 2
+    // функция, которую дергают извне, чтобы начать игру
     public static void onlineGameCreated() {
-        // Серёжа, напиши реализацию
+        gameActivity.gameCreated();
     }
 
     // функция, которую дергают, чтобы отобразить текст вопроса в layout 2a
