@@ -1,8 +1,5 @@
 package ru.spbhse.brainring.logic;
 
-import ru.spbhse.brainring.Controller;
-import ru.spbhse.brainring.utils.Question;
-
 public class LocalGameAdminLogic {
     final private int ROUND_TIME = 20;
 
@@ -24,8 +21,6 @@ public class LocalGameAdminLogic {
     4. Reject answer
      */
     public void onClickStartRound() {
-        status.setQuestion(Controller.getQuestion()); // May be parameters will be added
-        Controller.showPhase(/* Show start time button and question */);
 
     }
 }

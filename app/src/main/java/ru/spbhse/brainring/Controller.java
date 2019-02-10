@@ -11,7 +11,42 @@ public class Controller {
     public static GameActivity gameActivity;
     public static Network user;
 
-    /* layout 1 -- layout с кнопкой "Начать онлайн игру"
+    public static class LogicController {
+        public static void onAnswerIsReady(String clientId) {
+
+        }
+
+        public static void onAnswerIsWritten(String writtenAnswer) {
+
+        }
+
+        public static void onForbiddenToAnswer() {
+
+        }
+
+        public static void onAllowedToAnswer() {
+
+        }
+
+        public static void onReceivingQuestion(String question) {
+
+        }
+
+        public static void onIncorrectOpponentAnswer(String opponentAnswer) {
+
+        }
+
+        public static void onReceivingAnswer(int firstUserScore, int secondUserScore, String correctAnswer) {
+
+        }
+
+        public static void onOpponentIsAnswering() {
+
+        }
+    }
+
+    /*
+     layout 1 -- layout с кнопкой "Начать онлайн игру"
      layout 2 -- layout с 3 локациями
      a) Во время вопроса. Это поле с текстом (желательно с прокруткой,
         но не критично, если пока что будет без) и кнопка.
@@ -31,13 +66,7 @@ public class Controller {
     }
 
     public static void loggedIn(GoogleSignInAccount signedInAccount) {
-        System.out.println("LOGGED IN\n");
         user.googleSignInAccount = signedInAccount;
-        user.startQuickGame();
-    }
-
-    public static void loggedIn() {
-        System.out.println("NOT LOGGED IN\n");
         user.startQuickGame();
     }
 
@@ -53,7 +82,6 @@ public class Controller {
 
     // функция, которую должен вызывать UI при нажатии на кнопку в layout 2a
     public static void answerButtonPushed() {
-        // Реализацию писать не надо
     }
 
     // меняет локацию ui на соответствующую номеру locationId
@@ -76,15 +104,5 @@ public class Controller {
     public static Question getQuestion() {
         // TODO : get question from database
         return new Question("aa", "bb", "00", "gg");
-    }
-
-    public static void startLocalGameAsAdmin() {
-        // TODO
-        // Somehow creates game
-    }
-
-    /** Shows phase using UI */
-    public static void showPhase(/* Phase somehow coded */) {
-        // TODOs
     }
 }
