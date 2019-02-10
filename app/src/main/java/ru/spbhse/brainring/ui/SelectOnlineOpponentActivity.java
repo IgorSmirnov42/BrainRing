@@ -6,7 +6,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 
-import ru.spbhse.brainring.Controller;
 import ru.spbhse.brainring.R;
 
 public class SelectOnlineOpponentActivity extends AppCompatActivity {
@@ -20,8 +19,6 @@ public class SelectOnlineOpponentActivity extends AppCompatActivity {
         searchOpponentButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Controller.createOnlineGame();
-
                 Intent intent = new Intent(SelectOnlineOpponentActivity.this, GameActivity.class);
                 startActivity(intent);
             }

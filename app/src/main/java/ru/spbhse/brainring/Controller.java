@@ -1,11 +1,15 @@
 package ru.spbhse.brainring;
 
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+
+import ru.spbhse.brainring.network.Network;
 import ru.spbhse.brainring.ui.GameActivity;
 import ru.spbhse.brainring.utils.Question;
 
 public class Controller {
 
-    private static GameActivity gameActivity;
+    public static GameActivity gameActivity;
+    public static Network user;
 
     /* layout 1 -- layout с кнопкой "Начать онлайн игру"
      layout 2 -- layout с 3 локациями
@@ -21,7 +25,20 @@ public class Controller {
 
     // функция, которую должен вызывать UI при нажатии на кнопку в layout 1
     public static void createOnlineGame() {
-        // реализацию писать не надо
+        System.out.println(gameActivity);
+        user = new Network();
+        gameActivity.signIn();
+    }
+
+    public static void loggedIn(GoogleSignInAccount signedInAccount) {
+        System.out.println("LOGGED IN\n");
+        user.googleSignInAccount = signedInAccount;
+        user.startQuickGame();
+    }
+
+    public static void loggedIn() {
+        System.out.println("NOT LOGGED IN\n");
+        user.startQuickGame();
     }
 
     // функция, которую дергают извне, чтобы начать игру

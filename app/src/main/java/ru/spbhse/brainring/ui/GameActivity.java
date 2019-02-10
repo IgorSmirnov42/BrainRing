@@ -1,16 +1,27 @@
 package ru.spbhse.brainring.ui;
 
+import android.app.AlertDialog;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.auth.api.signin.GoogleSignInResult;
+
 import ru.spbhse.brainring.Controller;
 import ru.spbhse.brainring.R;
 
 public class GameActivity extends AppCompatActivity {
+
+    private static final int RC_SIGN_IN = 42;
 
     enum Location {
         GAME_WAITING_START,
@@ -53,6 +64,8 @@ public class GameActivity extends AppCompatActivity {
         });
 
         drawLocation();
+
+        Controller.createOnlineGame();
     }
 
     public void gameCreated() {
@@ -114,4 +127,32 @@ public class GameActivity extends AppCompatActivity {
         drawLocation();
     }
 
+    public void signIn() {
+        GoogleSignInClient signInClient = GoogleSignIn.getClient(this,
+                GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN);
+        Intent intent = signInClient.getSignInIntent();
+        startActivityForResult(intent, RC_SIGN_IN);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == RC_SIGN_IN) {
+            System.out.println("HERE\n");
+            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
+            if (result.isSuccess()) {
+                System.out.println("SUCCESSSSSSSSS!!!!!!!!!");
+                // The signed in account is stored in the result.
+                Controller.loggedIn(result.getSignInAccount());
+            } else {
+                System.out.println("NOT SUCCESS\n");
+                String message = result.getStatus().getStatusMessage();
+                if (message == null || message.isEmpty()) {
+                    message = "Ошибка.";
+                }
+                new AlertDialog.Builder(this).setMessage(message)
+                        .setNeutralButton(android.R.string.ok, null).show();
+            }
+        }
+    }
 }
