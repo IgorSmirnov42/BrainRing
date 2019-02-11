@@ -202,6 +202,7 @@ public class Network {
     public Network() {}
 
     public void startQuickGame() {
+        isServer = false;
         // quick-start a game with 1 randomly selected opponent
         mRealTimeMultiplayerClient = Games.getRealTimeMultiplayerClient(Controller.gameActivity,
                 googleSignInAccount);
