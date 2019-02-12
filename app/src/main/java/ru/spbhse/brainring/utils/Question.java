@@ -10,6 +10,10 @@ public class Question {
         return question;
     }
 
+    public String getAllAnswers() {
+        return answer.getAllAnswers();
+    }
+
     public String getMainAnswer() {
         return answer.getMainAnswer();
     }
@@ -38,7 +42,7 @@ public class Question {
     }
 
     /** Checks if users answer is right */
-    boolean checkAnswer(String userAnswer) {
+    public boolean checkAnswer(String userAnswer) {
         return answer.checkAnswer(userAnswer);
     }
 }

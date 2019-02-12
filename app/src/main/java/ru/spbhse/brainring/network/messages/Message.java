@@ -1,7 +1,7 @@
 package ru.spbhse.brainring.network.messages;
 
+import java.io.DataInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 
 public class Message {
     /*
@@ -36,11 +36,11 @@ public class Message {
         return !messageIsToServer(identifier);
     }
 
-    public static String readString(InputStream is) {
+    public static String readString(DataInputStream is) {
         byte[] string = null;
         try {
             string = new byte[is.available()];
-            is.read(string);
+            is.readFully(string);
         } catch (IOException e) {
             e.printStackTrace();
         }

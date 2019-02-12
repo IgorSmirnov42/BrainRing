@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -19,23 +20,23 @@ import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import ru.spbhse.brainring.Controller;
 import ru.spbhse.brainring.R;
 
+import static ru.spbhse.brainring.ui.GameActivityLocation.GAME_WAITING_START;
+import static ru.spbhse.brainring.ui.GameActivityLocation.OPPONENT_IS_ANSWERING;
+import static ru.spbhse.brainring.ui.GameActivityLocation.SHOW_ANSWER;
+import static ru.spbhse.brainring.ui.GameActivityLocation.SHOW_QUESTION;
+import static ru.spbhse.brainring.ui.GameActivityLocation.WRITE_ANSWER;
+
 public class GameActivity extends AppCompatActivity {
 
     private static final int RC_SIGN_IN = 42;
 
-    enum Location {
-        GAME_WAITING_START,
-        SHOW_QUESTION,
-        WRITE_ANSWER,
-        SHOW_ANSWER
-    }
-
-    private Location currentLocation = Location.GAME_WAITING_START;
+    private GameActivityLocation currentLocation = GAME_WAITING_START;
     private TextView questionTextField;
     private Button answerButton;
     private Button answerWrittenButton;
     private TextView rightAnswerTextField;
     private EditText answerEditor;
+    private TextView opponentIsAnswering;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,63 +49,68 @@ public class GameActivity extends AppCompatActivity {
         answerWrittenButton = findViewById(R.id.answerWrittenButton);
         rightAnswerTextField = findViewById(R.id.rightAnswerTextField);
         answerEditor = findViewById(R.id.answerEditor);
+        opponentIsAnswering = findViewById(R.id.opponentIsAnswering);
 
         answerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Controller.answerButtonPushed();
+                Controller.UserLogicController.answerButtonPushed();
             }
         });
 
         answerWrittenButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Controller.answerIsWritten(answerEditor.getText().toString());
+                Controller.UserLogicController.answerIsWritten(answerEditor.getText().toString());
+                hideKeyboard();
             }
         });
 
         drawLocation();
 
-        Controller.createOnlineGame();
-    }
-
-    public void gameCreated() {
-        if (currentLocation != Location.GAME_WAITING_START) {
-            return;
-        }
-
-        currentLocation = Location.SHOW_QUESTION;
-        drawLocation();
+        Controller.NetworkController.createOnlineGame();
     }
 
     private void drawLocation() {
-        if (currentLocation == Location.GAME_WAITING_START) {
+        if (currentLocation == GAME_WAITING_START) {
             questionTextField.setVisibility(View.VISIBLE);
             answerButton.setVisibility(View.GONE);
             answerWrittenButton.setVisibility(View.GONE);
             rightAnswerTextField.setVisibility(View.GONE);
             answerEditor.setVisibility(View.GONE);
+            opponentIsAnswering.setVisibility(View.GONE);
         }
-        if (currentLocation == Location.SHOW_QUESTION) {
+        if (currentLocation == SHOW_QUESTION) {
             questionTextField.setVisibility(View.VISIBLE);
             answerButton.setVisibility(View.VISIBLE);
             answerWrittenButton.setVisibility(View.GONE);
             rightAnswerTextField.setVisibility(View.GONE);
             answerEditor.setVisibility(View.GONE);
+            opponentIsAnswering.setVisibility(View.GONE);
         }
-        if (currentLocation == Location.WRITE_ANSWER) {
+        if (currentLocation == WRITE_ANSWER) {
             questionTextField.setVisibility(View.GONE);
             answerButton.setVisibility(View.GONE);
             answerWrittenButton.setVisibility(View.VISIBLE);
             rightAnswerTextField.setVisibility(View.GONE);
             answerEditor.setVisibility(View.VISIBLE);
+            opponentIsAnswering.setVisibility(View.GONE);
         }
-        if (currentLocation == Location.SHOW_ANSWER) {
+        if (currentLocation == SHOW_ANSWER) {
             questionTextField.setVisibility(View.GONE);
             answerButton.setVisibility(View.GONE);
             answerWrittenButton.setVisibility(View.GONE);
             rightAnswerTextField.setVisibility(View.VISIBLE);
             answerEditor.setVisibility(View.GONE);
+            opponentIsAnswering.setVisibility(View.GONE);
+        }
+        if (currentLocation == OPPONENT_IS_ANSWERING) {
+            questionTextField.setVisibility(View.VISIBLE);
+            answerButton.setVisibility(View.GONE);
+            answerWrittenButton.setVisibility(View.GONE);
+            rightAnswerTextField.setVisibility(View.GONE);
+            answerEditor.setVisibility(View.GONE);
+            opponentIsAnswering.setVisibility(View.VISIBLE);
         }
     }
 
@@ -116,14 +122,8 @@ public class GameActivity extends AppCompatActivity {
         rightAnswerTextField.setText(answer);
     }
 
-    public void setLocation(int locationId) {
-        if (locationId == 1) {
-            currentLocation = Location.SHOW_QUESTION;
-        } else if (locationId == 2) {
-            currentLocation = Location.WRITE_ANSWER;
-        } else if (locationId == 3) {
-            currentLocation = Location.SHOW_ANSWER;
-        }
+    public void setLocation(GameActivityLocation location) {
+        currentLocation = location;
         drawLocation();
     }
 
@@ -134,13 +134,17 @@ public class GameActivity extends AppCompatActivity {
         startActivityForResult(intent, RC_SIGN_IN);
     }
 
+    public void hideKeyboard() {
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == RC_SIGN_IN) {
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
             if (result.isSuccess()) {
-                Controller.loggedIn(result.getSignInAccount());
+                Controller.NetworkController.loggedIn(result.getSignInAccount());
             } else {
                 String message = result.getStatus().getStatusMessage();
                 if (message == null || message.isEmpty()) {

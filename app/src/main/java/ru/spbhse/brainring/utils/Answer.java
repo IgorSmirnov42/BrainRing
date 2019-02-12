@@ -11,6 +11,16 @@ class Answer {
         return possibleAnswers[0];
     }
 
+    String getAllAnswers() {
+        StringBuilder answer = new StringBuilder();
+        answer.append(possibleAnswers[0]);
+        for (int i = 1; i < possibleAnswers.length; i++) {
+            answer.append("/");
+            answer.append(possibleAnswers[i]);
+        }
+        return answer.toString();
+    }
+
     /**
      * Builds Answer
      * @param mainAnswer answer given in field "Answer" of the question from base. Mustn't be null

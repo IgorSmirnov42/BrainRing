@@ -26,15 +26,18 @@ import java.util.List;
 
 import ru.spbhse.brainring.Controller;
 import ru.spbhse.brainring.network.messages.Message;
+import ru.spbhse.brainring.ui.GameActivityLocation;
 
 public class Network {
 
     public RoomConfig mRoomConfig;
     public Room room;
     public boolean isServer;
+    public String serverId;
     public GoogleSignInAccount googleSignInAccount;
     public RealTimeMultiplayerClient mRealTimeMultiplayerClient;
     public GoogleSignInClient mGoogleSignInClient;
+    public String myParticipantId;
     public RoomStatusUpdateCallback mRoomStatusUpdateCallback = new RoomStatusUpdateCallback() {
         @Override
         public void onRoomConnecting(@Nullable Room room) {
@@ -99,8 +102,8 @@ public class Network {
     public RoomUpdateCallback mRoomUpdateCallback = new RoomUpdateCallback() {
         @Override
         public void onRoomCreated(int i, @Nullable Room room) {
-            Controller.setLocation(1);
-            Controller.setQuestionText("ROOM CREATED");
+            Controller.UIController.setLocation(GameActivityLocation.SHOW_QUESTION);
+            Controller.UIController.setQuestionText("ROOM CREATED");
         }
 
         @Override
@@ -118,8 +121,8 @@ public class Network {
                 Log.wtf("BrainRing", "onRoomConnected got null as room");
                 return;
             }
-            Controller.setLocation(1);
-            Controller.setQuestionText("УРАААА! МЫ СКОННЕКТИЛИСЬ С КЕМ-ТО (onRoomConnected)!!!");
+            Controller.UIController.setLocation(GameActivityLocation.SHOW_QUESTION);
+            Controller.UIController.setQuestionText("УРАААА! МЫ СКОННЕКТИЛИСЬ С КЕМ-ТО (onRoomConnected)!!!");
             Network.this.room = room;
             if (code == GamesCallbackStatusCodes.OK) {
                 System.out.println("CONNECTED");
@@ -127,17 +130,18 @@ public class Network {
                 System.out.println("ERROR WHILE CONNECTING");
             }
             String minimalId = Collections.min(room.getParticipantIds());
+            serverId = minimalId;
             Games.getPlayersClient(Controller.gameActivity, googleSignInAccount)
                     .getCurrentPlayerId()
                     .addOnSuccessListener(new OnSuccessListener<String>() {
                         @Override
                         public void onSuccess(String myPlayerId) {
-                            String myId = room.getParticipantId(myPlayerId);
-                            Controller.setQuestionText(myId);
-                            if (myId.equals(minimalId)) {
+                            myParticipantId = room.getParticipantId(myPlayerId);
+                            Controller.UIController.setQuestionText(myParticipantId);
+                            if (myParticipantId.equals(minimalId)) {
                                 isServer = true;
-                                Controller.setQuestionText("Я сервер\n");
-                                // START GAME
+                                Controller.UIController.setQuestionText("Я сервер\n");
+                                Controller.startOnlineGame();
                             }
                         }
                     });
@@ -147,13 +151,16 @@ public class Network {
         @Override
         public void onRealTimeMessageReceived(@NonNull RealTimeMessage realTimeMessage) {
             byte[] buf = realTimeMessage.getMessageData();
-            onMessageReceived(buf);
+            onMessageReceived(buf, realTimeMessage.getSenderParticipantId());
         }
     };
 
-    private void onMessageReceived(byte[] buf) {
+    private void onMessageReceived(byte[] buf, String userId) {
+        System.out.println("RECEIVED MESSAGE!");
         try (DataInputStream is = new DataInputStream(new ByteArrayInputStream(buf))) {
             int identifier = is.readInt();
+            System.out.println("IDENTIFIER IS");
+            System.out.println(identifier);
 
             if (Message.messageIsToServer(identifier) && !isServer) {
                 Log.wtf("BrainRing", "Not server got message to server\n");
@@ -162,40 +169,40 @@ public class Network {
 
             switch (identifier) {
                 case Message.ANSWER_IS_READY:
-                    String clientId = Message.readString(is);
-                    Controller.LogicController.onAnswerIsReady(clientId);
+                    Controller.AdminLogicController.onAnswerIsReady(userId);
                     break;
                 case Message.ANSWER_IS_WRITTEN:
                     String answer = Message.readString(is);
-                    Controller.LogicController.onAnswerIsWritten(answer);
+                    Controller.AdminLogicController.onAnswerIsWritten(answer);
                     break;
                 case Message.FORBIDDEN_TO_ANSWER:
-                    Controller.LogicController.onForbiddenToAnswer();
+                    Controller.UserLogicController.onForbiddenToAnswer();
                     break;
                 case Message.ALLOWED_TO_ANSWER:
-                    Controller.LogicController.onAllowedToAnswer();
+                    Controller.UserLogicController.onAllowedToAnswer();
                     break;
                 case Message.SENDING_QUESTION:
                     String question = Message.readString(is);
-                    Controller.LogicController.onReceivingQuestion(question);
+                    Controller.UserLogicController.onReceivingQuestion(question);
                     break;
                 case Message.SENDING_INCORRECT_OPPONENT_ANSWER:
                     String opponentAnswer = Message.readString(is);
-                    Controller.LogicController.onIncorrectOpponentAnswer(opponentAnswer);
+                    Controller.UserLogicController.onIncorrectOpponentAnswer(opponentAnswer);
                     break;
                 case Message.SENDING_CORRECT_ANSWER_AND_SCORE:
                     int firstUserScore = is.readInt();
                     int secondUserScore = is.readInt();
                     String correctAnswer = Message.readString(is);
-                    Controller.LogicController.onReceivingAnswer(firstUserScore, secondUserScore, correctAnswer);
+                    Controller.UserLogicController.onReceivingAnswer(firstUserScore, secondUserScore, correctAnswer);
                     break;
                 case Message.OPPONENT_IS_ANSWERING:
-                    Controller.LogicController.onOpponentIsAnswering();
+                    Controller.UserLogicController.onOpponentIsAnswering();
                     break;
             }
 
         } catch (IOException e) {
             e.printStackTrace();
+            // TODO: нормальная обработка
         }
     }
 
@@ -222,17 +229,36 @@ public class Network {
 
     public void sendMessageToAll(byte[] message) {
         mRealTimeMultiplayerClient.sendUnreliableMessageToOthers(message, room.getRoomId());
+        onMessageReceived(message, myParticipantId);
     }
 
     public void sendMessageToConcreteUser(String userId, byte[] message) {
-        mRealTimeMultiplayerClient.sendUnreliableMessage(message, room.getRoomId(), userId);
+        if (userId.equals(myParticipantId)) {
+            onMessageReceived(message, myParticipantId);
+        } else {
+            mRealTimeMultiplayerClient.sendUnreliableMessage(message, room.getRoomId(), userId);
+        }
     }
 
     public void sendMessageToServer(byte[] message) {
         if (isServer) {
-            onMessageReceived(message);
+            onMessageReceived(message, myParticipantId);
         } else {
-            sendMessageToConcreteUser(room.getCreatorId(), message);
+            sendMessageToConcreteUser(serverId, message);
         }
+    }
+
+    public String getMyParticipantId() {
+        return myParticipantId;
+    }
+
+    public String getOpponentParticipantId() {
+        for (String participantId : room.getParticipantIds()) {
+            if (!participantId.equals(myParticipantId)) {
+                return participantId;
+            }
+        }
+        Log.wtf("BrainRing", "Opponent id was not found.");
+        return null;
     }
 }
