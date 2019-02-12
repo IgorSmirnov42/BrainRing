@@ -89,7 +89,7 @@ public class GameActivity extends AppCompatActivity {
             opponentIsAnswering.setVisibility(View.GONE);
         }
         if (currentLocation == WRITE_ANSWER) {
-            questionTextField.setVisibility(View.GONE);
+            questionTextField.setVisibility(View.VISIBLE);
             answerButton.setVisibility(View.GONE);
             answerWrittenButton.setVisibility(View.VISIBLE);
             rightAnswerTextField.setVisibility(View.GONE);
