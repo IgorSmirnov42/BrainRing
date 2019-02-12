@@ -6,7 +6,6 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.games.Games;
 import com.google.android.gms.games.GamesCallbackStatusCodes;
 import com.google.android.gms.games.RealTimeMultiplayerClient;
@@ -30,15 +29,14 @@ import ru.spbhse.brainring.ui.GameActivityLocation;
 
 public class Network {
 
-    public RoomConfig mRoomConfig;
-    public Room room;
-    public boolean isServer;
-    public String serverId;
+    private RoomConfig mRoomConfig;
+    private Room room;
+    private boolean isServer;
+    private String serverId;
     public GoogleSignInAccount googleSignInAccount;
-    public RealTimeMultiplayerClient mRealTimeMultiplayerClient;
-    public GoogleSignInClient mGoogleSignInClient;
-    public String myParticipantId;
-    public RoomStatusUpdateCallback mRoomStatusUpdateCallback = new RoomStatusUpdateCallback() {
+    private RealTimeMultiplayerClient mRealTimeMultiplayerClient;
+    private String myParticipantId;
+    private RoomStatusUpdateCallback mRoomStatusUpdateCallback = new RoomStatusUpdateCallback() {
         @Override
         public void onRoomConnecting(@Nullable Room room) {
 
@@ -99,11 +97,11 @@ public class Network {
 
         }
     };
-    public RoomUpdateCallback mRoomUpdateCallback = new RoomUpdateCallback() {
+    private RoomUpdateCallback mRoomUpdateCallback = new RoomUpdateCallback() {
         @Override
         public void onRoomCreated(int i, @Nullable Room room) {
             Controller.UIController.setLocation(GameActivityLocation.SHOW_QUESTION);
-            Controller.UIController.setQuestionText("ROOM CREATED");
+            Controller.UIController.setQuestionText("ROOM WAS CREATED");
         }
 
         @Override
@@ -122,7 +120,6 @@ public class Network {
                 return;
             }
             Controller.UIController.setLocation(GameActivityLocation.SHOW_QUESTION);
-            Controller.UIController.setQuestionText("УРАААА! МЫ СКОННЕКТИЛИСЬ С КЕМ-ТО (onRoomConnected)!!!");
             Network.this.room = room;
             if (code == GamesCallbackStatusCodes.OK) {
                 System.out.println("CONNECTED");
@@ -137,7 +134,6 @@ public class Network {
                         @Override
                         public void onSuccess(String myPlayerId) {
                             myParticipantId = room.getParticipantId(myPlayerId);
-                            Controller.UIController.setQuestionText(myParticipantId);
                             if (myParticipantId.equals(minimalId)) {
                                 isServer = true;
                                 Controller.UIController.setQuestionText("Я сервер\n");

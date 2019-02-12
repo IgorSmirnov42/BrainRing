@@ -72,6 +72,10 @@ public class Controller {
     }
 
     public static class UIController {
+        public static void clearEditText() {
+            gameActivity.clearEditText();
+        }
+
         public static void hideKeyboard() {
             gameActivity.hideKeyboard();
         }
@@ -127,7 +131,7 @@ public class Controller {
         /** Gets random question from database */
         public static Question getRandomQuestion() {
             // TODO : get question from database
-            return new Question("aa", "bb", "00", "gg");
+            return new Question("Что должен делать Серёжа?", "Писать код", "Работать", "gg");
         }
     }
 

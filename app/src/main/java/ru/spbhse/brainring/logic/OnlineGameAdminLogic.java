@@ -93,7 +93,8 @@ public class OnlineGameAdminLogic {
         try (ByteArrayOutputStream bout = new ByteArrayOutputStream();
              DataOutputStream dout = new DataOutputStream(bout)) {
             dout.writeInt(code);
-            dout.writeBytes(message);
+            dout.writeChars(message);
+            dout.flush();
             buf = bout.toByteArray();
         } catch (IOException e) {
             e.printStackTrace();
@@ -110,7 +111,7 @@ public class OnlineGameAdminLogic {
             dout.writeInt(Message.SENDING_CORRECT_ANSWER_AND_SCORE);
             dout.writeInt(user1.score);
             dout.writeInt(user2.score);
-            dout.writeBytes(answer);
+            dout.writeChars(answer);
             buf = bout.toByteArray();
         } catch (IOException e) {
             e.printStackTrace();
