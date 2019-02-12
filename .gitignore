@@ -1,0 +1,6 @@
+.gradle
+.idea/workspace.xml
+local.properties
+app/build
+app/release
+local.properties
