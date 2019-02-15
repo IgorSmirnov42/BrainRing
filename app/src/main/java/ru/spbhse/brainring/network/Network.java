@@ -25,7 +25,6 @@ import java.util.List;
 
 import ru.spbhse.brainring.Controller;
 import ru.spbhse.brainring.network.messages.Message;
-import ru.spbhse.brainring.ui.GameActivityLocation;
 
 public class Network {
 
@@ -39,87 +38,87 @@ public class Network {
     private RoomStatusUpdateCallback mRoomStatusUpdateCallback = new RoomStatusUpdateCallback() {
         @Override
         public void onRoomConnecting(@Nullable Room room) {
-
+            Log.d("BrainRing", "onRoomConnecting");
         }
 
         @Override
         public void onRoomAutoMatching(@Nullable Room room) {
-
+            Log.d("BrainRing", "onRoomAutoMatching");
         }
 
         @Override
         public void onPeerInvitedToRoom(@Nullable Room room, @NonNull List<String> list) {
-
+            Log.d("BrainRing", "onPeerInvitedToRoom");
         }
 
         @Override
         public void onPeerDeclined(@Nullable Room room, @NonNull List<String> list) {
-
+            Log.d("BrainRing", "onPeerDeclined");
         }
 
         @Override
         public void onPeerJoined(@Nullable Room room, @NonNull List<String> list) {
-
+            Log.d("BrainRing", "onPeerJoined");
         }
 
         @Override
         public void onPeerLeft(@Nullable Room room, @NonNull List<String> list) {
-
+            Log.d("BrainRing", "onPeerLeft");
         }
 
         @Override
         public void onConnectedToRoom(@Nullable Room room) {
-
+            Log.d("BrainRing", "onConnectedToRoom");
         }
 
         @Override
         public void onDisconnectedFromRoom(@Nullable Room room) {
-
+            Log.d("BrainRing", "onDisconnectedFromRoom");
         }
 
         @Override
         public void onPeersConnected(@Nullable Room room, @NonNull List<String> list) {
-
+            Log.d("BrainRing", "onPeersConnected");
         }
 
         @Override
         public void onPeersDisconnected(@Nullable Room room, @NonNull List<String> list) {
-
+            Log.d("BrainRing", "onPeersDisconnected");
         }
 
         @Override
         public void onP2PConnected(@NonNull String s) {
-
+            Log.d("BrainRing", "onP2PConnected");
         }
 
         @Override
         public void onP2PDisconnected(@NonNull String s) {
-
+            Log.d("BrainRing", "onP2PDisconnected");
         }
     };
     private RoomUpdateCallback mRoomUpdateCallback = new RoomUpdateCallback() {
         @Override
         public void onRoomCreated(int i, @Nullable Room room) {
-            Controller.UIController.setLocation(GameActivityLocation.SHOW_QUESTION);
-            Controller.UIController.setQuestionText("ROOM WAS CREATED");
+            Log.d("BrainRing", "Room was created");
         }
 
         @Override
         public void onJoinedRoom(int i, @Nullable Room room) {
+            Log.d("BrainRing", "Joined room");
         }
 
         @Override
         public void onLeftRoom(int i, @NonNull String s) {
-
+            Log.d("BrainRing", "Left room");
         }
 
         @Override
         public void onRoomConnected(int code, @Nullable Room room) {
+            Log.d("BrainRing", "Connected to room");
             if (room == null) {
                 Log.wtf("BrainRing", "onRoomConnected got null as room");
                 return;
             }
-            Controller.UIController.setLocation(GameActivityLocation.SHOW_QUESTION);
             Network.this.room = room;
             if (code == GamesCallbackStatusCodes.OK) {
                 System.out.println("CONNECTED");
@@ -136,7 +135,6 @@ public class Network {
                             myParticipantId = room.getParticipantId(myPlayerId);
                             if (myParticipantId.equals(minimalId)) {
                                 isServer = true;
-                                Controller.UIController.setQuestionText("Я сервер\n");
                                 Controller.startOnlineGame();
                             }
                         }

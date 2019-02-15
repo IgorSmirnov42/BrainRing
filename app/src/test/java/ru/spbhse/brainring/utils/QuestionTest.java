@@ -39,11 +39,20 @@ public class QuestionTest {
 
     @Test
     public void checkTotallyCorrectAnswer() {
-        Question question = new Question("aa", "bb", "00/cc", "gg");
+        Question question = new Question("aa", "bb", "00/cc/АВа", "gg");
         assertTrue(question.checkAnswer("bb"));
         assertTrue(question.checkAnswer("00"));
         assertTrue(question.checkAnswer("cc"));
+        assertTrue(question.checkAnswer("Ава"));
     }
 
-    // TODO: check answers that close to right
+    @Test
+    public void checkAnswersThatCloseToCorrect() {
+        Question question = new Question("aa", "bb", "00/cc/АВа/абракадабра", "gg");
+        assertFalse(question.checkAnswer("ba"));
+        assertTrue(question.checkAnswer("авракадабра"));
+        assertTrue(question.checkAnswer("авакадабра"));
+        assertFalse(question.checkAnswer("авадакедавра"));
+        assertTrue(question.checkAnswer("АБРАКАДАБРА"));
+    }
 }

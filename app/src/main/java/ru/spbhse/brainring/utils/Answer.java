@@ -1,5 +1,9 @@
 package ru.spbhse.brainring.utils;
 
+
+import static java.lang.Character.toLowerCase;
+import static java.lang.Math.min;
+
 /**
  * Class to store correct answers to questions and to check if given answer is right
  */
@@ -62,13 +66,39 @@ class Answer {
         return false;
     }
 
-    /** Checks if answers are similar. */
-    private static boolean compareAnswers(String correctAnswer, String userAnswer) {
-        /* TODO: better algorithm to check
-            1. Not case-sensitive
-            2. Allow some mistakes
-         */
-        return correctAnswer.equals(userAnswer);
+    private static int allowedDistance(String answer) {
+        return answer.length() / 5;
     }
 
+    private static int levenshteinDistance(String correctAnswer, String userAnswer) {
+        int[][] distance = new int[correctAnswer.length() + 1][userAnswer.length() + 1];
+        for (int row = 0; row <= correctAnswer.length(); row++) {
+            distance[row][0] = row;
+        }
+        for (int column = 0; column <= userAnswer.length(); ++column) {
+            distance[0][column] = column;
+        }
+
+        final int inf = correctAnswer.length() * userAnswer.length();
+
+        for (int row = 1; row <= correctAnswer.length(); row++) {
+            for (int column = 1; column <= userAnswer.length(); column++) {
+                char currentCorrectAnswerChar = toLowerCase(correctAnswer.charAt(row - 1));
+                char currentUserAnswerChar = toLowerCase(userAnswer.charAt(column - 1));
+                distance[row][column] = inf;
+                if (currentCorrectAnswerChar == currentUserAnswerChar) {
+                    distance[row][column] = distance[row - 1][column - 1];
+                }
+                distance[row][column] = min(distance[row][column - 1] + 1, distance[row][column]);
+                distance[row][column] = min(distance[row - 1][column] + 1, distance[row][column]);
+                distance[row][column] = min(distance[row - 1][column - 1] + 1, distance[row][column]);
+            }
+        }
+        return distance[correctAnswer.length()][userAnswer.length()];
+    }
+
+    /** Checks if answers are similar. */
+    private static boolean compareAnswers(String correctAnswer, String userAnswer) {
+        return levenshteinDistance(correctAnswer, userAnswer) <= allowedDistance(correctAnswer);
+    }
 }
