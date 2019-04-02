@@ -95,11 +95,13 @@ public class QuestionDataBase extends SQLiteOpenHelper {
         String answer = "";
         if (cursor.moveToFirst()) {
             do {
-                question = cursor.getString(cursor.getColumnIndex(Entry.COLUMN_QUESTION));
-                answer = cursor.getString(cursor.getColumnIndex(Entry.COLUMN_ANSWER));
+                question = cursor.getString(cursor.getColumnIndex(Entry.COLUMN_QUESTION)).
+                        replaceAll("Вопрос [0-9]*:", "");
+                answer = cursor.getString(cursor.getColumnIndex(Entry.COLUMN_ANSWER)).
+                        replaceAll("Ответ:", "");
             } while (cursor.moveToNext());
         }
-        return new Question(question, answer, "kek", "mda");
+        return new Question(question, answer, "", "");
     }
 
     private boolean checkDataBase() {
