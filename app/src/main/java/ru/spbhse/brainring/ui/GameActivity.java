@@ -51,8 +51,8 @@ public class GameActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
         Controller.setUI(GameActivity.this);
-//        dataBase = new QuestionDataBase(GameActivity.this);
-//        dataBase.openDataBase();
+        dataBase = new QuestionDataBase(GameActivity.this);
+        dataBase.openDataBase();
 
         questionTextField = findViewById(R.id.questionText);
         answerButton = findViewById(R.id.answerReadyButton);

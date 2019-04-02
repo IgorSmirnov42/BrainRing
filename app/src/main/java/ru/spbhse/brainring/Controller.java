@@ -137,6 +137,10 @@ public class Controller {
         private static final Random RAND = new Random();
         public static Question getRandomQuestion() {
             QuestionDataBase dataBase = gameActivity.dataBase;
+            if (dataBase == null) {
+                dataBase = new QuestionDataBase(gameActivity);
+            }
+            dataBase.openDataBase();
             int questionId = RAND.nextInt((int) dataBase.size());
             return dataBase.getQuestion(questionId);
         }

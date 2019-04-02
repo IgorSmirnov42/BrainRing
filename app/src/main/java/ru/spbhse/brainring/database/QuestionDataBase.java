@@ -83,10 +83,12 @@ public class QuestionDataBase extends SQLiteOpenHelper {
     }
 
     public long size() {
+        db = this.getReadableDatabase();
         return DatabaseUtils.queryNumEntries(db, Entry.TABLE_NAME);
     }
 
     public Question getQuestion(int id) {
+        db = this.getReadableDatabase();
         String query = "SELECT * FROM " + Entry.TABLE_NAME + " WHERE " + Entry._ID + "=" + id + ";";
         Cursor cursor = db.rawQuery(query, null);
         String question = "";
