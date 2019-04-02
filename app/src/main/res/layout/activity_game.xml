@@ -8,8 +8,8 @@
 
     <TextView
         android:id="@+id/questionText"
-        android:layout_width="243dp"
-        android:layout_height="82dp"
+        android:layout_width="319dp"
+        android:layout_height="233dp"
         android:text="ГГ"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -44,15 +44,15 @@
 
     <TextView
         android:id="@+id/rightAnswerTextField"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="324dp"
+        android:layout_height="48dp"
         android:text="Поле с ответом"
         app:layout_constraintBottom_toTopOf="@+id/questionText"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.84"
+        app:layout_constraintHorizontal_bias="0.775"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.16" />
+        app:layout_constraintVertical_bias="1.0" />
 
     <EditText
         android:id="@+id/answerEditor"

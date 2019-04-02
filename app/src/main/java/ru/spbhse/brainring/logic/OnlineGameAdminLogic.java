@@ -1,5 +1,7 @@
 package ru.spbhse.brainring.logic;
 
+import android.os.Handler;
+
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -70,7 +72,13 @@ public class OnlineGameAdminLogic {
 
     private void showAnswer() {
         Controller.NetworkController.sendMessageToAll(generateAnswer());
-        newQuestion();
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                newQuestion();
+            }
+        }, 5000);
     }
 
     public void newQuestion() {
