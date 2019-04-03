@@ -36,14 +36,11 @@ public class Message {
         return !messageIsToServer(identifier);
     }
 
-    public static String readString(DataInputStream is) {
-        byte[] string = null;
-        try {
-            string = new byte[is.available()];
-            is.readFully(string);
-        } catch (IOException e) {
-            e.printStackTrace();
+    public static String readString(DataInputStream is) throws IOException {
+        StringBuilder string = new StringBuilder();
+        while (is.available() > 0) {
+            string.append(is.readChar());
         }
-        return new String(string);
+        return string.toString();
     }
 }

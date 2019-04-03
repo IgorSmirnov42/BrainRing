@@ -1,5 +1,7 @@
 package ru.spbhse.brainring.logic;
 
+import android.os.Handler;
+
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -70,7 +72,13 @@ public class OnlineGameAdminLogic {
 
     private void showAnswer() {
         Controller.NetworkController.sendMessageToAll(generateAnswer());
-        newQuestion();
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                newQuestion();
+            }
+        }, 5000);
     }
 
     public void newQuestion() {
@@ -93,7 +101,8 @@ public class OnlineGameAdminLogic {
         try (ByteArrayOutputStream bout = new ByteArrayOutputStream();
              DataOutputStream dout = new DataOutputStream(bout)) {
             dout.writeInt(code);
-            dout.writeBytes(message);
+            dout.writeChars(message);
+            dout.flush();
             buf = bout.toByteArray();
         } catch (IOException e) {
             e.printStackTrace();
@@ -110,7 +119,7 @@ public class OnlineGameAdminLogic {
             dout.writeInt(Message.SENDING_CORRECT_ANSWER_AND_SCORE);
             dout.writeInt(user1.score);
             dout.writeInt(user2.score);
-            dout.writeBytes(answer);
+            dout.writeChars(answer);
             buf = bout.toByteArray();
         } catch (IOException e) {
             e.printStackTrace();

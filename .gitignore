@@ -1,5 +1,5 @@
-.gradle
-.idea/workspace.xml
+.gradle/
+.idea/
 local.properties
 app/build
 app/release

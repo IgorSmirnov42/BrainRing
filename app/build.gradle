@@ -8,7 +8,7 @@ android {
         applicationId "ru.spbhse.brainring"
         minSdkVersion 21
         targetSdkVersion 28
-        versionCode 30
+        versionCode 42
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
@@ -41,4 +41,5 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.3.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.3.1'
     implementation 'com.google.android.gms:play-services-auth:16.0.1'
+    implementation 'org.jsoup:jsoup:1.11.3'
 }

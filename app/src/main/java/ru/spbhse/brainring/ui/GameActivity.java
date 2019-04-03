@@ -3,6 +3,7 @@ package ru.spbhse.brainring.ui;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -19,6 +20,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 
 import ru.spbhse.brainring.Controller;
 import ru.spbhse.brainring.R;
+import ru.spbhse.brainring.database.QuestionDataBase;
 
 import static ru.spbhse.brainring.ui.GameActivityLocation.GAME_WAITING_START;
 import static ru.spbhse.brainring.ui.GameActivityLocation.OPPONENT_IS_ANSWERING;
@@ -37,12 +39,20 @@ public class GameActivity extends AppCompatActivity {
     private TextView rightAnswerTextField;
     private EditText answerEditor;
     private TextView opponentIsAnswering;
+    public QuestionDataBase dataBase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        /////////////
+        StrictMode.ThreadPolicy policy = new
+                StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
+        /////////////
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
         Controller.setUI(GameActivity.this);
+        dataBase = new QuestionDataBase(GameActivity.this);
+        dataBase.openDataBase();
 
         questionTextField = findViewById(R.id.questionText);
         answerButton = findViewById(R.id.answerReadyButton);
@@ -89,7 +99,7 @@ public class GameActivity extends AppCompatActivity {
             opponentIsAnswering.setVisibility(View.GONE);
         }
         if (currentLocation == WRITE_ANSWER) {
-            questionTextField.setVisibility(View.GONE);
+            questionTextField.setVisibility(View.VISIBLE);
             answerButton.setVisibility(View.GONE);
             answerWrittenButton.setVisibility(View.VISIBLE);
             rightAnswerTextField.setVisibility(View.GONE);
@@ -136,6 +146,10 @@ public class GameActivity extends AppCompatActivity {
 
     public void hideKeyboard() {
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+    }
+
+    public void clearEditText() {
+        answerEditor.setText("");
     }
 
     @Override

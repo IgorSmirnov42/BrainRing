@@ -25,6 +25,7 @@ public class OnlineGameUserLogic {
     }
 
     public void onReceivingQuestion(String question) {
+        Controller.UIController.clearEditText();
         userStatus.onNewQuestion();
         currentQuestion = question;
         Controller.UIController.setQuestionText(question);
@@ -73,7 +74,7 @@ public class OnlineGameUserLogic {
         try (ByteArrayOutputStream bout = new ByteArrayOutputStream();
             DataOutputStream dout = new DataOutputStream(bout)) {
             dout.writeInt(Message.ANSWER_IS_WRITTEN);
-            dout.writeBytes(answer);
+            dout.writeChars(answer);
             dout.flush();
             message = bout.toByteArray();
         } catch (IOException e) {

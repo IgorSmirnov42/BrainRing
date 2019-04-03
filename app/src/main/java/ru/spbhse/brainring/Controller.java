@@ -1,7 +1,12 @@
 package ru.spbhse.brainring;
 
+import android.database.sqlite.SQLiteDatabase;
+
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 
+import java.util.Random;
+
+import ru.spbhse.brainring.database.QuestionDataBase;
 import ru.spbhse.brainring.logic.OnlineGameAdminLogic;
 import ru.spbhse.brainring.logic.OnlineGameUserLogic;
 import ru.spbhse.brainring.network.Network;
@@ -72,6 +77,10 @@ public class Controller {
     }
 
     public static class UIController {
+        public static void clearEditText() {
+            gameActivity.clearEditText();
+        }
+
         public static void hideKeyboard() {
             gameActivity.hideKeyboard();
         }
@@ -125,9 +134,15 @@ public class Controller {
 
     public static class DatabaseController {
         /** Gets random question from database */
+        private static final Random RAND = new Random();
         public static Question getRandomQuestion() {
-            // TODO : get question from database
-            return new Question("aa", "bb", "00", "gg");
+            QuestionDataBase dataBase = gameActivity.dataBase;
+            if (dataBase == null) {
+                dataBase = new QuestionDataBase(gameActivity);
+            }
+            dataBase.openDataBase();
+            int questionId = RAND.nextInt((int) dataBase.size());
+            return dataBase.getQuestion(questionId);
         }
     }
 
