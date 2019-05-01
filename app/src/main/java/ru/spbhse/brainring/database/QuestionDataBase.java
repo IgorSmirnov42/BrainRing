@@ -101,7 +101,7 @@ public class QuestionDataBase extends SQLiteOpenHelper {
                         replaceAll("Ответ:", "");
             } while (cursor.moveToNext());
         }
-        return new Question(question, answer, "", "");
+        return new Question(question, answer, null, "");
     }
 
     private boolean checkDataBase() {
