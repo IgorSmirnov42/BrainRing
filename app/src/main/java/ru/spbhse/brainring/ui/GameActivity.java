@@ -72,7 +72,7 @@ public class GameActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Controller.UserLogicController.answerIsWritten(answerEditor.getText().toString());
-                hideKeyboard();
+                //hideKeyboard();
             }
         });
 

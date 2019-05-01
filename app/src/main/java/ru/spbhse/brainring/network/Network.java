@@ -153,8 +153,7 @@ public class Network {
         System.out.println("RECEIVED MESSAGE!");
         try (DataInputStream is = new DataInputStream(new ByteArrayInputStream(buf))) {
             int identifier = is.readInt();
-            System.out.println("IDENTIFIER IS");
-            System.out.println(identifier);
+            System.out.println("IDENTIFIER IS" + identifier);
 
             if (Message.messageIsToServer(identifier) && !isServer) {
                 Log.wtf("BrainRing", "Not server got message to server\n");
