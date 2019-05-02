@@ -1,28 +1,72 @@
 package ru.spbhse.brainring;
 
-import android.database.sqlite.SQLiteDatabase;
-
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 
+import java.lang.ref.WeakReference;
 import java.util.Random;
 
 import ru.spbhse.brainring.database.QuestionDataBase;
+import ru.spbhse.brainring.logic.LocalGameAdminLogic;
 import ru.spbhse.brainring.logic.OnlineGameAdminLogic;
 import ru.spbhse.brainring.logic.OnlineGameUserLogic;
 import ru.spbhse.brainring.network.Network;
 import ru.spbhse.brainring.ui.GameActivity;
 import ru.spbhse.brainring.ui.GameActivityLocation;
+import ru.spbhse.brainring.ui.JuryActivity;
+import ru.spbhse.brainring.ui.PlayerActivity;
 import ru.spbhse.brainring.utils.Question;
 
 public class Controller {
 
-    public static GameActivity gameActivity;
+    private static WeakReference<GameActivity> gameActivity;
+    private static WeakReference<JuryActivity> juryActivity;
+    private static WeakReference<PlayerActivity> playerActivity;
 
-    public static void setUI(GameActivity ui) {
-        gameActivity = ui;
+    public static GameActivity getGameActivity() {
+        return gameActivity.get();
     }
 
-    public static class AdminLogicController {
+    public static void setUI(GameActivity ui) {
+        gameActivity = new WeakReference<>(ui);
+    }
+
+    public static void setUI(JuryActivity ui) {
+        juryActivity = new WeakReference<>(ui);
+    }
+
+    public static void setUI(PlayerActivity ui) {
+        playerActivity = new WeakReference<>(ui);
+    }
+
+    public static class LocalAdminLogicController {
+        private static LocalGameAdminLogic adminLogic;
+
+        public static String getGreenScore() {
+            return adminLogic.getGreenScore();
+        }
+
+        public static String getRedScore() {
+            return adminLogic.getRedScore();
+        }
+
+        public static void toNextState() {
+            // TODO
+        }
+
+        public static void onAnswerIsReady(String userId) {
+            // TODO
+        }
+
+        public static void plusPoint(int userNumber) {
+            adminLogic.plusPoint(userNumber);
+        }
+
+        public static void minusPoint(int userNumber) {
+            adminLogic.minusPoint(userNumber);
+        }
+    }
+
+    public static class OnlineAdminLogicController {
         private static OnlineGameAdminLogic adminLogic;
 
         public static void onAnswerIsReady(String userId) {
@@ -76,25 +120,41 @@ public class Controller {
         }
     }
 
-    public static class UIController {
+    public static class LocalNetworkAdminUIController {
+
+    }
+
+    public static class NetworkUIController {
         public static void clearEditText() {
-            gameActivity.clearEditText();
+            gameActivity.get().clearEditText();
         }
 
         public static void hideKeyboard() {
-            gameActivity.hideKeyboard();
+            gameActivity.get().hideKeyboard();
         }
 
         public static void setQuestionText(String question) {
-            gameActivity.setQuestionText(question);
+            gameActivity.get().setQuestionText(question);
         }
 
         public static void setAnswer(String answer) {
-            gameActivity.setAnswer(answer);
+            gameActivity.get().setAnswer(answer);
         }
 
         public static void setLocation(GameActivityLocation location) {
-            gameActivity.setLocation(location);
+            gameActivity.get().setLocation(location);
+        }
+    }
+
+    public static class LocalNetworkController {
+        public static String getGreenParticipantId() {
+            // TODO
+            return null;
+        }
+
+        public static String getRedParticipantId() {
+            // TODO
+            return null;
         }
     }
 
@@ -103,7 +163,7 @@ public class Controller {
         // функция, которую должен вызывать UI при нажатии на кнопку в layout 1
         public static void createOnlineGame() {
             network = new Network();
-            gameActivity.signIn();
+            gameActivity.get().signIn();
         }
 
         public static void loggedIn(GoogleSignInAccount signedInAccount) {
@@ -133,12 +193,12 @@ public class Controller {
     }
 
     public static class DatabaseController {
-        /** Gets random question from database */
         private static final Random RAND = new Random();
+        /** Gets random question from database */
         public static Question getRandomQuestion() {
-            QuestionDataBase dataBase = gameActivity.dataBase;
+            QuestionDataBase dataBase = gameActivity.get().dataBase;
             if (dataBase == null) {
-                dataBase = new QuestionDataBase(gameActivity);
+                dataBase = new QuestionDataBase(gameActivity.get());
             }
             dataBase.openDataBase();
             int questionId = RAND.nextInt((int) dataBase.size());
@@ -148,13 +208,18 @@ public class Controller {
 
     public static void startOnlineGame() {
         System.out.println("НАЧИНАЕМ ИГРУ");
-        AdminLogicController.adminLogic = new OnlineGameAdminLogic();
+        OnlineAdminLogicController.adminLogic = new OnlineGameAdminLogic();
         UserLogicController.userLogic = new OnlineGameUserLogic();
-        AdminLogicController.adminLogic.newQuestion();
+        OnlineAdminLogicController.adminLogic.newQuestion();
     }
 
     public static void finishOnlineGame() {
-        AdminLogicController.adminLogic = null;
+        OnlineAdminLogicController.adminLogic = null;
         UserLogicController.userLogic = null;
+    }
+
+    public static void startLocalGameAsAdmin() {
+        LocalAdminLogicController.adminLogic = new LocalGameAdminLogic();
+
     }
 }

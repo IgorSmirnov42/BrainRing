@@ -22,27 +22,29 @@
 
     <ImageView
         android:id="@+id/greenTeamStatus"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="137dp"
+        android:layout_height="163dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.148"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.854"
-        tools:srcCompat="@tools:sample/avatars" />
+        app:srcCompat="@android:color/holo_green_dark"
+        tools:srcCompat="@color/colorPrimary" />
 
     <ImageView
         android:id="@+id/redTeamStatus"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="126dp"
+        android:layout_height="163dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.46"
         app:layout_constraintStart_toEndOf="@+id/greenTeamStatus"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.854"
-        tools:srcCompat="@tools:sample/avatars" />
+        app:srcCompat="@color/colorAccent"
+        tools:srcCompat="@color/colorAccent" />
 
     <Button
         android:id="@+id/mainButton"
@@ -99,12 +101,15 @@
     <TextView
         android:id="@+id/gameStatusInfo"
         android:layout_width="357dp"
-        android:layout_height="158dp"
+        android:layout_height="155dp"
         android:text="Ожидаем подключения игроков"
         android:textAlignment="center"
         android:textSize="24sp"
-        tools:layout_editor_absoluteX="27dp"
-        tools:layout_editor_absoluteY="155dp" />
+        app:layout_constraintBottom_toTopOf="@+id/greenTeamStatus"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/mainButton"
+        app:layout_constraintVertical_bias="0.142" />
 
     <Button
         android:id="@+id/plusGreenTeamButton"

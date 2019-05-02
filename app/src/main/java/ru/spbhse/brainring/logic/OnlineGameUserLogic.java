@@ -21,31 +21,31 @@ public class OnlineGameUserLogic {
     }
 
     public void onAllowedToAnswer() {
-        Controller.UIController.setLocation(GameActivityLocation.WRITE_ANSWER);
+        Controller.NetworkUIController.setLocation(GameActivityLocation.WRITE_ANSWER);
     }
 
     public void onReceivingQuestion(String question) {
-        Controller.UIController.clearEditText();
+        Controller.NetworkUIController.clearEditText();
         userStatus.onNewQuestion();
         currentQuestion = question;
-        Controller.UIController.setQuestionText(question);
-        Controller.UIController.setLocation(GameActivityLocation.SHOW_QUESTION);
+        Controller.NetworkUIController.setQuestionText(question);
+        Controller.NetworkUIController.setLocation(GameActivityLocation.SHOW_QUESTION);
     }
 
     public void onIncorrectOpponentAnswer(String opponentAnswer) {
         userStatus.opponentAnswer = opponentAnswer;
         // TODO: вывод на экран ответа соперника
-        Controller.UIController.setLocation(GameActivityLocation.SHOW_QUESTION);
+        Controller.NetworkUIController.setLocation(GameActivityLocation.SHOW_QUESTION);
     }
 
     public void onReceivingAnswer(int firstUserScore, int secondUserScore, String correctAnswer) {
         // TODO: вывод на экран счета
-        Controller.UIController.setAnswer(correctAnswer);
-        Controller.UIController.setLocation(GameActivityLocation.SHOW_ANSWER);
+        Controller.NetworkUIController.setAnswer(correctAnswer);
+        Controller.NetworkUIController.setLocation(GameActivityLocation.SHOW_ANSWER);
     }
 
     public void onOpponentIsAnswering() {
-        Controller.UIController.setLocation(GameActivityLocation.OPPONENT_IS_ANSWERING);
+        Controller.NetworkUIController.setLocation(GameActivityLocation.OPPONENT_IS_ANSWERING);
     }
 
     // функция, которую должен вызывать UI при нажатии на кнопку в layout 2a
@@ -81,7 +81,7 @@ public class OnlineGameUserLogic {
             message = null;
             e.printStackTrace();
         }
-        Controller.UIController.setLocation(GameActivityLocation.OPPONENT_IS_ANSWERING);
+        Controller.NetworkUIController.setLocation(GameActivityLocation.OPPONENT_IS_ANSWERING);
         Controller.NetworkController.sendMessageToServer(message);
     }
 }

@@ -24,11 +24,22 @@ public class SelectLocalGameModeActivity extends AppCompatActivity {
             }
         });
 
-        Button playerButton = findViewById(R.id.playerModeButton);
-        playerButton.setOnClickListener(new View.OnClickListener() {
+        Button greenButton = findViewById(R.id.greenPlayerButton);
+        greenButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(SelectLocalGameModeActivity.this, PlayerActivity.class);
+                intent.putExtra("color", "green");
+                startActivity(intent);
+            }
+        });
+
+        Button redButton = findViewById(R.id.redPlayerButton);
+        redButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(SelectLocalGameModeActivity.this, PlayerActivity.class);
+                intent.putExtra("color", "red");
                 startActivity(intent);
             }
         });

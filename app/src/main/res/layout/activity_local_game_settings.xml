@@ -11,6 +11,7 @@
         android:layout_width="265dp"
         android:layout_height="107dp"
         android:text="Режим ведущего"
+        android:textSize="24sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.458"
@@ -19,13 +20,28 @@
         app:layout_constraintVertical_bias="0.237" />
 
     <Button
-        android:id="@+id/playerModeButton"
-        android:layout_width="285dp"
-        android:layout_height="89dp"
-        android:text="Режим игрока"
+        android:id="@+id/greenPlayerButton"
+        android:layout_width="176dp"
+        android:layout_height="138dp"
+        android:text="Зелёный стол"
+        android:textSize="24sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.068"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/juryModeButton"
+        app:layout_constraintVertical_bias="0.494" />
+
+    <Button
+        android:id="@+id/redPlayerButton"
+        android:layout_width="164dp"
+        android:layout_height="133dp"
+        android:text="Красный стол"
+        android:textSize="24sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/greenPlayerButton"
         app:layout_constraintTop_toBottomOf="@+id/juryModeButton" />
+
 </android.support.constraint.ConstraintLayout>

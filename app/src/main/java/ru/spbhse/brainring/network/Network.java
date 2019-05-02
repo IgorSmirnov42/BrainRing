@@ -127,7 +127,7 @@ public class Network {
             }
             String minimalId = Collections.min(room.getParticipantIds());
             serverId = minimalId;
-            Games.getPlayersClient(Controller.gameActivity, googleSignInAccount)
+            Games.getPlayersClient(Controller.getGameActivity(), googleSignInAccount)
                     .getCurrentPlayerId()
                     .addOnSuccessListener(new OnSuccessListener<String>() {
                         @Override
@@ -162,11 +162,11 @@ public class Network {
 
             switch (identifier) {
                 case Message.ANSWER_IS_READY:
-                    Controller.AdminLogicController.onAnswerIsReady(userId);
+                    Controller.OnlineAdminLogicController.onAnswerIsReady(userId);
                     break;
                 case Message.ANSWER_IS_WRITTEN:
                     String answer = Message.readString(is);
-                    Controller.AdminLogicController.onAnswerIsWritten(answer);
+                    Controller.OnlineAdminLogicController.onAnswerIsWritten(answer);
                     break;
                 case Message.FORBIDDEN_TO_ANSWER:
                     Controller.UserLogicController.onForbiddenToAnswer();
@@ -204,7 +204,7 @@ public class Network {
     public void startQuickGame() {
         isServer = false;
         // quick-start a game with 1 randomly selected opponent
-        mRealTimeMultiplayerClient = Games.getRealTimeMultiplayerClient(Controller.gameActivity,
+        mRealTimeMultiplayerClient = Games.getRealTimeMultiplayerClient(Controller.getGameActivity(),
                 googleSignInAccount);
         final int MIN_OPPONENTS = 1, MAX_OPPONENTS = 1;
         Bundle autoMatchCriteria = RoomConfig.createAutoMatchCriteria(MIN_OPPONENTS,
@@ -216,7 +216,7 @@ public class Network {
                 .setAutoMatchCriteria(autoMatchCriteria)
                 .build();
 
-        Games.getRealTimeMultiplayerClient(Controller.gameActivity, googleSignInAccount)
+        Games.getRealTimeMultiplayerClient(Controller.getGameActivity(), googleSignInAccount)
                 .create(mRoomConfig);
     }
 
