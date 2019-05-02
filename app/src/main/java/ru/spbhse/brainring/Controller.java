@@ -161,16 +161,18 @@ public class Controller {
         }
 
         public static void startGameCycle() {
+            LocalAdminLogicController.adminLogic.addUsers(network.getGreenId(),
+                    network.getRedId());
             // TODO
         }
 
-        public static String getGreenParticipantId() {
+        /*public static String getGreenParticipantId() {
             return network.getGreenId();
         }
 
         public static String getRedParticipantId() {
             return network.getRedId();
-        }
+        }*/
     }
 
     public static class LocalNetworkPlayerController {

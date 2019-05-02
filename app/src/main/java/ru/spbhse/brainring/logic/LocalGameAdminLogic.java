@@ -40,6 +40,11 @@ public class LocalGameAdminLogic {
         }
     }
 
+    public void addUsers(String green, String red) {
+        this.green = new UserScore(green);
+        this.red = new UserScore(red);
+    }
+
     public void newQuestion() {
         green.status.onNewQuestion();
         red.status.onNewQuestion();

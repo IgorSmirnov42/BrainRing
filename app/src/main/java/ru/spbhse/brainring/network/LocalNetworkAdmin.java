@@ -122,14 +122,7 @@ public class LocalNetworkAdmin extends LocalNetwork {
         byte[] message = new byte[0];
         mRealTimeMultiplayerClient.sendUnreliableMessageToOthers(message, room.getRoomId());
 
-        synchronized (handshakeBlock) {
-            while (!handshaked) {
-                try {
-                    handshakeBlock.wait();
-                } catch (InterruptedException e) {
-                }
-            }
-        }
+        waitHandshake();
 
         assert redId != null;
         Controller.LocalNetworkAdminController.startGameCycle();
@@ -149,12 +142,12 @@ public class LocalNetworkAdmin extends LocalNetwork {
     }
 
     public String getGreenId() {
-        waitHandshake();
+        //waitHandshake();
         return greenId;
     }
 
     public String getRedId() {
-        waitHandshake();
+        //waitHandshake();
         return redId;
     }
 }
