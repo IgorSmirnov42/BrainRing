@@ -102,7 +102,7 @@ public class LocalNetworkAdmin extends LocalNetwork {
 
     @Override
     public void startQuickGame() {
-        mRealTimeMultiplayerClient = Games.getRealTimeMultiplayerClient(Controller.getGameActivity(),
+        mRealTimeMultiplayerClient = Games.getRealTimeMultiplayerClient(Controller.getJuryActivity(),
                 googleSignInAccount);
         final int MIN_OPPONENTS = 2, MAX_OPPONENTS = 2;
         Bundle autoMatchCriteria = RoomConfig.createAutoMatchCriteria(MIN_OPPONENTS,
@@ -114,7 +114,7 @@ public class LocalNetworkAdmin extends LocalNetwork {
                 .setAutoMatchCriteria(autoMatchCriteria)
                 .build();
 
-        Games.getRealTimeMultiplayerClient(Controller.getGameActivity(), googleSignInAccount)
+        Games.getRealTimeMultiplayerClient(Controller.getJuryActivity(), googleSignInAccount)
                 .create(mRoomConfig);
     }
 

@@ -34,6 +34,7 @@ public class PlayerActivity extends AppCompatActivity {
         textView.setText(color);
 
         Controller.setUI(this);
+
         Button button = findViewById(R.id.buttonPush);
         button.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -33,6 +33,14 @@ public class Controller {
         return gameActivity.get();
     }
 
+    public static JuryActivity getJuryActivity() {
+        return juryActivity.get();
+    }
+
+    public static PlayerActivity getPlayerActivity() {
+        return playerActivity.get();
+    }
+
     public static void setUI(GameActivity ui) {
         gameActivity = new WeakReference<>(ui);
     }
@@ -195,6 +203,7 @@ public class Controller {
         public static void createLocalGame() {
             network = new LocalNetworkAdmin();
             LocalNetworkController.network = network;
+            System.out.println("BEGIN LOGIN");
             juryActivity.get().signIn();
         }
 
