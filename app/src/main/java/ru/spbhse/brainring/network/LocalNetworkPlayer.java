@@ -18,10 +18,19 @@ import java.io.IOException;
 import ru.spbhse.brainring.Controller;
 import ru.spbhse.brainring.network.messages.Message;
 
+/**
+ * Class with methods to interact with network
+ * Used by player in a local network mode
+ */
 public class LocalNetworkPlayer extends LocalNetwork {
     private String serverId;
+    /** Green or red table. Values are written in base class */
     private int myColor;
 
+    /**
+     * Creates new instance of LocalNetworkPlayer.
+     * @param myColor string "red" or "green"
+     */
     public LocalNetworkPlayer(String myColor) {
         super();
 
@@ -64,6 +73,10 @@ public class LocalNetworkPlayer extends LocalNetwork {
         };
     }
 
+    /**
+     * Decodes byte message received by player and calls needed functions in Controller
+     * If it is a first message to player, sends response if green
+     */
     @Override
     protected void onMessageReceived(byte[] buf, String userId) {
         if (!handshaked) {
@@ -102,6 +115,7 @@ public class LocalNetworkPlayer extends LocalNetwork {
         }
     }
 
+    /** Starts quick game with auto matched server and player */
     @Override
     public void startQuickGame() {
         mRealTimeMultiplayerClient = Games.getRealTimeMultiplayerClient(Controller.getPlayerActivity(),
@@ -120,6 +134,10 @@ public class LocalNetworkPlayer extends LocalNetwork {
                 .create(mRoomConfig);
     }
 
+    /**
+     * Sends message to server
+     * If server is not known, does nothing
+     */
     public void sendMessageToServer(byte[] message) {
         if (serverId == null) {
             Log.d("BrainRing", "Sending message before handshake");

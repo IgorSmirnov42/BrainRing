@@ -1,13 +1,13 @@
 package ru.spbhse.brainring.logic;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-
 import ru.spbhse.brainring.Controller;
 import ru.spbhse.brainring.network.messages.Message;
 import ru.spbhse.brainring.ui.LocalGameLocation;
 
+/**
+ * Class realizing admin's logic (counting time, switching locations etc)
+ *      in local network mode
+ */
 public class LocalGameAdminLogic {
     private LocalGameLocation location = LocalGameLocation.GAME_WAITING_START;
     private UserScore green;
@@ -17,10 +17,11 @@ public class LocalGameAdminLogic {
     private static final byte[] FORBID_ANSWER;
 
     static {
-        ALLOW_ANSWER = generateMessage(Message.ALLOWED_TO_ANSWER, "");
-        FORBID_ANSWER = generateMessage(Message.FORBIDDEN_TO_ANSWER, "");
+        ALLOW_ANSWER = Message.generateMessage(Message.ALLOWED_TO_ANSWER, "");
+        FORBID_ANSWER = Message.generateMessage(Message.FORBIDDEN_TO_ANSWER, "");
     }
 
+    /** Called when jury accepts answer */
     public void onAcceptAnswer() {
         getThisUser(answeringUserId).score++;
         answeringUserId = null;
@@ -28,12 +29,17 @@ public class LocalGameAdminLogic {
         Controller.LocalNetworkAdminUIController.setLocation(location);
     }
 
+    /** Called when jury rejects answer */
     public void onRejectAnswer() {
         answeringUserId = null;
         location = LocalGameLocation.COUNTDOWN;
         Controller.LocalNetworkAdminUIController.setLocation(location);
     }
 
+    /**
+     * Called when jury pushes button to switch location
+     * @return true if location was switched
+     */
     public boolean toNextState() {
         // Если игра не началась, кнопки неактивны
         if (location == LocalGameLocation.GAME_WAITING_START) {
@@ -65,14 +71,20 @@ public class LocalGameAdminLogic {
         return false;
     }
 
+    /** Returns UserScore object connected with given user */
     private UserScore getThisUser(String userId) {
         return green.status.participantId.equals(userId) ? green : red;
     }
 
+    /** Returns UserScore object connected with opponent of given user */
     private UserScore getOtherUser(String userId) {
         return green.status.participantId.equals(userId) ? red : green;
     }
 
+    /**
+     * Allows or forbids to answer team that pushed answer button
+     * Determines (no) false starts
+     */
     public void onAnswerIsReady(String userId) {
         UserScore user = getThisUser(userId);
         if (location == LocalGameLocation.READING_QUESTION) {
@@ -91,6 +103,7 @@ public class LocalGameAdminLogic {
         location = LocalGameLocation.ONE_IS_ANSWERING;
     }
 
+    /** Creates UserScore Objects for users */
     public void addUsers(String green, String red) {
         this.green = new UserScore(green);
         this.red = new UserScore(red);
@@ -98,19 +111,23 @@ public class LocalGameAdminLogic {
         Controller.LocalNetworkAdminUIController.setLocation(location);
     }
 
-    public void newQuestion() {
+    /** Clears all information about previous question */
+    private void newQuestion() {
         green.status.onNewQuestion();
         red.status.onNewQuestion();
     }
 
+    /** Returns score of red table if it is initialized and "?" otherwise */
     public String getRedScore() {
         return getScore(red);
     }
 
+    /** Returns score of green table if it is initialized and "?" otherwise */
     public String getGreenScore() {
         return getScore(green);
     }
 
+    /** Returns score or "?" by user */
     private String getScore(UserScore user) {
         if (user == null) {
             return "?";
@@ -118,29 +135,19 @@ public class LocalGameAdminLogic {
         return String.valueOf(user.score);
     }
 
+    /** Determines if jury can change score now and pluses point if possible */
     public void plusPoint(int userNumber) {
+        // TODO
         (userNumber == 1 ? green : red).score++;
     }
 
+    /** Determines if jury can change score now and minuses point if possible */
     public void minusPoint(int userNumber) {
+        // TODO
         (userNumber == 1 ? green : red).score--;
     }
 
-    private static byte[] generateMessage(int code, String message) {
-        byte[] buf;
-        try (ByteArrayOutputStream bout = new ByteArrayOutputStream();
-             DataOutputStream dout = new DataOutputStream(bout)) {
-            dout.writeInt(code);
-            dout.writeChars(message);
-            dout.flush();
-            buf = bout.toByteArray();
-        } catch (IOException e) {
-            e.printStackTrace();
-            buf = null;
-        }
-        return buf;
-    }
-
+    /** Class to store current score and status of user */
     private static class UserScore {
         private int score;
         private UserStatus status;

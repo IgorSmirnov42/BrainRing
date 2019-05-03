@@ -15,10 +15,12 @@ import com.google.android.gms.games.multiplayer.realtime.RoomUpdateCallback;
 
 import java.util.List;
 
+/** Class for interaction with network in local network mode */
 public abstract class LocalNetwork {
     static final int ROLE_ADMIN = 1;
     static final int ROLE_GREEN = 1 << 1;
     static final int ROLE_RED = 1 << 2;
+    /** Flag to determine if handshake was done */
     protected volatile boolean handshaked = false;
     protected RoomConfig mRoomConfig;
     protected Room room;
@@ -89,6 +91,7 @@ public abstract class LocalNetwork {
 
     protected RoomUpdateCallback mRoomUpdateCallback;
 
+    /** Gets message and resubmits it to {@code onMessageReceived} with sender id*/
     public OnRealTimeMessageReceivedListener mOnRealTimeMessageReceivedListener = new OnRealTimeMessageReceivedListener() {
         @Override
         public void onRealTimeMessageReceived(@NonNull RealTimeMessage realTimeMessage) {
@@ -97,17 +100,15 @@ public abstract class LocalNetwork {
         }
     };
 
+    /** Reacts on received message */
     protected abstract void onMessageReceived(byte[] buf, String userId);
 
     //public LocalNetwork() {}
 
     abstract public void startQuickGame();
 
+    /** Sends message to user with given id */
     public void sendMessageToConcreteUser(String userId, byte[] message) {
         mRealTimeMultiplayerClient.sendUnreliableMessage(message, room.getRoomId(), userId);
-    }
-
-    public String getMyParticipantId() {
-        return myParticipantId;
     }
 }
