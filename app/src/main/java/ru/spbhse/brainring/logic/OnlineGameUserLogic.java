@@ -1,29 +1,29 @@
 package ru.spbhse.brainring.logic;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-
 import ru.spbhse.brainring.Controller;
 import ru.spbhse.brainring.network.messages.Message;
 import ru.spbhse.brainring.ui.GameActivityLocation;
 
+/** Realizing user logic in online mode */
 public class OnlineGameUserLogic {
-    public UserStatus userStatus;
-    public String currentQuestion;
+    private UserStatus userStatus;
+    private String currentQuestion;
 
     public OnlineGameUserLogic() {
         userStatus = new UserStatus(Controller.NetworkController.getMyParticipantId());
     }
 
+    /** Reacts on server's forbiddance to answer */
     public void onForbiddenToAnswer() {
         // Возможно сделать тост
     }
 
+    /** Reacts on server's allowance to answer */
     public void onAllowedToAnswer() {
         Controller.NetworkUIController.setLocation(GameActivityLocation.WRITE_ANSWER);
     }
 
+    /** Gets question and prints it on the screen */
     public void onReceivingQuestion(String question) {
         Controller.NetworkUIController.clearEditText();
         userStatus.onNewQuestion();
@@ -32,55 +32,39 @@ public class OnlineGameUserLogic {
         Controller.NetworkUIController.setLocation(GameActivityLocation.SHOW_QUESTION);
     }
 
+    /** Reacts on opponent's incorrect answer */
     public void onIncorrectOpponentAnswer(String opponentAnswer) {
         userStatus.opponentAnswer = opponentAnswer;
         // TODO: вывод на экран ответа соперника
         Controller.NetworkUIController.setLocation(GameActivityLocation.SHOW_QUESTION);
     }
 
+    /** Shows answer and score (no) on the screen */
     public void onReceivingAnswer(int firstUserScore, int secondUserScore, String correctAnswer) {
         // TODO: вывод на экран счета
         Controller.NetworkUIController.setAnswer(correctAnswer);
         Controller.NetworkUIController.setLocation(GameActivityLocation.SHOW_ANSWER);
     }
 
+    /** Reacts on opponent's pushing */
     public void onOpponentIsAnswering() {
         Controller.NetworkUIController.setLocation(GameActivityLocation.OPPONENT_IS_ANSWERING);
     }
 
+    /** Sends request to server trying to answer */
     public void answerButtonPushed() {
         if (userStatus.alreadyAnswered) {
             onForbiddenToAnswer();
             return;
         }
-        byte[] message;
-        try (ByteArrayOutputStream bout = new ByteArrayOutputStream();
-             DataOutputStream dout = new DataOutputStream(bout)) {
-            dout.writeInt(Message.ANSWER_IS_READY);
-            message = bout.toByteArray();
-        } catch (IOException e) {
-            message = null;
-            e.printStackTrace();
-        }
-        System.out.println("SEND ANSWER BUTTON PUSHED");
-        Controller.NetworkController.sendMessageToServer(message);
+        Controller.NetworkController.sendMessageToServer(
+                Message.generateMessage(Message.ANSWER_IS_READY, ""));
     }
 
-    // функция, которую должен вызывать UI при нажатии на кнопку в layout 2b
-    // answer -- введенный текст
+    /** Sends written answer to server */
     public void answerIsWritten(String answer) {
-        byte[] message;
-        try (ByteArrayOutputStream bout = new ByteArrayOutputStream();
-            DataOutputStream dout = new DataOutputStream(bout)) {
-            dout.writeInt(Message.ANSWER_IS_WRITTEN);
-            dout.writeChars(answer);
-            dout.flush();
-            message = bout.toByteArray();
-        } catch (IOException e) {
-            message = null;
-            e.printStackTrace();
-        }
         Controller.NetworkUIController.setLocation(GameActivityLocation.OPPONENT_IS_ANSWERING);
-        Controller.NetworkController.sendMessageToServer(message);
+        Controller.NetworkController.sendMessageToServer(Message.generateMessage(
+                Message.ANSWER_IS_WRITTEN, answer));
     }
 }

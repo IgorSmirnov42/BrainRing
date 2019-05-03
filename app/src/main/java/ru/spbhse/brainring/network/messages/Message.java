@@ -1,6 +1,8 @@
 package ru.spbhse.brainring.network.messages;
 
+import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 
 public class Message {
@@ -42,5 +44,21 @@ public class Message {
             string.append(is.readChar());
         }
         return string.toString();
+    }
+
+    /** Generates byte message by code and body */
+    public static byte[] generateMessage(int code, String message) {
+        byte[] buf;
+        try (ByteArrayOutputStream bout = new ByteArrayOutputStream();
+             DataOutputStream dout = new DataOutputStream(bout)) {
+            dout.writeInt(code);
+            dout.writeChars(message);
+            dout.flush();
+            buf = bout.toByteArray();
+        } catch (IOException e) {
+            e.printStackTrace();
+            buf = null;
+        }
+        return buf;
     }
 }

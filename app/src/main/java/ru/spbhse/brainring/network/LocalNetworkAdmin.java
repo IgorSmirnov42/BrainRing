@@ -19,11 +19,19 @@ import java.io.IOException;
 import ru.spbhse.brainring.Controller;
 import ru.spbhse.brainring.network.messages.Message;
 
+/**
+ * Class with methods to interact with network
+ * Used by admin in a local network mode
+ */
 public class LocalNetworkAdmin extends LocalNetwork {
     private final Object handshakeBlock = new Object();
     private String redId;
     private String greenId;
 
+    /**
+     * Creates new instance. Fills {@code mRoomUpdateCallback} with an instance that
+     *      on connected room starts game
+     */
     public LocalNetworkAdmin() {
         super();
         mRoomUpdateCallback = new RoomUpdateCallback() {
@@ -69,6 +77,10 @@ public class LocalNetworkAdmin extends LocalNetwork {
     }
 
 
+    /**
+     * Decodes byte message received by server and calls needed functions in Controller
+     * If it is a first message to server fills player's ids
+     */
     @Override
     protected void onMessageReceived(byte[] buf, String userId) {
         System.out.println("RECEIVED MESSAGE!");
@@ -100,6 +112,7 @@ public class LocalNetworkAdmin extends LocalNetwork {
         }
     }
 
+    /** Starts quick game with two auto matched players */
     @Override
     public void startQuickGame() {
         mRealTimeMultiplayerClient = Games.getRealTimeMultiplayerClient(Controller.getJuryActivity(),
@@ -118,6 +131,11 @@ public class LocalNetworkAdmin extends LocalNetwork {
                 .create(mRoomConfig);
     }
 
+    /**
+     * Sends empty message to players in order to determine which of them is green/red
+     * Waits while the answer isn't received
+     * After execution starts game cycle
+     */
     private void handshake() {
         byte[] message = new byte[0];
         mRealTimeMultiplayerClient.sendUnreliableMessageToOthers(message, room.getRoomId());
@@ -128,6 +146,7 @@ public class LocalNetworkAdmin extends LocalNetwork {
         Controller.LocalNetworkAdminController.startGameCycle();
     }
 
+    /** Blocking waiter for one's handshake response */
     private void waitHandshake() {
         if (!handshaked) {
             synchronized (handshakeBlock) {

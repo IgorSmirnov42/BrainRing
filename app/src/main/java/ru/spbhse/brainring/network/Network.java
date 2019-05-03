@@ -26,8 +26,8 @@ import java.util.List;
 import ru.spbhse.brainring.Controller;
 import ru.spbhse.brainring.network.messages.Message;
 
+/** Class for working with network in online mode */
 public class Network {
-
     private RoomConfig mRoomConfig;
     private Room room;
     private boolean isServer;
@@ -141,7 +141,7 @@ public class Network {
                     });
         }
     };
-    public OnRealTimeMessageReceivedListener mOnRealTimeMessageReceivedListener = new OnRealTimeMessageReceivedListener() {
+    private OnRealTimeMessageReceivedListener mOnRealTimeMessageReceivedListener = new OnRealTimeMessageReceivedListener() {
         @Override
         public void onRealTimeMessageReceived(@NonNull RealTimeMessage realTimeMessage) {
             byte[] buf = realTimeMessage.getMessageData();
@@ -149,6 +149,7 @@ public class Network {
         }
     };
 
+    /** Reacts on received message */
     private void onMessageReceived(byte[] buf, String userId) {
         System.out.println("RECEIVED MESSAGE!");
         try (DataInputStream is = new DataInputStream(new ByteArrayInputStream(buf))) {
@@ -199,8 +200,9 @@ public class Network {
         }
     }
 
-    public Network() {}
+    //public Network() {}
 
+    /** Starts quick game with 1 auto matched player */
     public void startQuickGame() {
         isServer = false;
         // quick-start a game with 1 randomly selected opponent
@@ -220,11 +222,13 @@ public class Network {
                 .create(mRoomConfig);
     }
 
+    /** Sends message to all users in a room (and to itself) */
     public void sendMessageToAll(byte[] message) {
         mRealTimeMultiplayerClient.sendUnreliableMessageToOthers(message, room.getRoomId());
         onMessageReceived(message, myParticipantId);
     }
 
+    /** Sends message to user with given id */
     public void sendMessageToConcreteUser(String userId, byte[] message) {
         if (userId.equals(myParticipantId)) {
             onMessageReceived(message, myParticipantId);
