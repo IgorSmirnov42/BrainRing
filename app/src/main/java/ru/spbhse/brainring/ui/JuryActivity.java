@@ -40,7 +40,10 @@ public class JuryActivity extends AppCompatActivity {
         mainButton.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                Controller.LocalAdminLogicController.toNextState();
+                if (!Controller.LocalAdminLogicController.toNextState()) {
+                    Toast.makeText(JuryActivity.this, "Невозможно в данный момент переключиться.",
+                            Toast.LENGTH_LONG).show();
+                }
                 return true;
             }
         });
@@ -60,6 +63,11 @@ public class JuryActivity extends AppCompatActivity {
         redrawLocation();
 
         Controller.LocalNetworkAdminController.createLocalGame();
+    }
+
+    public void setLocation(LocalGameLocation location) {
+        currentLocation = location;
+        redrawLocation();
     }
 
     public void redrawLocation() {
@@ -86,9 +94,14 @@ public class JuryActivity extends AppCompatActivity {
         }
         if (currentLocation == LocalGameLocation.ONE_IS_ANSWERING) {
             statusText.setText("Что-то пошло не так. Вы не должны видеть это меню.");
-            mainButton.setText("Остановить таймер");
+            //mainButton.setText("Остановить таймер");
             mainButton.setVisibility(View.GONE);
         }
+    }
+
+    public void onReceivingAnswer() {
+        Intent intent = new Intent(JuryActivity.this, Judging.class);
+        startActivity(intent);
     }
 
     /* I know that this function is out of content here,

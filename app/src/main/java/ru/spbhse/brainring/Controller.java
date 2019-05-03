@@ -1,5 +1,7 @@
 package ru.spbhse.brainring;
 
+import android.util.Log;
+
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 
 import java.lang.ref.WeakReference;
@@ -16,6 +18,7 @@ import ru.spbhse.brainring.network.Network;
 import ru.spbhse.brainring.ui.GameActivity;
 import ru.spbhse.brainring.ui.GameActivityLocation;
 import ru.spbhse.brainring.ui.JuryActivity;
+import ru.spbhse.brainring.ui.LocalGameLocation;
 import ru.spbhse.brainring.ui.PlayerActivity;
 import ru.spbhse.brainring.utils.Question;
 
@@ -52,20 +55,30 @@ public class Controller {
             return adminLogic.getRedScore();
         }
 
-        public static void toNextState() {
-            // TODO
+        public static void onAcceptAnswer() {
+            adminLogic.onAcceptAnswer();
+        }
+
+        public static void onRejectAnswer() {
+            adminLogic.onRejectAnswer();
+        }
+
+        public static boolean toNextState() {
+            return adminLogic.toNextState();
         }
 
         public static void onAnswerIsReady(String userId) {
-            // TODO
+            adminLogic.onAnswerIsReady(userId);
         }
 
         public static void plusPoint(int userNumber) {
             adminLogic.plusPoint(userNumber);
+            LocalNetworkAdminUIController.redraw();
         }
 
         public static void minusPoint(int userNumber) {
             adminLogic.minusPoint(userNumber);
+            LocalNetworkAdminUIController.redraw();
         }
     }
 
@@ -81,7 +94,7 @@ public class Controller {
         }
     }
 
-    public static class UserLogicController {
+    public static class OnlineUserLogicController {
         private static OnlineGameUserLogic userLogic;
 
         public static void onForbiddenToAnswer() {
@@ -124,8 +137,12 @@ public class Controller {
     }
 
     public static class LocalNetworkAdminUIController {
-        public void redraw() {
+        public static void redraw() {
             juryActivity.get().redrawLocation();
+        }
+
+        public static void setLocation(LocalGameLocation location) {
+            juryActivity.get().setLocation(location);
         }
     }
 
@@ -163,7 +180,9 @@ public class Controller {
         public static void startGameCycle() {
             LocalAdminLogicController.adminLogic.addUsers(network.getGreenId(),
                     network.getRedId());
-            // TODO
+            if (!LocalAdminLogicController.toNextState()) {
+                Log.wtf("BrainRing", "Cannot start new game");
+            }
         }
 
         /*public static String getGreenParticipantId() {
@@ -188,6 +207,10 @@ public class Controller {
         public static void loggedIn(GoogleSignInAccount signedInAccount) {
             network.googleSignInAccount = signedInAccount;
             network.startQuickGame();
+        }
+
+        public static void sendMessageToConcreteUser(String userId, byte[] message) {
+            network.sendMessageToConcreteUser(userId, message);
         }
     }
 
@@ -242,13 +265,13 @@ public class Controller {
     public static void startOnlineGame() {
         System.out.println("НАЧИНАЕМ ИГРУ");
         OnlineAdminLogicController.adminLogic = new OnlineGameAdminLogic();
-        UserLogicController.userLogic = new OnlineGameUserLogic();
+        OnlineUserLogicController.userLogic = new OnlineGameUserLogic();
         OnlineAdminLogicController.adminLogic.newQuestion();
     }
 
     public static void finishOnlineGame() {
         OnlineAdminLogicController.adminLogic = null;
-        UserLogicController.userLogic = null;
+        OnlineUserLogicController.userLogic = null;
         NetworkController.network = null;
     }
 

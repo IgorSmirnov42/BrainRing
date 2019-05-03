@@ -87,10 +87,10 @@ public class LocalNetworkPlayer extends LocalNetwork {
 
             switch (identifier) {
                 case Message.FORBIDDEN_TO_ANSWER:
-                    Controller.UserLogicController.onForbiddenToAnswer();
+                    //Controller.UserLogicController.onForbiddenToAnswer();
                     break;
                 case Message.ALLOWED_TO_ANSWER:
-                    Controller.UserLogicController.onAllowedToAnswer();
+                    //Controller.UserLogicController.onAllowedToAnswer();
                     break;
                 default:
                     Log.wtf("BrainRing", "Unexpected message received");

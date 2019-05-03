@@ -64,14 +64,14 @@ public class GameActivity extends AppCompatActivity {
         answerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Controller.UserLogicController.answerButtonPushed();
+                Controller.OnlineUserLogicController.answerButtonPushed();
             }
         });
 
         answerWrittenButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Controller.UserLogicController.answerIsWritten(answerEditor.getText().toString());
+                Controller.OnlineUserLogicController.answerIsWritten(answerEditor.getText().toString());
                 //hideKeyboard();
             }
         });

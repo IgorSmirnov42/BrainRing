@@ -90,7 +90,7 @@ public class LocalNetworkAdmin extends LocalNetwork {
             System.out.println("IDENTIFIER IS" + identifier);
 
             if (identifier == Message.ANSWER_IS_READY) {
-                Controller.OnlineAdminLogicController.onAnswerIsReady(userId);
+                Controller.LocalAdminLogicController.onAnswerIsReady(userId);
             } else {
                 Log.wtf("BrainRing", "Unexpected message received");
             }
