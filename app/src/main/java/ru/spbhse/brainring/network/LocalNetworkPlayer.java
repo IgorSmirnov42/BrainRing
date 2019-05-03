@@ -104,7 +104,6 @@ public class LocalNetworkPlayer extends LocalNetwork {
 
     @Override
     public void startQuickGame() {
-        // quick-start a game with 1 randomly selected opponent
         mRealTimeMultiplayerClient = Games.getRealTimeMultiplayerClient(Controller.getGameActivity(),
                 googleSignInAccount);
         final int MIN_OPPONENTS = 2, MAX_OPPONENTS = 2;

@@ -7,7 +7,7 @@ import java.io.IOException;
 import ru.spbhse.brainring.Controller;
 import ru.spbhse.brainring.network.messages.Message;
 
-public class LocalGameUserLogic {
+public class LocalGamePlayerLogic {
 
     private static byte[] PUSHED_BUTTON;
 

@@ -7,7 +7,7 @@
     tools:context=".ui.PlayerActivity">
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/tableColor"
         android:layout_width="204dp"
         android:layout_height="97dp"
         android:text="Зелёный стол"
@@ -29,6 +29,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView"
+        app:layout_constraintTop_toBottomOf="@+id/tableColor"
         app:layout_constraintVertical_bias="0.206" />
 </android.support.constraint.ConstraintLayout>

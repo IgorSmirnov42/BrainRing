@@ -9,7 +9,7 @@ import java.util.Random;
 
 import ru.spbhse.brainring.database.QuestionDataBase;
 import ru.spbhse.brainring.logic.LocalGameAdminLogic;
-import ru.spbhse.brainring.logic.LocalGameUserLogic;
+import ru.spbhse.brainring.logic.LocalGamePlayerLogic;
 import ru.spbhse.brainring.logic.OnlineGameAdminLogic;
 import ru.spbhse.brainring.logic.OnlineGameUserLogic;
 import ru.spbhse.brainring.network.LocalNetwork;
@@ -96,7 +96,7 @@ public class Controller {
     }
 
     public static class LocalUserLogicController {
-        private static LocalGameUserLogic userLogic = new LocalGameUserLogic(); //
+        private static LocalGamePlayerLogic userLogic = new LocalGamePlayerLogic(); //
 
         public static void onForbiddenToAnswer() {
             userLogic.onForbiddenToAnswer();
