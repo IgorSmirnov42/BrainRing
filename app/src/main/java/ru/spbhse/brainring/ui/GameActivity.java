@@ -64,14 +64,14 @@ public class GameActivity extends AppCompatActivity {
         answerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Controller.UserLogicController.answerButtonPushed();
+                Controller.OnlineUserLogicController.answerButtonPushed();
             }
         });
 
         answerWrittenButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Controller.UserLogicController.answerIsWritten(answerEditor.getText().toString());
+                Controller.OnlineUserLogicController.answerIsWritten(answerEditor.getText().toString());
                 //hideKeyboard();
             }
         });
@@ -137,19 +137,21 @@ public class GameActivity extends AppCompatActivity {
         drawLocation();
     }
 
-    public void signIn() {
-        GoogleSignInClient signInClient = GoogleSignIn.getClient(this,
-                GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN);
-        Intent intent = signInClient.getSignInIntent();
-        startActivityForResult(intent, RC_SIGN_IN);
-    }
-
     public void hideKeyboard() {
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
     }
 
     public void clearEditText() {
         answerEditor.setText("");
+    }
+
+    /* I know that this function is out of content here,
+       but it is linked with onActivityResult that can be placed only here */
+    public void signIn() {
+        GoogleSignInClient signInClient = GoogleSignIn.getClient(this,
+                GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN);
+        Intent intent = signInClient.getSignInIntent();
+        startActivityForResult(intent, RC_SIGN_IN);
     }
 
     @Override

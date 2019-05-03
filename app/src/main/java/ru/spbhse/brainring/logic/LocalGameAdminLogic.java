@@ -4,9 +4,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
+import ru.spbhse.brainring.Controller;
 import ru.spbhse.brainring.network.messages.Message;
+import ru.spbhse.brainring.ui.LocalGameLocation;
 
 public class LocalGameAdminLogic {
+    private LocalGameLocation location = LocalGameLocation.GAME_WAITING_START;
     private UserScore green;
     private UserScore red;
     private String answeringUserId;
@@ -17,7 +20,50 @@ public class LocalGameAdminLogic {
         ALLOW_ANSWER = generateMessage(Message.ALLOWED_TO_ANSWER, "");
         FORBID_ANSWER = generateMessage(Message.FORBIDDEN_TO_ANSWER, "");
     }
-    
+
+    public void onAcceptAnswer() {
+        getThisUser(answeringUserId).score++;
+        answeringUserId = null;
+        location = LocalGameLocation.NOT_STARTED;
+        Controller.LocalNetworkAdminUIController.setLocation(location);
+    }
+
+    public void onRejectAnswer() {
+        answeringUserId = null;
+        location = LocalGameLocation.COUNTDOWN;
+        Controller.LocalNetworkAdminUIController.setLocation(location);
+    }
+
+    public boolean toNextState() {
+        // Если игра не началась, кнопки неактивны
+        if (location == LocalGameLocation.GAME_WAITING_START) {
+            return false;
+        }
+        // Во время принятия ответа нельзя переключиться
+        if (location == LocalGameLocation.ONE_IS_ANSWERING) {
+            return false;
+        }
+        // Переключение на чтение вопроса
+        if (location == LocalGameLocation.NOT_STARTED) {
+            newQuestion();
+            location = LocalGameLocation.READING_QUESTION;
+            Controller.LocalNetworkAdminUIController.setLocation(location);
+            return true;
+        }
+        // Переклчение на таймер
+        if (location == LocalGameLocation.READING_QUESTION) {
+            location = LocalGameLocation.COUNTDOWN;
+            Controller.LocalNetworkAdminUIController.setLocation(location);
+            return true;
+        }
+        // Начало нового раунда
+        if (location == LocalGameLocation.COUNTDOWN) {
+            location = LocalGameLocation.NOT_STARTED;
+            Controller.LocalNetworkAdminUIController.setLocation(location);
+            return true;
+        }
+        return false;
+    }
 
     private UserScore getThisUser(String userId) {
         return green.status.participantId.equals(userId) ? green : red;
@@ -28,16 +74,28 @@ public class LocalGameAdminLogic {
     }
 
     public void onAnswerIsReady(String userId) {
-        answeringUserId = userId;
         UserScore user = getThisUser(userId);
-        if (user.status.alreadyAnswered) {
-            //Controller.NetworkController.sendMessageToConcreteUser(userId, FORBID_ANSWER);
+        if (location == LocalGameLocation.READING_QUESTION) {
+            user.status.alreadyAnswered = true;
+        }
+        if (user.status.alreadyAnswered || location != LocalGameLocation.COUNTDOWN) {
+            Controller.LocalNetworkController.sendMessageToConcreteUser(userId, FORBID_ANSWER);
         } else {
             user.status.alreadyAnswered = true;
-            //Controller.NetworkController.sendMessageToConcreteUser(userId, ALLOW_ANSWER);
+            answeringUserId = userId;
+            Controller.LocalNetworkController.sendMessageToConcreteUser(userId, ALLOW_ANSWER);
             //Controller.NetworkController.sendMessageToConcreteUser(
             //        getOtherUser(userId).status.participantId, OPPONENT_ANSWERING);
         }
+        Controller.LocalNetworkAdminUIController.onReceivingAnswer();
+        location = LocalGameLocation.ONE_IS_ANSWERING;
+    }
+
+    public void addUsers(String green, String red) {
+        this.green = new UserScore(green);
+        this.red = new UserScore(red);
+        location = LocalGameLocation.NOT_STARTED;
+        Controller.LocalNetworkAdminUIController.setLocation(location);
     }
 
     public void newQuestion() {

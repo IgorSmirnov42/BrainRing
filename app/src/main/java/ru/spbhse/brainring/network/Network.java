@@ -169,27 +169,27 @@ public class Network {
                     Controller.OnlineAdminLogicController.onAnswerIsWritten(answer);
                     break;
                 case Message.FORBIDDEN_TO_ANSWER:
-                    Controller.UserLogicController.onForbiddenToAnswer();
+                    Controller.OnlineUserLogicController.onForbiddenToAnswer();
                     break;
                 case Message.ALLOWED_TO_ANSWER:
-                    Controller.UserLogicController.onAllowedToAnswer();
+                    Controller.OnlineUserLogicController.onAllowedToAnswer();
                     break;
                 case Message.SENDING_QUESTION:
                     String question = Message.readString(is);
-                    Controller.UserLogicController.onReceivingQuestion(question);
+                    Controller.OnlineUserLogicController.onReceivingQuestion(question);
                     break;
                 case Message.SENDING_INCORRECT_OPPONENT_ANSWER:
                     String opponentAnswer = Message.readString(is);
-                    Controller.UserLogicController.onIncorrectOpponentAnswer(opponentAnswer);
+                    Controller.OnlineUserLogicController.onIncorrectOpponentAnswer(opponentAnswer);
                     break;
                 case Message.SENDING_CORRECT_ANSWER_AND_SCORE:
                     int firstUserScore = is.readInt();
                     int secondUserScore = is.readInt();
                     String correctAnswer = Message.readString(is);
-                    Controller.UserLogicController.onReceivingAnswer(firstUserScore, secondUserScore, correctAnswer);
+                    Controller.OnlineUserLogicController.onReceivingAnswer(firstUserScore, secondUserScore, correctAnswer);
                     break;
                 case Message.OPPONENT_IS_ANSWERING:
-                    Controller.UserLogicController.onOpponentIsAnswering();
+                    Controller.OnlineUserLogicController.onOpponentIsAnswering();
                     break;
             }
 

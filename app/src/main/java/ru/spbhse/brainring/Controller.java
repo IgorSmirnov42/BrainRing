@@ -1,5 +1,7 @@
 package ru.spbhse.brainring;
 
+import android.util.Log;
+
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 
 import java.lang.ref.WeakReference;
@@ -7,12 +9,17 @@ import java.util.Random;
 
 import ru.spbhse.brainring.database.QuestionDataBase;
 import ru.spbhse.brainring.logic.LocalGameAdminLogic;
+import ru.spbhse.brainring.logic.LocalGamePlayerLogic;
 import ru.spbhse.brainring.logic.OnlineGameAdminLogic;
 import ru.spbhse.brainring.logic.OnlineGameUserLogic;
+import ru.spbhse.brainring.network.LocalNetwork;
+import ru.spbhse.brainring.network.LocalNetworkAdmin;
+import ru.spbhse.brainring.network.LocalNetworkPlayer;
 import ru.spbhse.brainring.network.Network;
 import ru.spbhse.brainring.ui.GameActivity;
 import ru.spbhse.brainring.ui.GameActivityLocation;
 import ru.spbhse.brainring.ui.JuryActivity;
+import ru.spbhse.brainring.ui.LocalGameLocation;
 import ru.spbhse.brainring.ui.PlayerActivity;
 import ru.spbhse.brainring.utils.Question;
 
@@ -24,6 +31,14 @@ public class Controller {
 
     public static GameActivity getGameActivity() {
         return gameActivity.get();
+    }
+
+    public static JuryActivity getJuryActivity() {
+        return juryActivity.get();
+    }
+
+    public static PlayerActivity getPlayerActivity() {
+        return playerActivity.get();
     }
 
     public static void setUI(GameActivity ui) {
@@ -49,20 +64,30 @@ public class Controller {
             return adminLogic.getRedScore();
         }
 
-        public static void toNextState() {
-            // TODO
+        public static void onAcceptAnswer() {
+            adminLogic.onAcceptAnswer();
+        }
+
+        public static void onRejectAnswer() {
+            adminLogic.onRejectAnswer();
+        }
+
+        public static boolean toNextState() {
+            return adminLogic.toNextState();
         }
 
         public static void onAnswerIsReady(String userId) {
-            // TODO
+            adminLogic.onAnswerIsReady(userId);
         }
 
         public static void plusPoint(int userNumber) {
             adminLogic.plusPoint(userNumber);
+            LocalNetworkAdminUIController.redraw();
         }
 
         public static void minusPoint(int userNumber) {
             adminLogic.minusPoint(userNumber);
+            LocalNetworkAdminUIController.redraw();
         }
     }
 
@@ -78,7 +103,23 @@ public class Controller {
         }
     }
 
-    public static class UserLogicController {
+    public static class LocalUserLogicController {
+        private static LocalGamePlayerLogic userLogic = new LocalGamePlayerLogic(); //
+
+        public static void onForbiddenToAnswer() {
+            userLogic.onForbiddenToAnswer();
+        }
+
+        public static void onAllowedToAnswer() {
+            userLogic.onAllowedToAnswer();
+        }
+
+        public static void answerButtonPushed() {
+            userLogic.answerButtonPushed();
+        }
+    }
+
+    public static class OnlineUserLogicController {
         private static OnlineGameUserLogic userLogic;
 
         public static void onForbiddenToAnswer() {
@@ -121,7 +162,17 @@ public class Controller {
     }
 
     public static class LocalNetworkAdminUIController {
+        public static void redraw() {
+            juryActivity.get().redrawLocation();
+        }
 
+        public static void setLocation(LocalGameLocation location) {
+            juryActivity.get().setLocation(location);
+        }
+
+        public static void onReceivingAnswer() {
+            juryActivity.get().onReceivingAnswer();
+        }
     }
 
     public static class NetworkUIController {
@@ -146,15 +197,57 @@ public class Controller {
         }
     }
 
-    public static class LocalNetworkController {
-        public static String getGreenParticipantId() {
-            // TODO
-            return null;
+    public static class LocalNetworkAdminController {
+        private static LocalNetworkAdmin network;
+
+        public static void createLocalGame() {
+            network = new LocalNetworkAdmin();
+            LocalNetworkController.network = network;
+            System.out.println("BEGIN LOGIN");
+            juryActivity.get().signIn();
+        }
+
+        public static void startGameCycle() {
+            LocalAdminLogicController.adminLogic.addUsers(network.getGreenId(),
+                    network.getRedId());
+            if (!LocalAdminLogicController.toNextState()) {
+                Log.wtf("BrainRing", "Cannot start new game");
+            }
+        }
+
+        /*public static String getGreenParticipantId() {
+            return network.getGreenId();
         }
 
         public static String getRedParticipantId() {
-            // TODO
-            return null;
+            return network.getRedId();
+        }*/
+    }
+
+    public static class LocalNetworkPlayerController {
+        private static LocalNetworkPlayer network;
+
+        public static void createLocalGame(String color) {
+            network = new LocalNetworkPlayer(color);
+            LocalNetworkController.network = network;
+            playerActivity.get().signIn();
+        }
+
+        public static void sendMessageToServer(byte[] message) {
+            network.sendMessageToServer(message);
+        }
+    }
+
+    public static class LocalNetworkController {
+        private static LocalNetwork network;
+
+        public static void loggedIn(GoogleSignInAccount signedInAccount) {
+            network.googleSignInAccount = signedInAccount;
+            network.startQuickGame();
+        }
+
+        public static void sendMessageToConcreteUser(String userId, byte[] message) {
+            network.sendMessageToConcreteUser(userId, message);
         }
     }
 
@@ -209,17 +302,21 @@ public class Controller {
     public static void startOnlineGame() {
         System.out.println("НАЧИНАЕМ ИГРУ");
         OnlineAdminLogicController.adminLogic = new OnlineGameAdminLogic();
-        UserLogicController.userLogic = new OnlineGameUserLogic();
+        OnlineUserLogicController.userLogic = new OnlineGameUserLogic();
         OnlineAdminLogicController.adminLogic.newQuestion();
     }
 
     public static void finishOnlineGame() {
         OnlineAdminLogicController.adminLogic = null;
-        UserLogicController.userLogic = null;
+        OnlineUserLogicController.userLogic = null;
+        NetworkController.network = null;
     }
 
-    public static void startLocalGameAsAdmin() {
+    public static void initializeLocalGame() {
         LocalAdminLogicController.adminLogic = new LocalGameAdminLogic();
+    }
 
+    public static void finishLocalGameAsAdmin() {
+        LocalAdminLogicController.adminLogic = null;
     }
 }
