@@ -9,6 +9,7 @@ import java.util.Random;
 
 import ru.spbhse.brainring.database.QuestionDataBase;
 import ru.spbhse.brainring.logic.LocalGameAdminLogic;
+import ru.spbhse.brainring.logic.LocalGameUserLogic;
 import ru.spbhse.brainring.logic.OnlineGameAdminLogic;
 import ru.spbhse.brainring.logic.OnlineGameUserLogic;
 import ru.spbhse.brainring.network.LocalNetwork;
@@ -94,6 +95,22 @@ public class Controller {
         }
     }
 
+    public static class LocalUserLogicController {
+        private static LocalGameUserLogic userLogic = new LocalGameUserLogic(); //
+
+        public static void onForbiddenToAnswer() {
+            userLogic.onForbiddenToAnswer();
+        }
+
+        public static void onAllowedToAnswer() {
+            userLogic.onAllowedToAnswer();
+        }
+
+        public static void answerButtonPushed() {
+            userLogic.answerButtonPushed();
+        }
+    }
+
     public static class OnlineUserLogicController {
         private static OnlineGameUserLogic userLogic;
 
@@ -143,6 +160,10 @@ public class Controller {
 
         public static void setLocation(LocalGameLocation location) {
             juryActivity.get().setLocation(location);
+        }
+
+        public static void onReceivingAnswer() {
+            juryActivity.get().onReceivingAnswer();
         }
     }
 
@@ -195,9 +216,16 @@ public class Controller {
     }
 
     public static class LocalNetworkPlayerController {
+        private static LocalNetworkPlayer network;
+
         public static void createLocalGame(String color) {
-            LocalNetworkController.network = new LocalNetworkPlayer(color);
+            network = new LocalNetworkPlayer(color);
+            LocalNetworkController.network = network;
             playerActivity.get().signIn();
+        }
+
+        public static void sendMessageToServer(byte[] message) {
+            network.sendMessageToServer(message);
         }
     }
 

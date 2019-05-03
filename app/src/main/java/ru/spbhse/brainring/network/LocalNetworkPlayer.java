@@ -122,6 +122,10 @@ public class LocalNetworkPlayer extends LocalNetwork {
     }
 
     public void sendMessageToServer(byte[] message) {
-        sendMessageToConcreteUser(serverId, message);
+        if (serverId == null) {
+            Log.d("BrainRing", "Sending message before handshake");
+        } else {
+            sendMessageToConcreteUser(serverId, message);
+        }
     }
 }

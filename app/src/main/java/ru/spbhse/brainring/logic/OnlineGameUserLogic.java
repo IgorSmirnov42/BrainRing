@@ -48,7 +48,6 @@ public class OnlineGameUserLogic {
         Controller.NetworkUIController.setLocation(GameActivityLocation.OPPONENT_IS_ANSWERING);
     }
 
-    // функция, которую должен вызывать UI при нажатии на кнопку в layout 2a
     public void answerButtonPushed() {
         if (userStatus.alreadyAnswered) {
             onForbiddenToAnswer();

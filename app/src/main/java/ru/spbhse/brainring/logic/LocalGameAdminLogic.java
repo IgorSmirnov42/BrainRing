@@ -23,11 +23,15 @@ public class LocalGameAdminLogic {
 
     public void onAcceptAnswer() {
         getThisUser(answeringUserId).score++;
-        // TODO
+        answeringUserId = null;
+        location = LocalGameLocation.NOT_STARTED;
+        Controller.LocalNetworkAdminUIController.setLocation(location);
     }
 
     public void onRejectAnswer() {
-        // TODO
+        answeringUserId = null;
+        location = LocalGameLocation.COUNTDOWN;
+        Controller.LocalNetworkAdminUIController.setLocation(location);
     }
 
     public boolean toNextState() {
@@ -41,6 +45,7 @@ public class LocalGameAdminLogic {
         }
         // Переключение на чтение вопроса
         if (location == LocalGameLocation.NOT_STARTED) {
+            newQuestion();
             location = LocalGameLocation.READING_QUESTION;
             Controller.LocalNetworkAdminUIController.setLocation(location);
             return true;
@@ -69,20 +74,21 @@ public class LocalGameAdminLogic {
     }
 
     public void onAnswerIsReady(String userId) {
-        if (location != LocalGameLocation.COUNTDOWN) {
-            return;
-        }
-        answeringUserId = userId;
         UserScore user = getThisUser(userId);
-        if (user.status.alreadyAnswered) {
+        if (location == LocalGameLocation.READING_QUESTION) {
+            user.status.alreadyAnswered = true;
+        }
+        if (user.status.alreadyAnswered || location != LocalGameLocation.COUNTDOWN) {
             Controller.LocalNetworkController.sendMessageToConcreteUser(userId, FORBID_ANSWER);
         } else {
             user.status.alreadyAnswered = true;
+            answeringUserId = userId;
             Controller.LocalNetworkController.sendMessageToConcreteUser(userId, ALLOW_ANSWER);
             //Controller.NetworkController.sendMessageToConcreteUser(
             //        getOtherUser(userId).status.participantId, OPPONENT_ANSWERING);
         }
-        // TODO
+        Controller.LocalNetworkAdminUIController.onReceivingAnswer();
+        location = LocalGameLocation.ONE_IS_ANSWERING;
     }
 
     public void addUsers(String green, String red) {

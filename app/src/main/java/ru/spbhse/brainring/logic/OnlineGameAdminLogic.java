@@ -39,11 +39,12 @@ public class OnlineGameAdminLogic {
     }
 
     public void onAnswerIsReady(String userId) {
-        answeringUserId = userId;
+        // TODO : проверить, что никто не отвечает
         UserScore user = getThisUser(userId);
-        if (user.status.alreadyAnswered) {
+        if (user.status.alreadyAnswered || answeringUserId != null) {
             Controller.NetworkController.sendMessageToConcreteUser(userId, FORBID_ANSWER);
         } else {
+            answeringUserId = userId;
             user.status.alreadyAnswered = true;
             Controller.NetworkController.sendMessageToConcreteUser(userId, ALLOW_ANSWER);
             Controller.NetworkController.sendMessageToConcreteUser(
