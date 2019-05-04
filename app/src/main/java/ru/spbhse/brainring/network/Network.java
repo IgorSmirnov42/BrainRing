@@ -64,6 +64,7 @@ public class Network {
         @Override
         public void onPeerLeft(@Nullable Room room, @NonNull List<String> list) {
             Log.d("BrainRing", "onPeerLeft");
+            leaveRoom();
         }
 
         @Override
@@ -74,6 +75,7 @@ public class Network {
         @Override
         public void onDisconnectedFromRoom(@Nullable Room room) {
             Log.d("BrainRing", "onDisconnectedFromRoom");
+            leaveRoom();
         }
 
         @Override
@@ -84,6 +86,7 @@ public class Network {
         @Override
         public void onPeersDisconnected(@Nullable Room room, @NonNull List<String> list) {
             Log.d("BrainRing", "onPeersDisconnected");
+            leaveRoom();
         }
 
         @Override
@@ -93,7 +96,8 @@ public class Network {
 
         @Override
         public void onP2PDisconnected(@NonNull String s) {
-            Log.d("BrainRing", "onP2PDisconnected");
+            Log.d("BrainRing", "onP2PDisconnected " + s);
+            leaveRoom();
         }
     };
     private RoomUpdateCallback mRoomUpdateCallback = new RoomUpdateCallback() {
@@ -110,6 +114,7 @@ public class Network {
         @Override
         public void onLeftRoom(int i, @NonNull String s) {
             Log.d("BrainRing", "Left room");
+            Controller.finishOnlineGame();
         }
 
         @Override
@@ -149,6 +154,14 @@ public class Network {
         }
     };
 
+    public void leaveRoom() {
+        if (room != null) {
+            Games.getRealTimeMultiplayerClient(Controller.getGameActivity(),
+                    googleSignInAccount).leave(mRoomConfig, room.getRoomId());
+        }
+        //Controller.finishOnlineGame();
+    }
+
     /** Reacts on received message */
     private void onMessageReceived(byte[] buf, String userId) {
         System.out.println("RECEIVED MESSAGE!");
@@ -167,7 +180,7 @@ public class Network {
                     break;
                 case Message.ANSWER_IS_WRITTEN:
                     String answer = Message.readString(is);
-                    Controller.OnlineAdminLogicController.onAnswerIsWritten(answer);
+                    Controller.OnlineAdminLogicController.onAnswerIsWritten(answer, userId);
                     break;
                 case Message.FORBIDDEN_TO_ANSWER:
                     Controller.OnlineUserLogicController.onForbiddenToAnswer();
