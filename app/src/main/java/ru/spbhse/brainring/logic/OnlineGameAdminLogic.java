@@ -43,11 +43,11 @@ public class OnlineGameAdminLogic {
             showAnswer();
         }
     };
-    private final CountDownTimer secondGameTimer = new CountDownTimer(FIRST_COUNTDOWN * SECOND,
+    private final CountDownTimer secondGameTimer = new CountDownTimer(SECOND_COUNTDOWN * SECOND,
             SECOND) {
         @Override
         public void onTick(long millisUntilFinished) {
-            Log.d("BrainRing", "Tick first timer");
+            Log.d("BrainRing", "Tick second timer");
             if (millisUntilFinished <= SENDING_COUNTDOWN * SECOND) {
                 // отправить игрокам время
             }
@@ -55,7 +55,7 @@ public class OnlineGameAdminLogic {
 
         @Override
         public void onFinish() {
-            Log.d("BrainRing", "Finish first timer");
+            Log.d("BrainRing", "Finish second timer");
             showAnswer();
         }
     };
@@ -147,6 +147,13 @@ public class OnlineGameAdminLogic {
                 Message.generateMessage(Message.SENDING_QUESTION, currentQuestion.getQuestion()));
         timer = firstGameTimer;
         timer.start();
+    }
+
+    public void finishGame() {
+        if (timer != null) {
+            timer.cancel();
+        }
+        timer = null;
     }
 
     private byte[] generateAnswer() {

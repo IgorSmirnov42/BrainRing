@@ -337,6 +337,9 @@ public class Controller {
     }
 
     public static void finishOnlineGame() {
+        if (OnlineAdminLogicController.adminLogic != null) {
+            OnlineAdminLogicController.adminLogic.finishGame();
+        }
         OnlineAdminLogicController.adminLogic = null;
         OnlineUserLogicController.userLogic = null;
         NetworkController.network = null;
