@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -164,11 +165,18 @@ public class GameActivity extends AppCompatActivity {
             } else {
                 String message = result.getStatus().getStatusMessage();
                 if (message == null || message.isEmpty()) {
-                    message = "Неизвестная ошибка. Убедитесь, что у Вас установлены Google Play игры и выполнен вход в аккаунт.";
+                    message = "Ошибка входа в аккаунт Google Play Games";
                 }
                 new AlertDialog.Builder(this).setMessage(message)
-                        .setNeutralButton(android.R.string.ok, null).show();
+                        .setNeutralButton(android.R.string.ok, (dialog, which) -> finish()).show();
             }
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        Log.d("BrainRing", "Destroying activity. Leaving room");
+        super.onDestroy();
+        Controller.NetworkController.leaveRoom();
     }
 }

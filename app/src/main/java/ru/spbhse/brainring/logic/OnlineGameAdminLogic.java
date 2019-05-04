@@ -1,6 +1,8 @@
 package ru.spbhse.brainring.logic;
 
+import android.os.CountDownTimer;
 import android.os.Handler;
+import android.util.Log;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
@@ -16,15 +18,48 @@ public class OnlineGameAdminLogic {
     private UserScore user2;
     private Question currentQuestion;
     private String answeringUserId;
-    private static final byte[] ALLOW_ANSWER;
-    private static final byte[] FORBID_ANSWER;
-    private static final byte[] OPPONENT_ANSWERING;
+    private static final byte[] ALLOW_ANSWER = Message.generateMessage(Message.ALLOWED_TO_ANSWER, "");
+    private static final byte[] FORBID_ANSWER = Message.generateMessage(Message.FORBIDDEN_TO_ANSWER, "");
+    private static final byte[] OPPONENT_ANSWERING = Message.generateMessage(Message.OPPONENT_IS_ANSWERING, "");
 
-    static {
-        ALLOW_ANSWER = Message.generateMessage(Message.ALLOWED_TO_ANSWER, "");
-        FORBID_ANSWER = Message.generateMessage(Message.FORBIDDEN_TO_ANSWER, "");
-        OPPONENT_ANSWERING = Message.generateMessage(Message.OPPONENT_IS_ANSWERING, "");
-    }
+    private static final int WINNER_SCORE = 5;
+    private static final int FIRST_COUNTDOWN = 20;
+    private static final int SECOND_COUNTDOWN = 20;
+    private static final int SENDING_COUNTDOWN = 5;
+    private static final int SECOND = 1000;
+    private final CountDownTimer firstGameTimer = new CountDownTimer(FIRST_COUNTDOWN * SECOND,
+            SECOND) {
+        @Override
+        public void onTick(long millisUntilFinished) {
+            Log.d("BrainRing", "Tick first timer");
+            if (millisUntilFinished <= SENDING_COUNTDOWN * SECOND) {
+                // отправить игрокам время
+            }
+        }
+
+        @Override
+        public void onFinish() {
+            Log.d("BrainRing", "Finish first timer");
+            showAnswer();
+        }
+    };
+    private final CountDownTimer secondGameTimer = new CountDownTimer(FIRST_COUNTDOWN * SECOND,
+            SECOND) {
+        @Override
+        public void onTick(long millisUntilFinished) {
+            Log.d("BrainRing", "Tick first timer");
+            if (millisUntilFinished <= SENDING_COUNTDOWN * SECOND) {
+                // отправить игрокам время
+            }
+        }
+
+        @Override
+        public void onFinish() {
+            Log.d("BrainRing", "Finish first timer");
+            showAnswer();
+        }
+    };
+    private CountDownTimer timer;
 
     /** Returns UserScore object connected with given user */
     public OnlineGameAdminLogic() {
@@ -47,6 +82,7 @@ public class OnlineGameAdminLogic {
      * Determines (no) false starts
      */
     public void onAnswerIsReady(String userId) {
+        timer.cancel();
         UserScore user = getThisUser(userId);
         if (user.status.alreadyAnswered || answeringUserId != null) {
             Controller.NetworkController.sendMessageToConcreteUser(userId, FORBID_ANSWER);
@@ -60,10 +96,11 @@ public class OnlineGameAdminLogic {
     }
 
     /** Rejects or accepts answer written by user */
-    public void onAnswerIsWritten(String writtenAnswer) {
-        // TODO: проверять idшник
-        System.out.println("GOT ANSWER:");
-        System.out.println(writtenAnswer);
+    public void onAnswerIsWritten(String writtenAnswer, String id) {
+        Log.d("BrainRing","GOT ANSWER: " + writtenAnswer + " from user " + id);
+        if (!id.equals(answeringUserId)) {
+            return;
+        }
         String userId = answeringUserId;
         answeringUserId = null;
         if (!currentQuestion.checkAnswer(writtenAnswer)) {
@@ -71,6 +108,8 @@ public class OnlineGameAdminLogic {
                 Controller.NetworkController.sendMessageToConcreteUser(
                         getOtherUser(userId).status.participantId,
                         Message.generateMessage(Message.SENDING_INCORRECT_OPPONENT_ANSWER, writtenAnswer));
+                timer = secondGameTimer;
+                timer.start();
                 return;
             }
         } else {
@@ -94,18 +133,20 @@ public class OnlineGameAdminLogic {
 
     /** Determines if game is finished. If not, generates new question and sends it */
     public void newQuestion() {
-        if (user1.score >= 5 || user2.score >= 5) {
+        if (user1.score >= WINNER_SCORE || user2.score >= WINNER_SCORE) {
             Controller.finishOnlineGame();
             return;
         }
 
-        System.out.println("ЗАДАЮ ВОПРОС");
+        Log.d("BrainRing", "New question");
         user1.status.onNewQuestion();
         user2.status.onNewQuestion();
 
         currentQuestion = Controller.DatabaseController.getRandomQuestion();
         Controller.NetworkController.sendMessageToAll(
                 Message.generateMessage(Message.SENDING_QUESTION, currentQuestion.getQuestion()));
+        timer = firstGameTimer;
+        timer.start();
     }
 
     private byte[] generateAnswer() {
