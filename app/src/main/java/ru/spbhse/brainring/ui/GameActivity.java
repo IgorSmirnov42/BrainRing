@@ -6,7 +6,7 @@ import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.view.View;
+import android.util.Log;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -33,13 +33,16 @@ public class GameActivity extends AppCompatActivity {
     private static final int RC_SIGN_IN = 42;
 
     private GameActivityLocation currentLocation = GAME_WAITING_START;
-    private TextView questionTextField;
-    private Button answerButton;
-    private Button answerWrittenButton;
-    private TextView rightAnswerTextField;
-    private EditText answerEditor;
-    private TextView opponentIsAnswering;
+
     public QuestionDataBase dataBase;
+
+    private String question;
+    private String buttonText;
+    private String timeLeft;
+    private String opponentAnswer;
+    private String answer;
+    private String myScore;
+    private String opponentScore;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,32 +52,10 @@ public class GameActivity extends AppCompatActivity {
         StrictMode.setThreadPolicy(policy);
         /////////////
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_game);
+
         Controller.setUI(GameActivity.this);
         dataBase = new QuestionDataBase(GameActivity.this);
         dataBase.openDataBase();
-
-        questionTextField = findViewById(R.id.questionText);
-        answerButton = findViewById(R.id.answerReadyButton);
-        answerWrittenButton = findViewById(R.id.answerWrittenButton);
-        rightAnswerTextField = findViewById(R.id.rightAnswerTextField);
-        answerEditor = findViewById(R.id.answerEditor);
-        opponentIsAnswering = findViewById(R.id.opponentIsAnswering);
-
-        answerButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Controller.UserLogicController.answerButtonPushed();
-            }
-        });
-
-        answerWrittenButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Controller.UserLogicController.answerIsWritten(answerEditor.getText().toString());
-                hideKeyboard();
-            }
-        });
 
         drawLocation();
 
@@ -83,53 +64,93 @@ public class GameActivity extends AppCompatActivity {
 
     private void drawLocation() {
         if (currentLocation == GAME_WAITING_START) {
-            questionTextField.setVisibility(View.VISIBLE);
-            answerButton.setVisibility(View.GONE);
-            answerWrittenButton.setVisibility(View.GONE);
-            rightAnswerTextField.setVisibility(View.GONE);
-            answerEditor.setVisibility(View.GONE);
-            opponentIsAnswering.setVisibility(View.GONE);
+            setContentView(R.layout.activity_waiting_for_start);
         }
         if (currentLocation == SHOW_QUESTION) {
-            questionTextField.setVisibility(View.VISIBLE);
-            answerButton.setVisibility(View.VISIBLE);
-            answerWrittenButton.setVisibility(View.GONE);
-            rightAnswerTextField.setVisibility(View.GONE);
-            answerEditor.setVisibility(View.GONE);
-            opponentIsAnswering.setVisibility(View.GONE);
+            setContentView(R.layout.activity_showing_question);
+
+            Button answerButton = findViewById(R.id.answerReadyButton);
+            answerButton.setText(buttonText);
+
+            TextView questionTextField = findViewById(R.id.questionText);
+            questionTextField.setText(question);
+
+            TextView opponentAnswer = findViewById(R.id.opponentAnswer);
+            opponentAnswer.setText(this.opponentAnswer);
+
+            TextView timeLeft = findViewById(R.id.timeLeft);
+            timeLeft.setText(this.timeLeft);
+
+            answerButton.setOnClickListener(v -> Controller.OnlineUserLogicController.answerButtonPushed());
         }
         if (currentLocation == WRITE_ANSWER) {
-            questionTextField.setVisibility(View.VISIBLE);
-            answerButton.setVisibility(View.GONE);
-            answerWrittenButton.setVisibility(View.VISIBLE);
-            rightAnswerTextField.setVisibility(View.GONE);
-            answerEditor.setVisibility(View.VISIBLE);
-            opponentIsAnswering.setVisibility(View.GONE);
+            setContentView(R.layout.activity_writing_answer);
+
+            TextView questionTextField = findViewById(R.id.questionText);
+            questionTextField.setText(question);
+
+            EditText answerEditor = findViewById(R.id.answerEditor);
+            Button answerWrittenButton = findViewById(R.id.answerWrittenButton);
+            answerWrittenButton.setOnClickListener(v -> {
+                Controller.OnlineUserLogicController.answerIsWritten(answerEditor.getText().toString());
+                //hideKeyboard();
+            });
         }
         if (currentLocation == SHOW_ANSWER) {
-            questionTextField.setVisibility(View.GONE);
-            answerButton.setVisibility(View.GONE);
-            answerWrittenButton.setVisibility(View.GONE);
-            rightAnswerTextField.setVisibility(View.VISIBLE);
-            answerEditor.setVisibility(View.GONE);
-            opponentIsAnswering.setVisibility(View.GONE);
+            setContentView(R.layout.activity_showing_answer);
+
+            TextView rightAnswerTextField = findViewById(R.id.rightAnswerTextField);
+            rightAnswerTextField.setText(answer);
+
+            TextView myScore = findViewById(R.id.myScore);
+            myScore.setText(this.myScore);
+
+            TextView opponentScore = findViewById(R.id.opponentScore);
+            opponentScore.setText(this.opponentScore);
         }
         if (currentLocation == OPPONENT_IS_ANSWERING) {
-            questionTextField.setVisibility(View.VISIBLE);
-            answerButton.setVisibility(View.GONE);
-            answerWrittenButton.setVisibility(View.GONE);
-            rightAnswerTextField.setVisibility(View.GONE);
-            answerEditor.setVisibility(View.GONE);
-            opponentIsAnswering.setVisibility(View.VISIBLE);
+            setContentView(R.layout.activity_opponent_answering);
+
+            TextView questionTextField = findViewById(R.id.questionText);
+            questionTextField.setText(question);
         }
+    }
+
+    public void onNewQuestion() {
+        setOpponentAnswer("");
+        setTime("");
+        buttonText = "Чтение вопроса";
+    }
+
+    public void setButtonText(String text) {
+        buttonText = text;
+        drawLocation();
+    }
+
+    public void setTime(String time) {
+        timeLeft = time;
+        drawLocation();
+    }
+
+    public void setOpponentAnswer(String answer) {
+        opponentAnswer = answer;
+        drawLocation();
+    }
+
+    public void setScore(int my, int opponent) {
+        myScore = String.valueOf(my);
+        opponentScore = String.valueOf(opponent);
+        drawLocation();
     }
 
     public void setQuestionText(String question) {
-        questionTextField.setText(question);
+        this.question = question;
+        drawLocation();
     }
 
     public void setAnswer(String answer) {
-        rightAnswerTextField.setText(answer);
+        this.answer = answer;
+        drawLocation();
     }
 
     public void setLocation(GameActivityLocation location) {
@@ -137,19 +158,17 @@ public class GameActivity extends AppCompatActivity {
         drawLocation();
     }
 
+    public void hideKeyboard() {
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+    }
+
+    /* I know that this function is out of content here,
+       but it is linked with onActivityResult that can be placed only here */
     public void signIn() {
         GoogleSignInClient signInClient = GoogleSignIn.getClient(this,
                 GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN);
         Intent intent = signInClient.getSignInIntent();
         startActivityForResult(intent, RC_SIGN_IN);
-    }
-
-    public void hideKeyboard() {
-        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
-    }
-
-    public void clearEditText() {
-        answerEditor.setText("");
     }
 
     @Override
@@ -162,11 +181,18 @@ public class GameActivity extends AppCompatActivity {
             } else {
                 String message = result.getStatus().getStatusMessage();
                 if (message == null || message.isEmpty()) {
-                    message = "Неизвестная ошибка. Убедитесь, что у Вас установлены Google Play игры и выполнен вход в аккаунт.";
+                    message = "Ошибка входа в аккаунт Google Play Games";
                 }
                 new AlertDialog.Builder(this).setMessage(message)
-                        .setNeutralButton(android.R.string.ok, null).show();
+                        .setNeutralButton(android.R.string.ok, (dialog, which) -> finish()).show();
             }
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        Log.d("BrainRing", "Destroying activity. Leaving room");
+        super.onDestroy();
+        Controller.NetworkController.leaveRoom();
     }
 }

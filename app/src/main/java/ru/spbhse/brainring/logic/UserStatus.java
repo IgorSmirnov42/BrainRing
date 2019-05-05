@@ -7,8 +7,6 @@ class UserStatus {
 
     public UserStatus(String participantId) {
         this.participantId = participantId;
-        System.out.println("MY PARTICIPANT ID IS");
-        System.out.println(participantId);
     }
 
     public void onNewQuestion() {

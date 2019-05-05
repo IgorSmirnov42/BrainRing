@@ -1,6 +1,8 @@
 package ru.spbhse.brainring.network.messages;
 
+import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 
 public class Message {
@@ -27,9 +29,13 @@ public class Message {
     public static final int SENDING_INCORRECT_OPPONENT_ANSWER = 5;
     public static final int SENDING_CORRECT_ANSWER_AND_SCORE = 6;
     public static final int OPPONENT_IS_ANSWERING = 7;
+    public static final int TICK = 8;
+    public static final int FALSE_START = 9;
+    public static final int TIME_START = 10;
+    public static final int TIME_TO_WRITE_ANSWER_IS_OUT = 11;
 
     public static boolean messageIsToServer(int identifier) {
-        return identifier <= 1;
+        return identifier <= ANSWER_IS_WRITTEN;
     }
 
     public static boolean messageIsToClient(int identifier) {
@@ -42,5 +48,21 @@ public class Message {
             string.append(is.readChar());
         }
         return string.toString();
+    }
+
+    /** Generates byte message by code and body */
+    public static byte[] generateMessage(int code, String message) {
+        byte[] buf;
+        try (ByteArrayOutputStream bout = new ByteArrayOutputStream();
+             DataOutputStream dout = new DataOutputStream(bout)) {
+            dout.writeInt(code);
+            dout.writeChars(message);
+            dout.flush();
+            buf = bout.toByteArray();
+        } catch (IOException e) {
+            e.printStackTrace();
+            buf = null;
+        }
+        return buf;
     }
 }

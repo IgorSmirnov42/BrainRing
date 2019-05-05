@@ -26,8 +26,8 @@ import java.util.List;
 import ru.spbhse.brainring.Controller;
 import ru.spbhse.brainring.network.messages.Message;
 
+/** Class for working with network in online mode */
 public class Network {
-
     private RoomConfig mRoomConfig;
     private Room room;
     private boolean isServer;
@@ -64,6 +64,7 @@ public class Network {
         @Override
         public void onPeerLeft(@Nullable Room room, @NonNull List<String> list) {
             Log.d("BrainRing", "onPeerLeft");
+            leaveRoom();
         }
 
         @Override
@@ -74,6 +75,7 @@ public class Network {
         @Override
         public void onDisconnectedFromRoom(@Nullable Room room) {
             Log.d("BrainRing", "onDisconnectedFromRoom");
+            leaveRoom();
         }
 
         @Override
@@ -84,6 +86,7 @@ public class Network {
         @Override
         public void onPeersDisconnected(@Nullable Room room, @NonNull List<String> list) {
             Log.d("BrainRing", "onPeersDisconnected");
+            leaveRoom();
         }
 
         @Override
@@ -93,7 +96,8 @@ public class Network {
 
         @Override
         public void onP2PDisconnected(@NonNull String s) {
-            Log.d("BrainRing", "onP2PDisconnected");
+            Log.d("BrainRing", "onP2PDisconnected " + s);
+            leaveRoom();
         }
     };
     private RoomUpdateCallback mRoomUpdateCallback = new RoomUpdateCallback() {
@@ -110,6 +114,7 @@ public class Network {
         @Override
         public void onLeftRoom(int i, @NonNull String s) {
             Log.d("BrainRing", "Left room");
+            Controller.finishOnlineGame();
         }
 
         @Override
@@ -127,7 +132,7 @@ public class Network {
             }
             String minimalId = Collections.min(room.getParticipantIds());
             serverId = minimalId;
-            Games.getPlayersClient(Controller.gameActivity, googleSignInAccount)
+            Games.getPlayersClient(Controller.getGameActivity(), googleSignInAccount)
                     .getCurrentPlayerId()
                     .addOnSuccessListener(new OnSuccessListener<String>() {
                         @Override
@@ -141,7 +146,7 @@ public class Network {
                     });
         }
     };
-    public OnRealTimeMessageReceivedListener mOnRealTimeMessageReceivedListener = new OnRealTimeMessageReceivedListener() {
+    private OnRealTimeMessageReceivedListener mOnRealTimeMessageReceivedListener = new OnRealTimeMessageReceivedListener() {
         @Override
         public void onRealTimeMessageReceived(@NonNull RealTimeMessage realTimeMessage) {
             byte[] buf = realTimeMessage.getMessageData();
@@ -149,12 +154,20 @@ public class Network {
         }
     };
 
+    public void leaveRoom() {
+        if (room != null) {
+            Games.getRealTimeMultiplayerClient(Controller.getGameActivity(),
+                    googleSignInAccount).leave(mRoomConfig, room.getRoomId());
+        }
+        //Controller.finishOnlineGame();
+    }
+
+    /** Reacts on received message */
     private void onMessageReceived(byte[] buf, String userId) {
         System.out.println("RECEIVED MESSAGE!");
         try (DataInputStream is = new DataInputStream(new ByteArrayInputStream(buf))) {
             int identifier = is.readInt();
-            System.out.println("IDENTIFIER IS");
-            System.out.println(identifier);
+            System.out.println("IDENTIFIER IS" + identifier);
 
             if (Message.messageIsToServer(identifier) && !isServer) {
                 Log.wtf("BrainRing", "Not server got message to server\n");
@@ -163,34 +176,46 @@ public class Network {
 
             switch (identifier) {
                 case Message.ANSWER_IS_READY:
-                    Controller.AdminLogicController.onAnswerIsReady(userId);
+                    Controller.OnlineAdminLogicController.onAnswerIsReady(userId);
                     break;
                 case Message.ANSWER_IS_WRITTEN:
                     String answer = Message.readString(is);
-                    Controller.AdminLogicController.onAnswerIsWritten(answer);
+                    Controller.OnlineAdminLogicController.onAnswerIsWritten(answer, userId);
                     break;
                 case Message.FORBIDDEN_TO_ANSWER:
-                    Controller.UserLogicController.onForbiddenToAnswer();
+                    Controller.OnlineUserLogicController.onForbiddenToAnswer();
                     break;
                 case Message.ALLOWED_TO_ANSWER:
-                    Controller.UserLogicController.onAllowedToAnswer();
+                    Controller.OnlineUserLogicController.onAllowedToAnswer();
                     break;
                 case Message.SENDING_QUESTION:
                     String question = Message.readString(is);
-                    Controller.UserLogicController.onReceivingQuestion(question);
+                    Controller.OnlineUserLogicController.onReceivingQuestion(question);
                     break;
                 case Message.SENDING_INCORRECT_OPPONENT_ANSWER:
                     String opponentAnswer = Message.readString(is);
-                    Controller.UserLogicController.onIncorrectOpponentAnswer(opponentAnswer);
+                    Controller.OnlineUserLogicController.onIncorrectOpponentAnswer(opponentAnswer);
                     break;
                 case Message.SENDING_CORRECT_ANSWER_AND_SCORE:
                     int firstUserScore = is.readInt();
                     int secondUserScore = is.readInt();
                     String correctAnswer = Message.readString(is);
-                    Controller.UserLogicController.onReceivingAnswer(firstUserScore, secondUserScore, correctAnswer);
+                    Controller.OnlineUserLogicController.onReceivingAnswer(firstUserScore, secondUserScore, correctAnswer);
                     break;
                 case Message.OPPONENT_IS_ANSWERING:
-                    Controller.UserLogicController.onOpponentIsAnswering();
+                    Controller.OnlineUserLogicController.onOpponentIsAnswering();
+                    break;
+                case Message.TICK:
+                    Controller.OnlineUserLogicController.onReceivingTick(Message.readString(is));
+                    break;
+                case Message.TIME_START:
+                    Controller.OnlineUserLogicController.onTimeStart();
+                    break;
+                case Message.FALSE_START:
+                    Controller.OnlineUserLogicController.onFalseStart();
+                    break;
+                case Message.TIME_TO_WRITE_ANSWER_IS_OUT:
+                    Controller.OnlineUserLogicController.onTimeToWriteAnswerIsOut();
                     break;
             }
 
@@ -200,12 +225,13 @@ public class Network {
         }
     }
 
-    public Network() {}
+    //public Network() {}
 
+    /** Starts quick game with 1 auto matched player */
     public void startQuickGame() {
         isServer = false;
         // quick-start a game with 1 randomly selected opponent
-        mRealTimeMultiplayerClient = Games.getRealTimeMultiplayerClient(Controller.gameActivity,
+        mRealTimeMultiplayerClient = Games.getRealTimeMultiplayerClient(Controller.getGameActivity(),
                 googleSignInAccount);
         final int MIN_OPPONENTS = 1, MAX_OPPONENTS = 1;
         Bundle autoMatchCriteria = RoomConfig.createAutoMatchCriteria(MIN_OPPONENTS,
@@ -217,15 +243,17 @@ public class Network {
                 .setAutoMatchCriteria(autoMatchCriteria)
                 .build();
 
-        Games.getRealTimeMultiplayerClient(Controller.gameActivity, googleSignInAccount)
+        Games.getRealTimeMultiplayerClient(Controller.getGameActivity(), googleSignInAccount)
                 .create(mRoomConfig);
     }
 
+    /** Sends message to all users in a room (and to itself) */
     public void sendMessageToAll(byte[] message) {
         mRealTimeMultiplayerClient.sendUnreliableMessageToOthers(message, room.getRoomId());
         onMessageReceived(message, myParticipantId);
     }
 
+    /** Sends message to user with given id */
     public void sendMessageToConcreteUser(String userId, byte[] message) {
         if (userId.equals(myParticipantId)) {
             onMessageReceived(message, myParticipantId);
@@ -244,6 +272,10 @@ public class Network {
 
     public String getMyParticipantId() {
         return myParticipantId;
+    }
+
+    public boolean iAmServer() {
+        return isServer;
     }
 
     public String getOpponentParticipantId() {

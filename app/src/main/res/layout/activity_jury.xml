@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.JuryActivity">
+
+    <TextView
+        android:id="@+id/greenTeamScore"
+        android:layout_width="51dp"
+        android:layout_height="59dp"
+        android:text="0"
+        android:textAlignment="center"
+        android:textSize="36sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.222"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/greenTeamStatus"
+        app:layout_constraintVertical_bias="0.448" />
+
+    <ImageView
+        android:id="@+id/greenTeamStatus"
+        android:layout_width="137dp"
+        android:layout_height="163dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.148"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.854"
+        app:srcCompat="@android:color/holo_green_dark"
+        tools:srcCompat="@color/colorPrimary" />
+
+    <ImageView
+        android:id="@+id/redTeamStatus"
+        android:layout_width="126dp"
+        android:layout_height="163dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.46"
+        app:layout_constraintStart_toEndOf="@+id/greenTeamStatus"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.854"
+        app:srcCompat="@color/colorAccent"
+        tools:srcCompat="@color/colorAccent" />
+
+    <Button
+        android:id="@+id/mainButton"
+        android:layout_width="275dp"
+        android:layout_height="86dp"
+        android:text="Начать чтение вопроса"
+        app:layout_constraintBottom_toTopOf="@+id/greenTeamStatus"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.067" />
+
+    <TextView
+        android:id="@+id/redTeamScore"
+        android:layout_width="51dp"
+        android:layout_height="45dp"
+        android:text="0"
+        android:textAlignment="center"
+        android:textSize="30sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.752"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/redTeamStatus"
+        app:layout_constraintVertical_bias="0.162" />
+
+    <Button
+        android:id="@+id/plusRedTeamButton"
+        android:layout_width="50dp"
+        android:layout_height="61dp"
+        android:text="+"
+        android:textAlignment="center"
+        android:textSize="30sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/redTeamScore"
+        app:layout_constraintTop_toBottomOf="@+id/redTeamStatus"
+        app:layout_constraintVertical_bias="0.074" />
+
+    <Button
+        android:id="@+id/minusRedTeamButton"
+        android:layout_width="50dp"
+        android:layout_height="62dp"
+        android:text="-"
+        android:textSize="30sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/redTeamScore"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/redTeamStatus"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <TextView
+        android:id="@+id/gameStatusInfo"
+        android:layout_width="357dp"
+        android:layout_height="155dp"
+        android:text="Ожидаем подключения игроков"
+        android:textAlignment="center"
+        android:textSize="24sp"
+        app:layout_constraintBottom_toTopOf="@+id/greenTeamStatus"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/mainButton"
+        app:layout_constraintVertical_bias="0.142" />
+
+    <Button
+        android:id="@+id/plusGreenTeamButton"
+        android:layout_width="62dp"
+        android:layout_height="65dp"
+        android:text="+"
+        android:textAlignment="center"
+        android:textSize="36sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/minusRedTeamButton"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/greenTeamScore"
+        app:layout_constraintTop_toBottomOf="@+id/greenTeamStatus"
+        app:layout_constraintVertical_bias="0.086" />
+
+    <Button
+        android:id="@+id/minusGreenTeamButton"
+        android:layout_width="61dp"
+        android:layout_height="63dp"
+        android:text="-"
+        android:textSize="36sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/greenTeamScore"
+        app:layout_constraintHorizontal_bias="0.842"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/greenTeamStatus"
+        app:layout_constraintVertical_bias="0.125" />
+
+</android.support.constraint.ConstraintLayout>

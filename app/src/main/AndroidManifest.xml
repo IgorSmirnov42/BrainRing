@@ -12,6 +12,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".ui.Judging"></activity>
+        <activity android:name=".ui.PlayerActivity" />
+        <activity android:name=".ui.JuryActivity" />
+
         <meta-data
             android:name="com.google.android.gms.games.APP_ID"
             android:value="@string/app_id" />
@@ -28,6 +32,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".ui.SelectOnlineOpponentActivity" />
+        <activity android:name=".ui.SelectLocalGameModeActivity" />
     </application>
 
 </manifest>
