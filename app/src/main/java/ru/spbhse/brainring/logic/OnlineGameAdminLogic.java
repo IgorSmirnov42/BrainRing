@@ -17,16 +17,23 @@ public class OnlineGameAdminLogic {
     private UserScore user1;
     private UserScore user2;
     private Question currentQuestion;
-    private volatile String answeringUserId;
+    private String answeringUserId;
+    private volatile boolean readingTime;
+
     private static final byte[] ALLOW_ANSWER = Message.generateMessage(Message.ALLOWED_TO_ANSWER, "");
     private static final byte[] FORBID_ANSWER = Message.generateMessage(Message.FORBIDDEN_TO_ANSWER, "");
     private static final byte[] OPPONENT_ANSWERING = Message.generateMessage(Message.OPPONENT_IS_ANSWERING, "");
+    private static final byte[] TIME_START = Message.generateMessage(Message.TIME_START, "");
+    private static final byte[] FALSE_START = Message.generateMessage(Message.FALSE_START, "");
 
     private static final int WINNER_SCORE = 5;
     private static final int FIRST_COUNTDOWN = 20;
     private static final int SECOND_COUNTDOWN = 20;
     private static final int SENDING_COUNTDOWN = 5;
     private static final int SECOND = 1000;
+    private static final int TIME_TO_SHOW_ANSWER = 5;
+    private static final int TIME_TO_READ_QUESTION = 10;
+    private static final int TIME_TO_WRITE_ANSWER = 10;
     private final CountDownTimer firstGameTimer = new CountDownTimer(FIRST_COUNTDOWN * SECOND,
             SECOND) {
         @Override
@@ -71,7 +78,7 @@ public class OnlineGameAdminLogic {
             }
         }
     };
-    private CountDownTimer timer;
+    private volatile CountDownTimer timer;
 
     /** Returns UserScore object connected with given user */
     public OnlineGameAdminLogic() {
@@ -91,9 +98,14 @@ public class OnlineGameAdminLogic {
 
     /**
      * Allows or forbids to answer team that pushed answer button
-     * Determines (no) false starts
+     * Determines false starts
      */
     public synchronized void onAnswerIsReady(String userId) {
+        if (readingTime) {
+            getThisUser(userId).status.alreadyAnswered = true;
+            Controller.NetworkController.sendMessageToConcreteUser(userId, FALSE_START);
+            return;
+        }
         timer.cancel();
         UserScore user = getThisUser(userId);
         if (user.status.alreadyAnswered || answeringUserId != null) {
@@ -131,16 +143,10 @@ public class OnlineGameAdminLogic {
         showAnswer();
     }
 
-    /** Sends answer and shows it for 5 seconds */
+    /** Sends answer and shows it for {@code TIME_TO_SHOW_ANSWER} seconds */
     private void showAnswer() {
         Controller.NetworkController.sendMessageToAll(generateAnswer());
-        final Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                newQuestion();
-            }
-        }, 5000);
+        new Handler().postDelayed(this::newQuestion, TIME_TO_SHOW_ANSWER * SECOND);
     }
 
     /** Determines if game is finished. If not, generates new question and sends it */
@@ -155,17 +161,33 @@ public class OnlineGameAdminLogic {
         user2.status.onNewQuestion();
 
         currentQuestion = Controller.DatabaseController.getRandomQuestion();
+        readingTime = true;
         Controller.NetworkController.sendMessageToAll(
                 Message.generateMessage(Message.SENDING_QUESTION, currentQuestion.getQuestion()));
-        timer = firstGameTimer;
-        timer.start();
+
+        new Handler().postDelayed(this::publishQuestion, TIME_TO_READ_QUESTION * SECOND);
+    }
+
+    private boolean bothAnswered() {
+        return user1.status.alreadyAnswered && user2.status.alreadyAnswered;
+    }
+
+    private void publishQuestion() {
+        readingTime = false;
+        if (!bothAnswered()) {
+            Controller.NetworkController.sendMessageToAll(TIME_START);
+            timer = firstGameTimer;
+            timer.start();
+        } else {
+            showAnswer();
+        }
     }
 
     public void finishGame() {
         if (timer != null) {
             timer.cancel();
+            timer = null;
         }
-        timer = null;
     }
 
     private byte[] generateAnswer() {

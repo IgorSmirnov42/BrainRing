@@ -1,6 +1,7 @@
 package ru.spbhse.brainring.logic;
 
 import android.media.MediaPlayer;
+import android.widget.Toast;
 
 import ru.spbhse.brainring.Controller;
 import ru.spbhse.brainring.R;
@@ -17,20 +18,28 @@ public class OnlineGameUserLogic {
         userStatus = new UserStatus(Controller.NetworkController.getMyParticipantId());
     }
 
-    /** Reacts on server's forbiddance to answer */
+    /** Reacts on server's forbiddance to answer (not false start) */
     public void onForbiddenToAnswer() {
-        // Возможно сделать тост
+        Toast.makeText(Controller.getGameActivity(), "Сервер запретил Вам отвечать",
+                Toast.LENGTH_LONG).show();
+    }
+
+    public void onFalseStart() {
+        Toast.makeText(Controller.getGameActivity(), "Фальстарт!", Toast.LENGTH_LONG).show();
+    }
+
+    public void onTimeStart() {
+        new Thread(() -> {
+            MediaPlayer player = MediaPlayer.create(Controller.getGameActivity(), R.raw.start);
+            player.setOnCompletionListener(MediaPlayer::release);
+            player.start();
+        }).start();
     }
 
     public void onReceivingTick(String secondsLeft) {
         new Thread(() -> {
             MediaPlayer player = MediaPlayer.create(Controller.getGameActivity(), R.raw.countdown);
-            player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                @Override
-                public void onCompletion(MediaPlayer mp) {
-                    mp.release();
-                }
-            });
+            player.setOnCompletionListener(MediaPlayer::release);
             player.start();
         }).start();
         // TODO : вывод оставшегося времени на экран
@@ -61,12 +70,7 @@ public class OnlineGameUserLogic {
     public void onReceivingAnswer(int firstUserScore, int secondUserScore, String correctAnswer) {
         new Thread(() -> {
             MediaPlayer player = MediaPlayer.create(Controller.getGameActivity(), R.raw.beep);
-            player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                @Override
-                public void onCompletion(MediaPlayer mp) {
-                    mp.release();
-                }
-            });
+            player.setOnCompletionListener(MediaPlayer::release);
             player.start();
         }).start();
         // TODO: вывод на экран счета

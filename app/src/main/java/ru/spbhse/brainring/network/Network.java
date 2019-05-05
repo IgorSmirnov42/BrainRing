@@ -208,6 +208,12 @@ public class Network {
                 case Message.TICK:
                     Controller.OnlineUserLogicController.onReceivingTick(Message.readString(is));
                     break;
+                case Message.TIME_START:
+                    Controller.OnlineUserLogicController.onTimeStart();
+                    break;
+                case Message.FALSE_START:
+                    Controller.OnlineUserLogicController.onFalseStart();
+                    break;
             }
 
         } catch (IOException e) {

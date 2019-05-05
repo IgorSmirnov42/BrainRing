@@ -163,6 +163,14 @@ public class Controller {
         public static void onReceivingTick(String secondsLeft) {
             userLogic.onReceivingTick(secondsLeft);
         }
+
+        public static void onTimeStart() {
+            userLogic.onTimeStart();
+        }
+
+        public static void onFalseStart() {
+            userLogic.onFalseStart();
+        }
     }
 
     public static class LocalNetworkAdminUIController {
