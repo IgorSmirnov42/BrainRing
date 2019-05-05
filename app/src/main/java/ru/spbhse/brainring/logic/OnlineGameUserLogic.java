@@ -34,6 +34,7 @@ public class OnlineGameUserLogic {
             player.setOnCompletionListener(MediaPlayer::release);
             player.start();
         }).start();
+        Controller.NetworkUIController.setButtonText("ЖМЯК!!");
     }
 
     public void onReceivingTick(String secondsLeft) {
@@ -42,7 +43,7 @@ public class OnlineGameUserLogic {
             player.setOnCompletionListener(MediaPlayer::release);
             player.start();
         }).start();
-        // TODO : вывод оставшегося времени на экран
+        Controller.NetworkUIController.setTime(secondsLeft);
     }
 
     /** Reacts on server's allowance to answer */
@@ -52,9 +53,9 @@ public class OnlineGameUserLogic {
 
     /** Gets question and prints it on the screen */
     public void onReceivingQuestion(String question) {
-        Controller.NetworkUIController.clearEditText();
         userStatus.onNewQuestion();
         currentQuestion = question;
+        Controller.NetworkUIController.onNewQuestion();
         Controller.NetworkUIController.setQuestionText(question);
         Controller.NetworkUIController.setLocation(GameActivityLocation.SHOW_QUESTION);
     }
@@ -62,7 +63,8 @@ public class OnlineGameUserLogic {
     /** Reacts on opponent's incorrect answer */
     public void onIncorrectOpponentAnswer(String opponentAnswer) {
         userStatus.opponentAnswer = opponentAnswer;
-        // TODO: вывод на экран ответа соперника
+        Controller.NetworkUIController.setTime("");
+        Controller.NetworkUIController.setOpponentAnswer(opponentAnswer);
         Controller.NetworkUIController.setLocation(GameActivityLocation.SHOW_QUESTION);
     }
 
@@ -73,7 +75,11 @@ public class OnlineGameUserLogic {
             player.setOnCompletionListener(MediaPlayer::release);
             player.start();
         }).start();
-        // TODO: вывод на экран счета
+        if (Controller.NetworkController.iAmServer()) {
+            Controller.NetworkUIController.setScore(firstUserScore, secondUserScore);
+        } else {
+            Controller.NetworkUIController.setScore(secondUserScore, firstUserScore);
+        }
         Controller.NetworkUIController.setAnswer(correctAnswer);
         Controller.NetworkUIController.setLocation(GameActivityLocation.SHOW_ANSWER);
     }

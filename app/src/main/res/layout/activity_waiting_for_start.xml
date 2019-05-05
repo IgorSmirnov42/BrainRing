@@ -7,10 +7,11 @@
     tools:context=".ui.GameActivity">
 
     <TextView
-        android:id="@+id/questionText"
+        android:id="@+id/wainingStartInfo"
         android:layout_width="319dp"
         android:layout_height="233dp"
-        android:text="ГГ"
+        android:text="Ожидаем подключения соперника"
+        android:textSize="24sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
