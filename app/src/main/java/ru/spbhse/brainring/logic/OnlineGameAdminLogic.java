@@ -17,7 +17,7 @@ public class OnlineGameAdminLogic {
     private UserScore user1;
     private UserScore user2;
     private Question currentQuestion;
-    private String answeringUserId;
+    private volatile String answeringUserId;
     private static final byte[] ALLOW_ANSWER = Message.generateMessage(Message.ALLOWED_TO_ANSWER, "");
     private static final byte[] FORBID_ANSWER = Message.generateMessage(Message.FORBIDDEN_TO_ANSWER, "");
     private static final byte[] OPPONENT_ANSWERING = Message.generateMessage(Message.OPPONENT_IS_ANSWERING, "");
@@ -33,14 +33,20 @@ public class OnlineGameAdminLogic {
         public void onTick(long millisUntilFinished) {
             Log.d("BrainRing", "Tick first timer");
             if (millisUntilFinished <= SENDING_COUNTDOWN * SECOND) {
-                // отправить игрокам время
+                Controller.NetworkController.sendMessageToAll(
+                        Message.generateMessage(Message.TICK,
+                                String.valueOf(millisUntilFinished / SECOND)));
             }
         }
 
         @Override
         public void onFinish() {
             Log.d("BrainRing", "Finish first timer");
-            showAnswer();
+            synchronized (OnlineGameAdminLogic.this) {
+                if (answeringUserId == null) {
+                    showAnswer();
+                }
+            }
         }
     };
     private final CountDownTimer secondGameTimer = new CountDownTimer(SECOND_COUNTDOWN * SECOND,
@@ -49,14 +55,20 @@ public class OnlineGameAdminLogic {
         public void onTick(long millisUntilFinished) {
             Log.d("BrainRing", "Tick second timer");
             if (millisUntilFinished <= SENDING_COUNTDOWN * SECOND) {
-                // отправить игрокам время
+                Controller.NetworkController.sendMessageToAll(
+                        Message.generateMessage(Message.TICK,
+                                String.valueOf(millisUntilFinished / SECOND)));
             }
         }
 
         @Override
         public void onFinish() {
             Log.d("BrainRing", "Finish second timer");
-            showAnswer();
+            synchronized (OnlineGameAdminLogic.this) {
+                if (answeringUserId == null) {
+                    showAnswer();
+                }
+            }
         }
     };
     private CountDownTimer timer;
@@ -81,7 +93,7 @@ public class OnlineGameAdminLogic {
      * Allows or forbids to answer team that pushed answer button
      * Determines (no) false starts
      */
-    public void onAnswerIsReady(String userId) {
+    public synchronized void onAnswerIsReady(String userId) {
         timer.cancel();
         UserScore user = getThisUser(userId);
         if (user.status.alreadyAnswered || answeringUserId != null) {
@@ -96,7 +108,7 @@ public class OnlineGameAdminLogic {
     }
 
     /** Rejects or accepts answer written by user */
-    public void onAnswerIsWritten(String writtenAnswer, String id) {
+    public synchronized void onAnswerIsWritten(String writtenAnswer, String id) {
         Log.d("BrainRing","GOT ANSWER: " + writtenAnswer + " from user " + id);
         if (!id.equals(answeringUserId)) {
             return;

@@ -23,7 +23,16 @@ public class OnlineGameUserLogic {
     }
 
     public void onReceivingTick(String secondsLeft) {
-        MediaPlayer.create(Controller.getGameActivity(), R.raw.countdown).start();
+        new Thread(() -> {
+            MediaPlayer player = MediaPlayer.create(Controller.getGameActivity(), R.raw.countdown);
+            player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                @Override
+                public void onCompletion(MediaPlayer mp) {
+                    mp.release();
+                }
+            });
+            player.start();
+        }).start();
         // TODO : вывод оставшегося времени на экран
     }
 
@@ -50,7 +59,16 @@ public class OnlineGameUserLogic {
 
     /** Shows answer and score (no) on the screen */
     public void onReceivingAnswer(int firstUserScore, int secondUserScore, String correctAnswer) {
-        MediaPlayer.create(Controller.getGameActivity(), R.raw.beep).start();
+        new Thread(() -> {
+            MediaPlayer player = MediaPlayer.create(Controller.getGameActivity(), R.raw.beep);
+            player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                @Override
+                public void onCompletion(MediaPlayer mp) {
+                    mp.release();
+                }
+            });
+            player.start();
+        }).start();
         // TODO: вывод на экран счета
         Controller.NetworkUIController.setAnswer(correctAnswer);
         Controller.NetworkUIController.setLocation(GameActivityLocation.SHOW_ANSWER);
