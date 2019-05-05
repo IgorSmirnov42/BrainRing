@@ -11,6 +11,7 @@ import ru.spbhse.brainring.ui.GameActivityLocation;
 public class OnlineGameUserLogic {
     private UserStatus userStatus;
     private String currentQuestion;
+    private static final byte[] IS_READY = Message.generateMessage(Message.ANSWER_IS_READY, "");
 
     public OnlineGameUserLogic() {
         userStatus = new UserStatus(Controller.NetworkController.getMyParticipantId());
@@ -63,11 +64,11 @@ public class OnlineGameUserLogic {
     /** Sends request to server trying to answer */
     public void answerButtonPushed() {
         if (userStatus.alreadyAnswered) {
+            // Вообще, кнопка пользователю недоступна, но мало ли...
             onForbiddenToAnswer();
             return;
         }
-        Controller.NetworkController.sendMessageToServer(
-                Message.generateMessage(Message.ANSWER_IS_READY, ""));
+        Controller.NetworkController.sendMessageToServer(IS_READY);
     }
 
     /** Sends written answer to server */

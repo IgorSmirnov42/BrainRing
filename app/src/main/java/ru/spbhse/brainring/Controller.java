@@ -98,8 +98,8 @@ public class Controller {
             adminLogic.onAnswerIsReady(userId);
         }
 
-        public static void onAnswerIsWritten(String writtenAnswer) {
-            adminLogic.onAnswerIsWritten(writtenAnswer);
+        public static void onAnswerIsWritten(String writtenAnswer, String id) {
+            adminLogic.onAnswerIsWritten(writtenAnswer, id);
         }
     }
 
@@ -263,28 +263,58 @@ public class Controller {
             gameActivity.get().signIn();
         }
 
+        public static void leaveRoom() {
+            if (network != null) {
+                network.leaveRoom();
+            }
+        }
+
         public static void loggedIn(GoogleSignInAccount signedInAccount) {
+            if (network == null) {
+                Log.wtf("BrainRing", "Logged in but network is null");
+                return;
+            }
             network.googleSignInAccount = signedInAccount;
             network.startQuickGame();
         }
 
         public static void sendMessageToServer(byte[] message) {
+            if (network == null) {
+                Log.wtf("BrainRing", "Sending message to server but network is null");
+                return;
+            }
             network.sendMessageToServer(message);
         }
 
         public static String getMyParticipantId() {
+            if (network == null) {
+                Log.wtf("BrainRing", "Getting id but network is null");
+                return null;
+            }
             return network.getMyParticipantId();
         }
 
         public static String getOpponentParticipantId() {
+            if (network == null) {
+                Log.wtf("BrainRing", "Getting id but network is null");
+                return null;
+            }
             return network.getOpponentParticipantId();
         }
 
         public static void sendMessageToConcreteUser(String userId, byte[] message) {
+            if (network == null) {
+                Log.wtf("BrainRing", "Sending message but network is null");
+                return;
+            }
             network.sendMessageToConcreteUser(userId, message);
         }
 
         public static void sendMessageToAll(byte[] message) {
+            if (network == null) {
+                Log.wtf("BrainRing", "Sending message but network is null");
+                return;
+            }
             network.sendMessageToAll(message);
         }
     }
@@ -311,9 +341,18 @@ public class Controller {
     }
 
     public static void finishOnlineGame() {
+        if (OnlineAdminLogicController.adminLogic != null) {
+            OnlineAdminLogicController.adminLogic.finishGame();
+        }
         OnlineAdminLogicController.adminLogic = null;
         OnlineUserLogicController.userLogic = null;
         NetworkController.network = null;
+        if (gameActivity != null) {
+            GameActivity activity = gameActivity.get();
+            if (activity != null) {
+                activity.finish();
+            }
+        }
     }
 
     public static void initializeLocalGame() {

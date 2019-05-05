@@ -31,8 +31,14 @@ public class LocalGameAdminLogic {
 
     /** Called when jury rejects answer */
     public void onRejectAnswer() {
+        UserScore other = getOtherUser(answeringUserId);
         answeringUserId = null;
-        location = LocalGameLocation.COUNTDOWN;
+        if (!other.status.alreadyAnswered) {
+            location = LocalGameLocation.COUNTDOWN;
+        } else {
+            newQuestion();
+            location = LocalGameLocation.NOT_STARTED;
+        }
         Controller.LocalNetworkAdminUIController.setLocation(location);
     }
 
