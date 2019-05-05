@@ -29,6 +29,7 @@ public class Message {
     public static final int SENDING_INCORRECT_OPPONENT_ANSWER = 5;
     public static final int SENDING_CORRECT_ANSWER_AND_SCORE = 6;
     public static final int OPPONENT_IS_ANSWERING = 7;
+    public static final int TICK = 8;
 
     public static boolean messageIsToServer(int identifier) {
         return identifier <= 1;

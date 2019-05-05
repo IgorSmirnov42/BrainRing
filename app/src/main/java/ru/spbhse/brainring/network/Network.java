@@ -192,6 +192,9 @@ public class Network {
                 case Message.OPPONENT_IS_ANSWERING:
                     Controller.OnlineUserLogicController.onOpponentIsAnswering();
                     break;
+                case Message.TICK:
+                    Controller.OnlineUserLogicController.onReceivingTick(Message.readString(is));
+                    break;
             }
 
         } catch (IOException e) {

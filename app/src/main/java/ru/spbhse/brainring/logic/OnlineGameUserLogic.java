@@ -1,6 +1,9 @@
 package ru.spbhse.brainring.logic;
 
+import android.media.MediaPlayer;
+
 import ru.spbhse.brainring.Controller;
+import ru.spbhse.brainring.R;
 import ru.spbhse.brainring.network.messages.Message;
 import ru.spbhse.brainring.ui.GameActivityLocation;
 
@@ -16,6 +19,11 @@ public class OnlineGameUserLogic {
     /** Reacts on server's forbiddance to answer */
     public void onForbiddenToAnswer() {
         // Возможно сделать тост
+    }
+
+    public void onReceivingTick(String secondsLeft) {
+        MediaPlayer.create(Controller.getGameActivity(), R.raw.countdown).start();
+        // TODO : вывод оставшегося времени на экран
     }
 
     /** Reacts on server's allowance to answer */
@@ -41,6 +49,7 @@ public class OnlineGameUserLogic {
 
     /** Shows answer and score (no) on the screen */
     public void onReceivingAnswer(int firstUserScore, int secondUserScore, String correctAnswer) {
+        MediaPlayer.create(Controller.getGameActivity(), R.raw.beep).start();
         // TODO: вывод на экран счета
         Controller.NetworkUIController.setAnswer(correctAnswer);
         Controller.NetworkUIController.setLocation(GameActivityLocation.SHOW_ANSWER);

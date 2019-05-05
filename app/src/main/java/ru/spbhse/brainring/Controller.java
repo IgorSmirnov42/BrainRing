@@ -159,6 +159,10 @@ public class Controller {
         public static void answerIsWritten(String answer) {
             userLogic.answerIsWritten(answer);
         }
+
+        public static void onReceivingTick(String secondsLeft) {
+            userLogic.onReceivingTick(secondsLeft);
+        }
     }
 
     public static class LocalNetworkAdminUIController {

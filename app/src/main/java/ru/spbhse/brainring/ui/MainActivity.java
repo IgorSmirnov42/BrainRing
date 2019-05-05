@@ -53,7 +53,6 @@ public class MainActivity extends AppCompatActivity {
         packagesBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
             }
         });
 
