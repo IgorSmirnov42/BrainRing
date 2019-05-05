@@ -32,9 +32,10 @@ public class Message {
     public static final int TICK = 8;
     public static final int FALSE_START = 9;
     public static final int TIME_START = 10;
+    public static final int TIME_TO_WRITE_ANSWER_IS_OUT = 11;
 
     public static boolean messageIsToServer(int identifier) {
-        return identifier <= 1;
+        return identifier <= ANSWER_IS_WRITTEN;
     }
 
     public static boolean messageIsToClient(int identifier) {

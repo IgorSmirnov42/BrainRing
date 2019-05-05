@@ -93,6 +93,13 @@ public class OnlineGameUserLogic {
         Controller.NetworkController.sendMessageToServer(IS_READY);
     }
 
+    public void onTimeToWriteAnswerIsOut() {
+        Toast.makeText(Controller.getGameActivity(), "Время на ввод ответа истекло",
+                Toast.LENGTH_LONG).show();
+        Controller.NetworkUIController.hideKeyboard();
+        Controller.NetworkUIController.setLocation(GameActivityLocation.OPPONENT_IS_ANSWERING);
+    }
+
     /** Sends written answer to server */
     public void answerIsWritten(String answer) {
         Controller.NetworkUIController.setLocation(GameActivityLocation.OPPONENT_IS_ANSWERING);

@@ -25,6 +25,7 @@ public class OnlineGameAdminLogic {
     private static final byte[] OPPONENT_ANSWERING = Message.generateMessage(Message.OPPONENT_IS_ANSWERING, "");
     private static final byte[] TIME_START = Message.generateMessage(Message.TIME_START, "");
     private static final byte[] FALSE_START = Message.generateMessage(Message.FALSE_START, "");
+    private static final byte[] TIME_OUT = Message.generateMessage(Message.TIME_TO_WRITE_ANSWER_IS_OUT, "");
 
     private static final int WINNER_SCORE = 5;
     private static final int FIRST_COUNTDOWN = 20;
@@ -114,9 +115,46 @@ public class OnlineGameAdminLogic {
             answeringUserId = userId;
             user.status.alreadyAnswered = true;
             Controller.NetworkController.sendMessageToConcreteUser(userId, ALLOW_ANSWER);
+            final String currentUser = userId;
+            timer = new CountDownTimer(TIME_TO_WRITE_ANSWER * SECOND,
+                    TIME_TO_WRITE_ANSWER * SECOND) {
+                @Override
+                public void onTick(long millisUntilFinished) {
+                }
+
+                @Override
+                public void onFinish() {
+                    synchronized (OnlineGameAdminLogic.this) {
+                        if (answeringUserId != null && answeringUserId.equals(currentUser)) {
+                            stopAnswering();
+                        }
+                    }
+                }
+            };
+            timer.start();
             Controller.NetworkController.sendMessageToConcreteUser(
                     getOtherUser(userId).status.participantId, OPPONENT_ANSWERING);
         }
+    }
+
+    private void restartTime(String previousUserId, String previousAnswer) {
+        if (bothAnswered()) {
+            showAnswer();
+            return;
+        }
+        Controller.NetworkController.sendMessageToConcreteUser(
+                getOtherUser(previousUserId).status.participantId,
+                Message.generateMessage(Message.SENDING_INCORRECT_OPPONENT_ANSWER, previousAnswer));
+        timer = secondGameTimer;
+        timer.start();
+    }
+
+    // called by writing timer. answeringUserId != null
+    private void stopAnswering() {
+        String userId = answeringUserId;
+        answeringUserId = null;
+        Controller.NetworkController.sendMessageToConcreteUser(userId, TIME_OUT);
+        restartTime(userId, "");
     }
 
     /** Rejects or accepts answer written by user */
@@ -125,15 +163,12 @@ public class OnlineGameAdminLogic {
         if (!id.equals(answeringUserId)) {
             return;
         }
+        timer.cancel();
         String userId = answeringUserId;
         answeringUserId = null;
         if (!currentQuestion.checkAnswer(writtenAnswer)) {
             if (!getOtherUser(userId).status.alreadyAnswered) {
-                Controller.NetworkController.sendMessageToConcreteUser(
-                        getOtherUser(userId).status.participantId,
-                        Message.generateMessage(Message.SENDING_INCORRECT_OPPONENT_ANSWER, writtenAnswer));
-                timer = secondGameTimer;
-                timer.start();
+                restartTime(userId, writtenAnswer);
                 return;
             }
         } else {

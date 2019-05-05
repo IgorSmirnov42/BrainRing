@@ -168,6 +168,10 @@ public class Controller {
             userLogic.onTimeStart();
         }
 
+        public static void onTimeToWriteAnswerIsOut() {
+            userLogic.onTimeToWriteAnswerIsOut();
+        }
+
         public static void onFalseStart() {
             userLogic.onFalseStart();
         }

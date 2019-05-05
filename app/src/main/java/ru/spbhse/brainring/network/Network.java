@@ -214,6 +214,9 @@ public class Network {
                 case Message.FALSE_START:
                     Controller.OnlineUserLogicController.onFalseStart();
                     break;
+                case Message.TIME_TO_WRITE_ANSWER_IS_OUT:
+                    Controller.OnlineUserLogicController.onTimeToWriteAnswerIsOut();
+                    break;
             }
 
         } catch (IOException e) {
