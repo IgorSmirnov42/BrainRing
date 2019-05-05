@@ -13,7 +13,7 @@ public class SelectOnlineOpponentActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_select_online_oppenent);
+        setContentView(R.layout.activity_select_online_opponent);
 
         Button searchOpponentButton = findViewById(R.id.searchOpponentButton);
         searchOpponentButton.setOnClickListener(new View.OnClickListener() {

@@ -50,7 +50,7 @@ public class GameActivity extends AppCompatActivity {
         StrictMode.setThreadPolicy(policy);
         /////////////
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_game);
+        setContentView(R.layout.activity_waiting_for_start);
         Controller.setUI(GameActivity.this);
         dataBase = new QuestionDataBase(GameActivity.this);
         dataBase.openDataBase();
@@ -84,6 +84,7 @@ public class GameActivity extends AppCompatActivity {
 
     private void drawLocation() {
         if (currentLocation == GAME_WAITING_START) {
+            setContentView(R.layout.activity_waiting_for_start);
             questionTextField.setVisibility(View.VISIBLE);
             answerButton.setVisibility(View.GONE);
             answerWrittenButton.setVisibility(View.GONE);
@@ -92,36 +93,40 @@ public class GameActivity extends AppCompatActivity {
             opponentIsAnswering.setVisibility(View.GONE);
         }
         if (currentLocation == SHOW_QUESTION) {
-            questionTextField.setVisibility(View.VISIBLE);
+            setContentView(R.layout.activity_showing_question);
+            /*questionTextField.setVisibility(View.VISIBLE);
             answerButton.setVisibility(View.VISIBLE);
             answerWrittenButton.setVisibility(View.GONE);
             rightAnswerTextField.setVisibility(View.GONE);
             answerEditor.setVisibility(View.GONE);
-            opponentIsAnswering.setVisibility(View.GONE);
+            opponentIsAnswering.setVisibility(View.GONE);*/
         }
         if (currentLocation == WRITE_ANSWER) {
-            questionTextField.setVisibility(View.VISIBLE);
+            setContentView(R.layout.activity_writing_answer);
+            /*questionTextField.setVisibility(View.VISIBLE);
             answerButton.setVisibility(View.GONE);
             answerWrittenButton.setVisibility(View.VISIBLE);
             rightAnswerTextField.setVisibility(View.GONE);
             answerEditor.setVisibility(View.VISIBLE);
-            opponentIsAnswering.setVisibility(View.GONE);
+            opponentIsAnswering.setVisibility(View.GONE);*/
         }
         if (currentLocation == SHOW_ANSWER) {
-            questionTextField.setVisibility(View.GONE);
+            setContentView(R.layout.activity_showing_answer);
+            /*questionTextField.setVisibility(View.GONE);
             answerButton.setVisibility(View.GONE);
             answerWrittenButton.setVisibility(View.GONE);
             rightAnswerTextField.setVisibility(View.VISIBLE);
             answerEditor.setVisibility(View.GONE);
-            opponentIsAnswering.setVisibility(View.GONE);
+            opponentIsAnswering.setVisibility(View.GONE);*/
         }
         if (currentLocation == OPPONENT_IS_ANSWERING) {
-            questionTextField.setVisibility(View.VISIBLE);
+            setContentView(R.layout.activity_opponent_answering);
+            /*questionTextField.setVisibility(View.VISIBLE);
             answerButton.setVisibility(View.GONE);
             answerWrittenButton.setVisibility(View.GONE);
             rightAnswerTextField.setVisibility(View.GONE);
             answerEditor.setVisibility(View.GONE);
-            opponentIsAnswering.setVisibility(View.VISIBLE);
+            opponentIsAnswering.setVisibility(View.VISIBLE);*/
         }
     }
 
