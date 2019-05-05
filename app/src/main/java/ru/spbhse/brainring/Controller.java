@@ -192,9 +192,6 @@ public class Controller {
     }
 
     public static class NetworkUIController {
-        public static void clearEditText() {
-            gameActivity.get().clearEditText();
-        }
 
         public static void hideKeyboard() {
             gameActivity.get().hideKeyboard();
@@ -204,12 +201,32 @@ public class Controller {
             gameActivity.get().setQuestionText(question);
         }
 
+        public static void onNewQuestion() {
+            gameActivity.get().onNewQuestion();
+        }
+
+        public static void setButtonText(String text) {
+            gameActivity.get().setButtonText(text);
+        }
+
+        public static void setTime(String time) {
+            gameActivity.get().setTime(time);
+        }
+
         public static void setAnswer(String answer) {
             gameActivity.get().setAnswer(answer);
         }
 
         public static void setLocation(GameActivityLocation location) {
             gameActivity.get().setLocation(location);
+        }
+
+        public static void setScore(int my, int opponent) {
+            gameActivity.get().setScore(my, opponent);
+        }
+
+        public static void setOpponentAnswer(String answer) {
+            gameActivity.get().setOpponentAnswer(answer);
         }
     }
 
@@ -279,6 +296,10 @@ public class Controller {
             if (network != null) {
                 network.leaveRoom();
             }
+        }
+
+        public static boolean iAmServer() {
+            return network.iAmServer();
         }
 
         public static void loggedIn(GoogleSignInAccount signedInAccount) {

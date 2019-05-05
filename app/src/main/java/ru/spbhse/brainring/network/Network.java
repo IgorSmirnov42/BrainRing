@@ -274,6 +274,10 @@ public class Network {
         return myParticipantId;
     }
 
+    public boolean iAmServer() {
+        return isServer;
+    }
+
     public String getOpponentParticipantId() {
         for (String participantId : room.getParticipantIds()) {
             if (!participantId.equals(myParticipantId)) {
