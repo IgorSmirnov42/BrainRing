@@ -19,6 +19,7 @@ public class OnlineGameAdminLogic {
     private Question currentQuestion;
     private String answeringUserId;
     private volatile boolean readingTime;
+    private volatile boolean interrupted;
 
     private static final byte[] ALLOW_ANSWER = Message.generateMessage(Message.ALLOWED_TO_ANSWER, "");
     private static final byte[] FORBID_ANSWER = Message.generateMessage(Message.FORBIDDEN_TO_ANSWER, "");
@@ -39,6 +40,9 @@ public class OnlineGameAdminLogic {
             SECOND) {
         @Override
         public void onTick(long millisUntilFinished) {
+            if (interrupted) {
+                return;
+            }
             Log.d("BrainRing", "Tick first timer");
             if (millisUntilFinished <= SENDING_COUNTDOWN * SECOND) {
                 Controller.NetworkController.sendMessageToAll(
@@ -49,6 +53,9 @@ public class OnlineGameAdminLogic {
 
         @Override
         public void onFinish() {
+            if (interrupted) {
+                return;
+            }
             Log.d("BrainRing", "Finish first timer");
             synchronized (OnlineGameAdminLogic.this) {
                 if (answeringUserId == null) {
@@ -61,6 +68,9 @@ public class OnlineGameAdminLogic {
             SECOND) {
         @Override
         public void onTick(long millisUntilFinished) {
+            if (interrupted) {
+                return;
+            }
             Log.d("BrainRing", "Tick second timer");
             if (millisUntilFinished <= SENDING_COUNTDOWN * SECOND) {
                 Controller.NetworkController.sendMessageToAll(
@@ -71,6 +81,9 @@ public class OnlineGameAdminLogic {
 
         @Override
         public void onFinish() {
+            if (interrupted) {
+                return;
+            }
             Log.d("BrainRing", "Finish second timer");
             synchronized (OnlineGameAdminLogic.this) {
                 if (answeringUserId == null) {
@@ -208,6 +221,9 @@ public class OnlineGameAdminLogic {
     }
 
     private void publishQuestion() {
+        if (interrupted) {
+            return;
+        }
         readingTime = false;
         if (!bothAnswered()) {
             Controller.NetworkController.sendMessageToAll(TIME_START);
@@ -219,6 +235,7 @@ public class OnlineGameAdminLogic {
     }
 
     public void finishGame() {
+        interrupted = true;
         if (timer != null) {
             timer.cancel();
             timer = null;

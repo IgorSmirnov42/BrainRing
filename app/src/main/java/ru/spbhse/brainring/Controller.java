@@ -186,6 +186,10 @@ public class Controller {
             juryActivity.get().setLocation(location);
         }
 
+        public static void showTime(long time) {
+            juryActivity.get().showTime(time);
+        }
+
         public static void onReceivingAnswer() {
             juryActivity.get().onReceivingAnswer();
         }
@@ -367,7 +371,6 @@ public class Controller {
     }
 
     public static void startOnlineGame() {
-        System.out.println("НАЧИНАЕМ ИГРУ");
         OnlineAdminLogicController.adminLogic = new OnlineGameAdminLogic();
         OnlineUserLogicController.userLogic = new OnlineGameUserLogic();
         OnlineAdminLogicController.adminLogic.newQuestion();

@@ -4,13 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:keepScreenOn="true"
     tools:context=".ui.GameActivity">
 
     <TextView
         android:id="@+id/questionText"
         android:layout_width="319dp"
         android:layout_height="233dp"
-        android:text="ГГ"
+        android:text="Тут должен быть вопрос"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Брэйн-Ринг</string>
+    <string name="app_name">Брейн-Ринг</string>
     <string name="train">Тренировка</string>
     <string name="net">Игра по сети</string>
     <string name="local">Игра по локальной сети</string>
