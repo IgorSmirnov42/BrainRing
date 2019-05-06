@@ -59,11 +59,11 @@ public class LocalNetworkAdmin extends LocalNetwork {
                 }
                 LocalNetworkAdmin.this.room = room;
                 if (code == GamesCallbackStatusCodes.OK) {
-                    System.out.println("CONNECTED");
+                    Log.d("BrainRing","CONNECTED");
                 } else {
-                    System.out.println("ERROR WHILE CONNECTING");
+                    Log.d("BrainRing","CONNECTING ERROR");
                 }
-                Games.getPlayersClient(Controller.getGameActivity(), googleSignInAccount)
+                Games.getPlayersClient(Controller.getJuryActivity(), googleSignInAccount)
                         .getCurrentPlayerId()
                         .addOnSuccessListener(new OnSuccessListener<String>() {
                             @Override
@@ -71,6 +71,7 @@ public class LocalNetworkAdmin extends LocalNetwork {
                                 myParticipantId = room.getParticipantId(myPlayerId);
                             }
                         });
+                Log.d("BrainRing", "Start handshake");
                 handshake();
             }
         };
@@ -83,19 +84,21 @@ public class LocalNetworkAdmin extends LocalNetwork {
      */
     @Override
     protected void onMessageReceived(byte[] buf, String userId) {
-        System.out.println("RECEIVED MESSAGE!");
+        Log.d("BrainRing", "RECEIVED MESSAGE AS ADMIN!");
         if (!handshaked) {
-            synchronized (handshakeBlock) {
-                greenId = userId;
-                handshaked = true;
-                for (String id : room.getParticipantIds()) {
-                    if (!id.equals(myParticipantId) && !id.equals(greenId)) {
-                        redId = id;
-                        break;
-                    }
+            greenId = userId;
+            handshaked = true;
+            for (String id : room.getParticipantIds()) {
+                if (!id.equals(myParticipantId) && !id.equals(greenId)) {
+                    redId = id;
+                    break;
                 }
-                handshakeBlock.notifyAll();
             }
+            Log.d("BrainRing","Successful handshake");
+
+            assert redId != null;
+            Controller.LocalNetworkAdminController.startGameCycle();
+            return;
         }
         try (DataInputStream is = new DataInputStream(new ByteArrayInputStream(buf))) {
             int identifier = is.readInt();
@@ -137,13 +140,10 @@ public class LocalNetworkAdmin extends LocalNetwork {
      * After execution starts game cycle
      */
     private void handshake() {
-        byte[] message = new byte[0];
+        byte[] message = new byte[20];
+        Log.d("BrainRing", "Writing message");
         mRealTimeMultiplayerClient.sendUnreliableMessageToOthers(message, room.getRoomId());
-
-        waitHandshake();
-
-        assert redId != null;
-        Controller.LocalNetworkAdminController.startGameCycle();
+        Log.d("BrainRing", "Message sent");
     }
 
     /** Blocking waiter for one's handshake response */

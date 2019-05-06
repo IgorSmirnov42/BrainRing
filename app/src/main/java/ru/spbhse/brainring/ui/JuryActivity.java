@@ -104,6 +104,10 @@ public class JuryActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    public void showTime(long time) {
+        statusText.setText(String.valueOf(time));
+    }
+
     /* I know that this function is out of content here,
        but it is linked with onActivityResult that can be placed only here */
     public void signIn() {

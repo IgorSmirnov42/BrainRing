@@ -58,16 +58,19 @@ public class LocalNetworkPlayer extends LocalNetwork {
 
             @Override
             public void onRoomConnected(int code, @Nullable Room room) {
-                Log.d("BrainRing", "Connected to room");
-                if (room == null) {
-                    Log.wtf("BrainRing", "onRoomConnected got null as room");
-                    return;
-                }
-                LocalNetworkPlayer.this.room = room;
-                if (code == GamesCallbackStatusCodes.OK) {
-                    System.out.println("CONNECTED");
-                } else {
-                    System.out.println("ERROR WHILE CONNECTING");
+                synchronized (LocalNetworkPlayer.this) {
+                    Log.d("BrainRing", "Connected to room");
+                    if (room == null) {
+                        Log.wtf("BrainRing", "onRoomConnected got null as room");
+                        return;
+                    }
+                    LocalNetworkPlayer.this.room = room;
+                    if (code == GamesCallbackStatusCodes.OK) {
+                        System.out.println("CONNECTED");
+                    } else {
+                        System.out.println("ERROR WHILE CONNECTING");
+                    }
+                    LocalNetworkPlayer.this.notifyAll();
                 }
             }
         };
@@ -79,16 +82,29 @@ public class LocalNetworkPlayer extends LocalNetwork {
      */
     @Override
     protected void onMessageReceived(byte[] buf, String userId) {
+        Log.d("BrainRing","RECEIVED MESSAGE AS PLAYER!");
         if (!handshaked) {
-            handshaked = true;
-            serverId = userId;
-            if (myColor == ROLE_GREEN) {
-                sendMessageToConcreteUser(userId, buf);
-            }
+            new Thread(() -> {
+                synchronized (LocalNetworkPlayer.this) {
+                    while (room == null) {
+                        try {
+                            wait();
+                        } catch (InterruptedException e) {
+                        }
+                    }
+                    handshaked = true;
+                    serverId = userId;
+                    if (myColor == ROLE_GREEN) {
+                        Log.d("BrainRing", "I am green");
+                        sendMessageToConcreteUser(userId, buf);
+                    } else {
+                        Log.d("BrainRing", "I am red");
+                    }
+                }
+            }).start();
             return;
         }
 
-        System.out.println("RECEIVED MESSAGE!");
         try (DataInputStream is = new DataInputStream(new ByteArrayInputStream(buf))) {
             int identifier = is.readInt();
             System.out.println("IDENTIFIER IS" + identifier);
