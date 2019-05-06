@@ -5,7 +5,7 @@
     android:id="@+id/layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.SelectOnlineOppenentActivity">
+    tools:context=".ui.SelectOnlineOpponentActivity">
 
     <Button
         android:id="@+id/searchOpponentButton"
