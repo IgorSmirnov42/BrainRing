@@ -117,4 +117,9 @@ public abstract class LocalNetwork {
     }
 
     abstract public void leaveRoom();
+
+    /** Sends message to all users in a room (and to itself) */
+    public void sendMessageToOthers(byte[] message) {
+        mRealTimeMultiplayerClient.sendUnreliableMessageToOthers(message, room.getRoomId());
+    }
 }

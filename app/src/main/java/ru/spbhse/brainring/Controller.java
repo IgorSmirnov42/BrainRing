@@ -105,7 +105,7 @@ public class Controller {
     }
 
     public static class LocalPlayerLogicController {
-        private static LocalGamePlayerLogic playerLogic = new LocalGamePlayerLogic(); //
+        private static LocalGamePlayerLogic playerLogic;
 
         public static void onForbiddenToAnswer() {
             playerLogic.onForbiddenToAnswer();
@@ -113,6 +113,14 @@ public class Controller {
 
         public static void onAllowedToAnswer() {
             playerLogic.onAllowedToAnswer();
+        }
+
+        public static void onFalseStart() {
+            playerLogic.onFalseStart();
+        }
+
+        public static void onTimeStart() {
+            playerLogic.onTimeStart();
         }
 
         public static void answerButtonPushed() {
@@ -191,8 +199,8 @@ public class Controller {
             juryActivity.get().showTime(time);
         }
 
-        public static void onReceivingAnswer() {
-            juryActivity.get().onReceivingAnswer();
+        public static void onReceivingAnswer(String color) {
+            juryActivity.get().onReceivingAnswer(color);
         }
     }
 
@@ -292,6 +300,10 @@ public class Controller {
 
         public static void sendMessageToConcreteUser(String userId, byte[] message) {
             network.sendMessageToConcreteUser(userId, message);
+        }
+
+        public static void sendMessageToOthers(byte[] message) {
+            network.sendMessageToOthers(message);
         }
     }
 
@@ -409,6 +421,10 @@ public class Controller {
         if (juryActivity != null) {
             finishActivity(juryActivity.get());
         }
+    }
+
+    public static void initializeLocalPlayer() {
+        LocalPlayerLogicController.playerLogic = new LocalGamePlayerLogic();
     }
 
     public static void finishLocalGameAsPlayer() {

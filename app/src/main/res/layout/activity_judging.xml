@@ -21,13 +21,27 @@
 
     <Button
         android:id="@+id/rejectButton"
-        android:layout_width="184dp"
+        android:layout_width="258dp"
         android:layout_height="122dp"
+        android:layout_marginStart="76dp"
         android:text="Отклонить ответ"
         android:textSize="24sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/acceptButton"
+        app:layout_constraintVertical_bias="0.223" />
+
+    <TextView
+        android:id="@+id/answeringId"
+        android:layout_width="250dp"
+        android:layout_height="108dp"
+        android:textAlignment="center"
+        android:textSize="70sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/acceptButton" />
+        app:layout_constraintTop_toBottomOf="@+id/rejectButton" />
 </android.support.constraint.ConstraintLayout>

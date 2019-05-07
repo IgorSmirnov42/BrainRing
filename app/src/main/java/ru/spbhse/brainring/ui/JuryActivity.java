@@ -100,8 +100,9 @@ public class JuryActivity extends AppCompatActivity {
         }
     }
 
-    public void onReceivingAnswer() {
+    public void onReceivingAnswer(String color) {
         Intent intent = new Intent(JuryActivity.this, Judging.class);
+        intent.putExtra("color", color);
         startActivity(intent);
     }
 

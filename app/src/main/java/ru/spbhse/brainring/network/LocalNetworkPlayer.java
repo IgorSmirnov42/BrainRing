@@ -108,7 +108,7 @@ public class LocalNetworkPlayer extends LocalNetwork {
 
         try (DataInputStream is = new DataInputStream(new ByteArrayInputStream(buf))) {
             int identifier = is.readInt();
-            System.out.println("IDENTIFIER IS" + identifier);
+            Log.d("BrainRing","Identifier is " + identifier);
 
             if (Message.messageIsToServer(identifier)) {
                 Log.wtf("BrainRing", "Client got message to server\n");
@@ -117,10 +117,16 @@ public class LocalNetworkPlayer extends LocalNetwork {
 
             switch (identifier) {
                 case Message.FORBIDDEN_TO_ANSWER:
-                    //Controller.UserLogicController.onForbiddenToAnswer();
+                    Controller.LocalPlayerLogicController.onForbiddenToAnswer();
                     break;
                 case Message.ALLOWED_TO_ANSWER:
-                    //Controller.UserLogicController.onAllowedToAnswer();
+                    Controller.LocalPlayerLogicController.onAllowedToAnswer();
+                    break;
+                case Message.FALSE_START:
+                    Controller.LocalPlayerLogicController.onFalseStart();
+                    break;
+                case Message.TIME_START:
+                    Controller.LocalPlayerLogicController.onTimeStart();
                     break;
                 default:
                     Log.wtf("BrainRing", "Unexpected message received");
@@ -128,7 +134,6 @@ public class LocalNetworkPlayer extends LocalNetwork {
 
         } catch (IOException e) {
             e.printStackTrace();
-            // TODO: нормальная обработка
         }
     }
 

@@ -156,6 +156,11 @@ public class LocalNetworkAdmin extends LocalNetwork {
         }
     }
 
+    /** Sends message to all users in a room (and to itself) */
+    public void sendMessageToAll(byte[] message) {
+        mRealTimeMultiplayerClient.sendUnreliableMessageToOthers(message, room.getRoomId());
+    }
+
     public String getGreenId() {
         //waitHandshake();
         return greenId;
