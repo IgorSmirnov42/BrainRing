@@ -202,6 +202,14 @@ public class Controller {
         public static void onReceivingAnswer(String color) {
             juryActivity.get().onReceivingAnswer(color);
         }
+
+        public static void setGreenStatus(String status) {
+            juryActivity.get().setGreenStatus(status);
+        }
+
+        public static void setRedStatus(String status) {
+            juryActivity.get().setRedStatus(status);
+        }
     }
 
     public static class NetworkUIController {
@@ -256,9 +264,6 @@ public class Controller {
         public static void startGameCycle() {
             LocalAdminLogicController.adminLogic.addUsers(network.getGreenId(),
                     network.getRedId());
-            if (!LocalAdminLogicController.toNextState()) {
-                Log.wtf("BrainRing", "Cannot start new game");
-            }
         }
 
         /*public static String getGreenParticipantId() {
@@ -407,8 +412,8 @@ public class Controller {
         }
     }
 
-    public static void initializeLocalGame() {
-        LocalAdminLogicController.adminLogic = new LocalGameAdminLogic();
+    public static void initializeLocalGame(int firstTimer, int secondTimer) {
+        LocalAdminLogicController.adminLogic = new LocalGameAdminLogic(firstTimer, secondTimer);
     }
 
     public static void finishLocalGameAsAdmin() {

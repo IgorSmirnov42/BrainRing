@@ -3,9 +3,37 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:keepScreenOn="true"
     android:layout_height="match_parent"
-    tools:context=".ui.local_game_settings">
+    android:keepScreenOn="true"
+    tools:context=".ui.SelectLocalGameModeActivity">
+
+    <TextView
+        android:id="@+id/secondCounterValue"
+        android:layout_width="42dp"
+        android:layout_height="39dp"
+        android:text="20"
+        android:textAlignment="center"
+        android:textSize="24sp"
+        app:layout_constraintBottom_toTopOf="@+id/redPlayerButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.583"
+        app:layout_constraintStart_toEndOf="@+id/firstCounterBar"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.337" />
+
+    <SeekBar
+        android:id="@+id/secondCounterBar"
+        style="@style/Widget.AppCompat.SeekBar.Discrete"
+        android:layout_width="252dp"
+        android:layout_height="45dp"
+        android:max="5"
+        android:progress="1"
+        app:layout_constraintBottom_toTopOf="@+id/juryModeButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.496"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.697" />
 
     <Button
         android:id="@+id/juryModeButton"
@@ -15,10 +43,10 @@
         android:textSize="24sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.458"
+        app:layout_constraintHorizontal_bias="0.465"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.237" />
+        app:layout_constraintVertical_bias="0.416" />
 
     <Button
         android:id="@+id/greenPlayerButton"
@@ -44,5 +72,58 @@
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/greenPlayerButton"
         app:layout_constraintTop_toBottomOf="@+id/juryModeButton" />
+
+    <SeekBar
+        android:id="@+id/firstCounterBar"
+        style="@style/Widget.AppCompat.SeekBar.Discrete"
+        android:layout_width="255dp"
+        android:layout_height="33dp"
+        android:max="5"
+        android:progress="1"
+        app:layout_constraintBottom_toTopOf="@+id/juryModeButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.303" />
+
+    <TextView
+        android:id="@+id/firstCounterValue"
+        android:layout_width="42dp"
+        android:layout_height="39dp"
+        android:text="20"
+        android:textAlignment="center"
+        android:textSize="24sp"
+        app:layout_constraintBottom_toTopOf="@+id/redPlayerButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.555"
+        app:layout_constraintStart_toEndOf="@+id/firstCounterBar"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.164" />
+
+    <TextView
+        android:id="@+id/textView7"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Первый таймер"
+        android:textSize="24sp"
+        app:layout_constraintBottom_toTopOf="@+id/firstCounterBar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.555"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.88" />
+
+    <TextView
+        android:id="@+id/textView8"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Второй таймер"
+        android:textSize="24sp"
+        app:layout_constraintBottom_toTopOf="@+id/secondCounterBar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.57"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/firstCounterBar"
+        app:layout_constraintVertical_bias="0.625" />
 
 </android.support.constraint.ConstraintLayout>
