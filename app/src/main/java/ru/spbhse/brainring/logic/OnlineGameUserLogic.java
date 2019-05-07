@@ -20,17 +20,17 @@ public class OnlineGameUserLogic {
 
     /** Reacts on server's forbiddance to answer (not false start) */
     public void onForbiddenToAnswer() {
-        Toast.makeText(Controller.getGameActivity(), "Сервер запретил Вам отвечать",
+        Toast.makeText(Controller.getOnlineGameActivity(), "Сервер запретил Вам отвечать",
                 Toast.LENGTH_LONG).show();
     }
 
     public void onFalseStart() {
-        Toast.makeText(Controller.getGameActivity(), "Фальстарт!", Toast.LENGTH_LONG).show();
+        Toast.makeText(Controller.getOnlineGameActivity(), "Фальстарт!", Toast.LENGTH_LONG).show();
     }
 
     public void onTimeStart() {
         new Thread(() -> {
-            MediaPlayer player = MediaPlayer.create(Controller.getGameActivity(), R.raw.start);
+            MediaPlayer player = MediaPlayer.create(Controller.getOnlineGameActivity(), R.raw.start);
             player.setOnCompletionListener(MediaPlayer::release);
             player.start();
         }).start();
@@ -39,7 +39,7 @@ public class OnlineGameUserLogic {
 
     public void onReceivingTick(String secondsLeft) {
         new Thread(() -> {
-            MediaPlayer player = MediaPlayer.create(Controller.getGameActivity(), R.raw.countdown);
+            MediaPlayer player = MediaPlayer.create(Controller.getOnlineGameActivity(), R.raw.countdown);
             player.setOnCompletionListener(MediaPlayer::release);
             player.start();
         }).start();
@@ -71,7 +71,7 @@ public class OnlineGameUserLogic {
     /** Shows answer and score (no) on the screen */
     public void onReceivingAnswer(int firstUserScore, int secondUserScore, String correctAnswer) {
         new Thread(() -> {
-            MediaPlayer player = MediaPlayer.create(Controller.getGameActivity(), R.raw.beep);
+            MediaPlayer player = MediaPlayer.create(Controller.getOnlineGameActivity(), R.raw.beep);
             player.setOnCompletionListener(MediaPlayer::release);
             player.start();
         }).start();
@@ -100,7 +100,7 @@ public class OnlineGameUserLogic {
     }
 
     public void onTimeToWriteAnswerIsOut() {
-        Toast.makeText(Controller.getGameActivity(), "Время на ввод ответа истекло",
+        Toast.makeText(Controller.getOnlineGameActivity(), "Время на ввод ответа истекло",
                 Toast.LENGTH_LONG).show();
         Controller.NetworkUIController.hideKeyboard();
         Controller.NetworkUIController.setLocation(GameActivityLocation.OPPONENT_IS_ANSWERING);

@@ -17,21 +17,21 @@ import ru.spbhse.brainring.network.LocalNetwork;
 import ru.spbhse.brainring.network.LocalNetworkAdmin;
 import ru.spbhse.brainring.network.LocalNetworkPlayer;
 import ru.spbhse.brainring.network.Network;
-import ru.spbhse.brainring.ui.GameActivity;
 import ru.spbhse.brainring.ui.GameActivityLocation;
 import ru.spbhse.brainring.ui.JuryActivity;
 import ru.spbhse.brainring.ui.LocalGameLocation;
+import ru.spbhse.brainring.ui.OnlineGameActivity;
 import ru.spbhse.brainring.ui.PlayerActivity;
 import ru.spbhse.brainring.utils.Question;
 
 public class Controller {
 
-    private static WeakReference<GameActivity> gameActivity;
+    private static WeakReference<OnlineGameActivity> onlineGameActivity;
     private static WeakReference<JuryActivity> juryActivity;
     private static WeakReference<PlayerActivity> playerActivity;
 
-    public static GameActivity getGameActivity() {
-        return gameActivity.get();
+    public static OnlineGameActivity getOnlineGameActivity() {
+        return onlineGameActivity.get();
     }
 
     public static JuryActivity getJuryActivity() {
@@ -42,8 +42,8 @@ public class Controller {
         return playerActivity.get();
     }
 
-    public static void setUI(GameActivity ui) {
-        gameActivity = new WeakReference<>(ui);
+    public static void setUI(OnlineGameActivity ui) {
+        onlineGameActivity = new WeakReference<>(ui);
     }
 
     public static void setUI(JuryActivity ui) {
@@ -207,39 +207,39 @@ public class Controller {
     public static class NetworkUIController {
 
         public static void hideKeyboard() {
-            gameActivity.get().hideKeyboard();
+            onlineGameActivity.get().hideKeyboard();
         }
 
         public static void setQuestionText(String question) {
-            gameActivity.get().setQuestionText(question);
+            onlineGameActivity.get().setQuestionText(question);
         }
 
         public static void onNewQuestion() {
-            gameActivity.get().onNewQuestion();
+            onlineGameActivity.get().onNewQuestion();
         }
 
         public static void setButtonText(String text) {
-            gameActivity.get().setButtonText(text);
+            onlineGameActivity.get().setButtonText(text);
         }
 
         public static void setTime(String time) {
-            gameActivity.get().setTime(time);
+            onlineGameActivity.get().setTime(time);
         }
 
         public static void setAnswer(String answer) {
-            gameActivity.get().setAnswer(answer);
+            onlineGameActivity.get().setAnswer(answer);
         }
 
         public static void setLocation(GameActivityLocation location) {
-            gameActivity.get().setLocation(location);
+            onlineGameActivity.get().setLocation(location);
         }
 
         public static void setScore(int my, int opponent) {
-            gameActivity.get().setScore(my, opponent);
+            onlineGameActivity.get().setScore(my, opponent);
         }
 
         public static void setOpponentAnswer(String answer) {
-            gameActivity.get().setOpponentAnswer(answer);
+            onlineGameActivity.get().setOpponentAnswer(answer);
         }
     }
 
@@ -312,7 +312,7 @@ public class Controller {
         // функция, которую должен вызывать UI при нажатии на кнопку в layout 1
         public static void createOnlineGame() {
             network = new Network();
-            gameActivity.get().signIn();
+            onlineGameActivity.get().signIn();
         }
 
         public static void leaveRoom() {
@@ -379,9 +379,9 @@ public class Controller {
         private static final Random RAND = new Random();
         /** Gets random question from database */
         public static Question getRandomQuestion() {
-            QuestionDataBase dataBase = gameActivity.get().dataBase;
+            QuestionDataBase dataBase = onlineGameActivity.get().dataBase;
             if (dataBase == null) {
-                dataBase = new QuestionDataBase(gameActivity.get());
+                dataBase = new QuestionDataBase(onlineGameActivity.get());
             }
             dataBase.openDataBase();
             int questionId = RAND.nextInt((int) dataBase.size());
@@ -402,8 +402,8 @@ public class Controller {
         }
         OnlineUserLogicController.userLogic = null;
         NetworkController.network = null;
-        if (gameActivity != null) {
-            finishActivity(gameActivity.get());
+        if (onlineGameActivity != null) {
+            finishActivity(onlineGameActivity.get());
         }
     }
 
