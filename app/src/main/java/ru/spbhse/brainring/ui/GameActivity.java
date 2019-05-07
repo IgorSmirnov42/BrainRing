@@ -91,10 +91,9 @@ public class GameActivity extends AppCompatActivity {
 
             EditText answerEditor = findViewById(R.id.answerEditor);
             Button answerWrittenButton = findViewById(R.id.answerWrittenButton);
-            answerWrittenButton.setOnClickListener(v -> {
-                Controller.OnlineUserLogicController.answerIsWritten(answerEditor.getText().toString());
-                //hideKeyboard();
-            });
+            answerWrittenButton.setOnClickListener(
+                    v -> Controller.OnlineUserLogicController.answerIsWritten(
+                            answerEditor.getText().toString()));
         }
         if (currentLocation == SHOW_ANSWER) {
             setContentView(R.layout.activity_showing_answer);

@@ -1,5 +1,6 @@
 package ru.spbhse.brainring;
 
+import android.app.Activity;
 import android.util.Log;
 
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -103,19 +104,27 @@ public class Controller {
         }
     }
 
-    public static class LocalUserLogicController {
-        private static LocalGamePlayerLogic userLogic = new LocalGamePlayerLogic(); //
+    public static class LocalPlayerLogicController {
+        private static LocalGamePlayerLogic playerLogic;
 
         public static void onForbiddenToAnswer() {
-            userLogic.onForbiddenToAnswer();
+            playerLogic.onForbiddenToAnswer();
         }
 
         public static void onAllowedToAnswer() {
-            userLogic.onAllowedToAnswer();
+            playerLogic.onAllowedToAnswer();
+        }
+
+        public static void onFalseStart() {
+            playerLogic.onFalseStart();
+        }
+
+        public static void onTimeStart() {
+            playerLogic.onTimeStart();
         }
 
         public static void answerButtonPushed() {
-            userLogic.answerButtonPushed();
+            playerLogic.answerButtonPushed();
         }
     }
 
@@ -186,8 +195,12 @@ public class Controller {
             juryActivity.get().setLocation(location);
         }
 
-        public static void onReceivingAnswer() {
-            juryActivity.get().onReceivingAnswer();
+        public static void showTime(long time) {
+            juryActivity.get().showTime(time);
+        }
+
+        public static void onReceivingAnswer(String color) {
+            juryActivity.get().onReceivingAnswer(color);
         }
     }
 
@@ -274,6 +287,12 @@ public class Controller {
     public static class LocalNetworkController {
         private static LocalNetwork network;
 
+        public static void leaveRoom() {
+            if (network != null) {
+                network.leaveRoom();
+            }
+        }
+
         public static void loggedIn(GoogleSignInAccount signedInAccount) {
             network.googleSignInAccount = signedInAccount;
             network.startQuickGame();
@@ -281,6 +300,10 @@ public class Controller {
 
         public static void sendMessageToConcreteUser(String userId, byte[] message) {
             network.sendMessageToConcreteUser(userId, message);
+        }
+
+        public static void sendMessageToOthers(byte[] message) {
+            network.sendMessageToOthers(message);
         }
     }
 
@@ -367,7 +390,6 @@ public class Controller {
     }
 
     public static void startOnlineGame() {
-        System.out.println("НАЧИНАЕМ ИГРУ");
         OnlineAdminLogicController.adminLogic = new OnlineGameAdminLogic();
         OnlineUserLogicController.userLogic = new OnlineGameUserLogic();
         OnlineAdminLogicController.adminLogic.newQuestion();
@@ -376,15 +398,12 @@ public class Controller {
     public static void finishOnlineGame() {
         if (OnlineAdminLogicController.adminLogic != null) {
             OnlineAdminLogicController.adminLogic.finishGame();
+            OnlineAdminLogicController.adminLogic = null;
         }
-        OnlineAdminLogicController.adminLogic = null;
         OnlineUserLogicController.userLogic = null;
         NetworkController.network = null;
         if (gameActivity != null) {
-            GameActivity activity = gameActivity.get();
-            if (activity != null) {
-                activity.finish();
-            }
+            finishActivity(gameActivity.get());
         }
     }
 
@@ -393,6 +412,33 @@ public class Controller {
     }
 
     public static void finishLocalGameAsAdmin() {
-        LocalAdminLogicController.adminLogic = null;
+        if (LocalAdminLogicController.adminLogic != null) {
+            LocalAdminLogicController.adminLogic.finishGame();
+            LocalAdminLogicController.adminLogic = null;
+        }
+        LocalNetworkAdminController.network = null;
+        LocalNetworkController.network = null;
+        if (juryActivity != null) {
+            finishActivity(juryActivity.get());
+        }
+    }
+
+    public static void initializeLocalPlayer() {
+        LocalPlayerLogicController.playerLogic = new LocalGamePlayerLogic();
+    }
+
+    public static void finishLocalGameAsPlayer() {
+        LocalPlayerLogicController.playerLogic = null;
+        LocalNetworkController.network = null;
+        LocalNetworkPlayerController.network = null;
+        if (playerActivity != null) {
+            finishActivity(playerActivity.get());
+        }
+    }
+
+    private static void finishActivity(Activity activity) {
+        if (activity != null) {
+            activity.finish();
+        }
     }
 }

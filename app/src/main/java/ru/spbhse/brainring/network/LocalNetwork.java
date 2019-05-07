@@ -56,6 +56,7 @@ public abstract class LocalNetwork {
         @Override
         public void onPeerLeft(@Nullable Room room, @NonNull List<String> list) {
             Log.d("BrainRing", "onPeerLeft");
+            leaveRoom();
         }
 
         @Override
@@ -66,6 +67,7 @@ public abstract class LocalNetwork {
         @Override
         public void onDisconnectedFromRoom(@Nullable Room room) {
             Log.d("BrainRing", "onDisconnectedFromRoom");
+            leaveRoom();
         }
 
         @Override
@@ -76,6 +78,7 @@ public abstract class LocalNetwork {
         @Override
         public void onPeersDisconnected(@Nullable Room room, @NonNull List<String> list) {
             Log.d("BrainRing", "onPeersDisconnected");
+            leaveRoom();
         }
 
         @Override
@@ -86,6 +89,7 @@ public abstract class LocalNetwork {
         @Override
         public void onP2PDisconnected(@NonNull String s) {
             Log.d("BrainRing", "onP2PDisconnected");
+            leaveRoom();
         }
     };
 
@@ -110,5 +114,12 @@ public abstract class LocalNetwork {
     /** Sends message to user with given id */
     public void sendMessageToConcreteUser(String userId, byte[] message) {
         mRealTimeMultiplayerClient.sendUnreliableMessage(message, room.getRoomId(), userId);
+    }
+
+    abstract public void leaveRoom();
+
+    /** Sends message to all users in a room (and to itself) */
+    public void sendMessageToOthers(byte[] message) {
+        mRealTimeMultiplayerClient.sendUnreliableMessageToOthers(message, room.getRoomId());
     }
 }

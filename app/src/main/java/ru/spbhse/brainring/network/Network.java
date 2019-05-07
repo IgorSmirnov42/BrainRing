@@ -158,6 +158,7 @@ public class Network {
         if (room != null) {
             Games.getRealTimeMultiplayerClient(Controller.getGameActivity(),
                     googleSignInAccount).leave(mRoomConfig, room.getRoomId());
+            room = null;
         }
         //Controller.finishOnlineGame();
     }

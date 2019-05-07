@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -28,6 +27,7 @@ public class PlayerActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_player);
+        Controller.initializeLocalPlayer();
         String color = getIntent().getStringExtra("color");
 
         TextView textView = findViewById(R.id.tableColor);
@@ -36,12 +36,7 @@ public class PlayerActivity extends AppCompatActivity {
         Controller.setUI(this);
 
         Button button = findViewById(R.id.buttonPush);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Controller.LocalUserLogicController.answerButtonPushed();
-            }
-        });
+        button.setOnClickListener(v -> Controller.LocalPlayerLogicController.answerButtonPushed());
 
         Controller.LocalNetworkPlayerController.createLocalGame(color);
     }
