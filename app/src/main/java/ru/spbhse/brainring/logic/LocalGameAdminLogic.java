@@ -7,6 +7,8 @@ import ru.spbhse.brainring.Controller;
 import ru.spbhse.brainring.network.messages.Message;
 import ru.spbhse.brainring.ui.LocalGameLocation;
 
+import static java.lang.Math.min;
+
 /**
  * Class realizing admin's logic (counting time, switching locations etc)
  *      in local network mode
@@ -16,21 +18,22 @@ public class LocalGameAdminLogic {
     private UserScore green;
     private UserScore red;
     private String answeringUserId;
+
     private static final byte[] ALLOW_ANSWER = Message.generateMessage(Message.ALLOWED_TO_ANSWER, "");;
     private static final byte[] FORBID_ANSWER = Message.generateMessage(Message.FORBIDDEN_TO_ANSWER, "");
+
     private static final int FIRST_COUNTDOWN = 20;
     private static final int SECOND_COUNTDOWN = 20;
     private static final int SECOND = 1000;
-    private static final int TIME_TO_SHOW_ANSWER = 5;
-    private static final int TIME_TO_READ_QUESTION = 10;
-    private static final int TIME_TO_WRITE_ANSWER = 10;
+
     private final CountDownTimer firstGameTimer = new CountDownTimer(FIRST_COUNTDOWN * SECOND,
             SECOND) {
         @Override
         public void onTick(long millisUntilFinished) {
             Log.d("BrainRing", "Tick first timer");
             if (timer == this) {
-                Controller.LocalNetworkAdminUIController.showTime(millisUntilFinished / SECOND);
+                Controller.LocalNetworkAdminUIController.showTime(
+                        min(millisUntilFinished / SECOND + 1, FIRST_COUNTDOWN));
             }
         }
 
@@ -50,7 +53,8 @@ public class LocalGameAdminLogic {
         public void onTick(long millisUntilFinished) {
             Log.d("BrainRing", "Tick first timer");
             if (timer == this) {
-                Controller.LocalNetworkAdminUIController.showTime(millisUntilFinished / SECOND);
+                Controller.LocalNetworkAdminUIController.showTime(
+                        min(millisUntilFinished / SECOND + 1, SECOND_COUNTDOWN));
             }
         }
 
@@ -120,6 +124,10 @@ public class LocalGameAdminLogic {
         }
         // Начало нового раунда
         if (location == LocalGameLocation.COUNTDOWN) {
+            if (timer != null) {
+                timer.cancel();
+                timer = null;
+            }
             location = LocalGameLocation.NOT_STARTED;
             Controller.LocalNetworkAdminUIController.setLocation(location);
             return true;
@@ -220,6 +228,13 @@ public class LocalGameAdminLogic {
     public void minusPoint(int userNumber) {
         // TODO
         (userNumber == 1 ? green : red).score--;
+    }
+
+    public void finishGame() {
+        if (timer != null) {
+            timer.cancel();
+            timer = null;
+        }
     }
 
     /** Class to store current score and status of user */

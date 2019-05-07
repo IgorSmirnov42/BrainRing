@@ -54,6 +54,7 @@ public class LocalNetworkPlayer extends LocalNetwork {
             @Override
             public void onLeftRoom(int i, @NonNull String s) {
                 Log.d("BrainRing", "Left room");
+                Controller.finishLocalGameAsPlayer();
             }
 
             @Override
@@ -66,9 +67,9 @@ public class LocalNetworkPlayer extends LocalNetwork {
                     }
                     LocalNetworkPlayer.this.room = room;
                     if (code == GamesCallbackStatusCodes.OK) {
-                        System.out.println("CONNECTED");
+                        Log.d("BrainRing","Connected");
                     } else {
-                        System.out.println("ERROR WHILE CONNECTING");
+                        Log.d("BrainRing","Error during connecting");
                     }
                     LocalNetworkPlayer.this.notifyAll();
                 }
@@ -159,6 +160,15 @@ public class LocalNetworkPlayer extends LocalNetwork {
             Log.d("BrainRing", "Sending message before handshake");
         } else {
             sendMessageToConcreteUser(serverId, message);
+        }
+    }
+
+    @Override
+    public void leaveRoom() {
+        if (room != null) {
+            Games.getRealTimeMultiplayerClient(Controller.getPlayerActivity(),
+                    googleSignInAccount).leave(mRoomConfig, room.getRoomId());
+            room = null;
         }
     }
 }

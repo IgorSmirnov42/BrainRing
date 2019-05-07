@@ -1,5 +1,6 @@
 package ru.spbhse.brainring;
 
+import android.app.Activity;
 import android.util.Log;
 
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -103,19 +104,19 @@ public class Controller {
         }
     }
 
-    public static class LocalUserLogicController {
-        private static LocalGamePlayerLogic userLogic = new LocalGamePlayerLogic(); //
+    public static class LocalPlayerLogicController {
+        private static LocalGamePlayerLogic playerLogic = new LocalGamePlayerLogic(); //
 
         public static void onForbiddenToAnswer() {
-            userLogic.onForbiddenToAnswer();
+            playerLogic.onForbiddenToAnswer();
         }
 
         public static void onAllowedToAnswer() {
-            userLogic.onAllowedToAnswer();
+            playerLogic.onAllowedToAnswer();
         }
 
         public static void answerButtonPushed() {
-            userLogic.answerButtonPushed();
+            playerLogic.answerButtonPushed();
         }
     }
 
@@ -278,6 +279,12 @@ public class Controller {
     public static class LocalNetworkController {
         private static LocalNetwork network;
 
+        public static void leaveRoom() {
+            if (network != null) {
+                network.leaveRoom();
+            }
+        }
+
         public static void loggedIn(GoogleSignInAccount signedInAccount) {
             network.googleSignInAccount = signedInAccount;
             network.startQuickGame();
@@ -379,15 +386,12 @@ public class Controller {
     public static void finishOnlineGame() {
         if (OnlineAdminLogicController.adminLogic != null) {
             OnlineAdminLogicController.adminLogic.finishGame();
+            OnlineAdminLogicController.adminLogic = null;
         }
-        OnlineAdminLogicController.adminLogic = null;
         OnlineUserLogicController.userLogic = null;
         NetworkController.network = null;
         if (gameActivity != null) {
-            GameActivity activity = gameActivity.get();
-            if (activity != null) {
-                activity.finish();
-            }
+            finishActivity(gameActivity.get());
         }
     }
 
@@ -396,6 +400,29 @@ public class Controller {
     }
 
     public static void finishLocalGameAsAdmin() {
-        LocalAdminLogicController.adminLogic = null;
+        if (LocalAdminLogicController.adminLogic != null) {
+            LocalAdminLogicController.adminLogic.finishGame();
+            LocalAdminLogicController.adminLogic = null;
+        }
+        LocalNetworkAdminController.network = null;
+        LocalNetworkController.network = null;
+        if (juryActivity != null) {
+            finishActivity(juryActivity.get());
+        }
+    }
+
+    public static void finishLocalGameAsPlayer() {
+        LocalPlayerLogicController.playerLogic = null;
+        LocalNetworkController.network = null;
+        LocalNetworkPlayerController.network = null;
+        if (playerActivity != null) {
+            finishActivity(playerActivity.get());
+        }
+    }
+
+    private static void finishActivity(Activity activity) {
+        if (activity != null) {
+            activity.finish();
+        }
     }
 }

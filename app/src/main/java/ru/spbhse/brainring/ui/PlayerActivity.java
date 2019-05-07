@@ -39,7 +39,7 @@ public class PlayerActivity extends AppCompatActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Controller.LocalUserLogicController.answerButtonPushed();
+                Controller.LocalPlayerLogicController.answerButtonPushed();
             }
         });
 
