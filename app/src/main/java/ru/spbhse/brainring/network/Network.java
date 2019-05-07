@@ -132,7 +132,7 @@ public class Network {
             }
             String minimalId = Collections.min(room.getParticipantIds());
             serverId = minimalId;
-            Games.getPlayersClient(Controller.getGameActivity(), googleSignInAccount)
+            Games.getPlayersClient(Controller.getOnlineGameActivity(), googleSignInAccount)
                     .getCurrentPlayerId()
                     .addOnSuccessListener(new OnSuccessListener<String>() {
                         @Override
@@ -156,7 +156,7 @@ public class Network {
 
     public void leaveRoom() {
         if (room != null) {
-            Games.getRealTimeMultiplayerClient(Controller.getGameActivity(),
+            Games.getRealTimeMultiplayerClient(Controller.getOnlineGameActivity(),
                     googleSignInAccount).leave(mRoomConfig, room.getRoomId());
             room = null;
         }
@@ -232,7 +232,7 @@ public class Network {
     public void startQuickGame() {
         isServer = false;
         // quick-start a game with 1 randomly selected opponent
-        mRealTimeMultiplayerClient = Games.getRealTimeMultiplayerClient(Controller.getGameActivity(),
+        mRealTimeMultiplayerClient = Games.getRealTimeMultiplayerClient(Controller.getOnlineGameActivity(),
                 googleSignInAccount);
         final int MIN_OPPONENTS = 1, MAX_OPPONENTS = 1;
         Bundle autoMatchCriteria = RoomConfig.createAutoMatchCriteria(MIN_OPPONENTS,
@@ -244,7 +244,7 @@ public class Network {
                 .setAutoMatchCriteria(autoMatchCriteria)
                 .build();
 
-        Games.getRealTimeMultiplayerClient(Controller.getGameActivity(), googleSignInAccount)
+        Games.getRealTimeMultiplayerClient(Controller.getOnlineGameActivity(), googleSignInAccount)
                 .create(mRoomConfig);
     }
 

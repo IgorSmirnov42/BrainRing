@@ -8,22 +8,20 @@ import android.widget.Button;
 
 import ru.spbhse.brainring.R;
 
-public class SelectOnlineOpponentActivity extends AppCompatActivity {
+public class TrainingGamePreparationActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_select_online_opponent);
+        setContentView(R.layout.activity_select_training_packages);
 
-        Button searchOpponentButton = findViewById(R.id.searchOpponentButton);
-        searchOpponentButton.setOnClickListener(new View.OnClickListener() {
+        Button startTrainingGameButton = findViewById(R.id.startTrainingGameButton);
+        startTrainingGameButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(SelectOnlineOpponentActivity.this, OnlineGameActivity.class);
+                Intent intent = new Intent(TrainingGamePreparationActivity.this, TrainingGameActivity.class);
                 startActivity(intent);
             }
         });
     }
-
-
 }
