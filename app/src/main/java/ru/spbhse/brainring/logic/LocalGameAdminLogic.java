@@ -1,11 +1,15 @@
 package ru.spbhse.brainring.logic;
 
+import android.media.MediaPlayer;
 import android.os.CountDownTimer;
 import android.util.Log;
 
 import ru.spbhse.brainring.Controller;
+import ru.spbhse.brainring.R;
 import ru.spbhse.brainring.network.messages.Message;
 import ru.spbhse.brainring.ui.LocalGameLocation;
+
+import static java.lang.Math.min;
 
 /**
  * Class realizing admin's logic (counting time, switching locations etc)
@@ -16,21 +20,33 @@ public class LocalGameAdminLogic {
     private UserScore green;
     private UserScore red;
     private String answeringUserId;
+
     private static final byte[] ALLOW_ANSWER = Message.generateMessage(Message.ALLOWED_TO_ANSWER, "");;
     private static final byte[] FORBID_ANSWER = Message.generateMessage(Message.FORBIDDEN_TO_ANSWER, "");
+    private static final byte[] FALSE_START = Message.generateMessage(Message.FALSE_START, "");
+    private static final byte[] TIME_START = Message.generateMessage(Message.TIME_START, "");
+
     private static final int FIRST_COUNTDOWN = 20;
     private static final int SECOND_COUNTDOWN = 20;
     private static final int SECOND = 1000;
-    private static final int TIME_TO_SHOW_ANSWER = 5;
-    private static final int TIME_TO_READ_QUESTION = 10;
-    private static final int TIME_TO_WRITE_ANSWER = 10;
+    private static final int SENDING_COUNTDOWN = 5;
+
     private final CountDownTimer firstGameTimer = new CountDownTimer(FIRST_COUNTDOWN * SECOND,
             SECOND) {
         @Override
         public void onTick(long millisUntilFinished) {
             Log.d("BrainRing", "Tick first timer");
             if (timer == this) {
-                Controller.LocalNetworkAdminUIController.showTime(millisUntilFinished / SECOND);
+                Controller.LocalNetworkAdminUIController.showTime(
+                        min(millisUntilFinished / SECOND + 1, FIRST_COUNTDOWN));
+
+                if (millisUntilFinished <= SENDING_COUNTDOWN * SECOND) {
+                    new Thread(() -> {
+                        MediaPlayer player = MediaPlayer.create(Controller.getJuryActivity(), R.raw.countdown);
+                        player.setOnCompletionListener(MediaPlayer::release);
+                        player.start();
+                    }).start();
+                }
             }
         }
 
@@ -39,6 +55,12 @@ public class LocalGameAdminLogic {
             Log.d("BrainRing", "Finish first timer");
             synchronized (LocalGameAdminLogic.this) {
                 if (timer == this) {
+                    new Thread(() -> {
+                        MediaPlayer player = MediaPlayer.create(Controller.getJuryActivity(), R.raw.beep);
+                        player.setOnCompletionListener(MediaPlayer::release);
+                        player.start();
+                    }).start();
+
                     newQuestion();
                 }
             }
@@ -50,7 +72,16 @@ public class LocalGameAdminLogic {
         public void onTick(long millisUntilFinished) {
             Log.d("BrainRing", "Tick first timer");
             if (timer == this) {
-                Controller.LocalNetworkAdminUIController.showTime(millisUntilFinished / SECOND);
+                Controller.LocalNetworkAdminUIController.showTime(
+                        min(millisUntilFinished / SECOND + 1, SECOND_COUNTDOWN));
+
+                if (millisUntilFinished <= SENDING_COUNTDOWN * SECOND) {
+                    new Thread(() -> {
+                        MediaPlayer player = MediaPlayer.create(Controller.getJuryActivity(), R.raw.countdown);
+                        player.setOnCompletionListener(MediaPlayer::release);
+                        player.start();
+                    }).start();
+                }
             }
         }
 
@@ -59,6 +90,11 @@ public class LocalGameAdminLogic {
             Log.d("BrainRing", "Finish first timer");
             synchronized (LocalGameAdminLogic.this) {
                 if (timer == this) {
+                    new Thread(() -> {
+                        MediaPlayer player = MediaPlayer.create(Controller.getJuryActivity(), R.raw.beep);
+                        player.setOnCompletionListener(MediaPlayer::release);
+                        player.start();
+                    }).start();
                     newQuestion();
                 }
             }
@@ -116,10 +152,20 @@ public class LocalGameAdminLogic {
             Controller.LocalNetworkAdminUIController.setLocation(location);
             timer = firstGameTimer;
             timer.start();
+            new Thread(() -> {
+                MediaPlayer player = MediaPlayer.create(Controller.getJuryActivity(), R.raw.start);
+                player.setOnCompletionListener(MediaPlayer::release);
+                player.start();
+            }).start();
+            Controller.LocalNetworkController.sendMessageToOthers(TIME_START);
             return true;
         }
         // Начало нового раунда
         if (location == LocalGameLocation.COUNTDOWN) {
+            if (timer != null) {
+                timer.cancel();
+                timer = null;
+            }
             location = LocalGameLocation.NOT_STARTED;
             Controller.LocalNetworkAdminUIController.setLocation(location);
             return true;
@@ -153,7 +199,7 @@ public class LocalGameAdminLogic {
         UserScore user = getThisUser(userId);
         if (location == LocalGameLocation.READING_QUESTION) {
             user.status.alreadyAnswered = true;
-            Controller.LocalNetworkController.sendMessageToConcreteUser(userId, FORBID_ANSWER);
+            Controller.LocalNetworkController.sendMessageToConcreteUser(userId, FALSE_START);
             if (bothAnswered()) {
                 newQuestion();
             }
@@ -164,11 +210,24 @@ public class LocalGameAdminLogic {
         } else {
             user.status.alreadyAnswered = true;
             answeringUserId = userId;
+            new Thread(() -> {
+                MediaPlayer player = MediaPlayer.create(Controller.getJuryActivity(), R.raw.answering);
+                player.setOnCompletionListener(MediaPlayer::release);
+                player.start();
+            }).start();
             Controller.LocalNetworkController.sendMessageToConcreteUser(userId, ALLOW_ANSWER);
             //Controller.NetworkController.sendMessageToConcreteUser(
             //        getOtherUser(userId).status.participantId, OPPONENT_ANSWERING);
-            Controller.LocalNetworkAdminUIController.onReceivingAnswer();
+            Controller.LocalNetworkAdminUIController.onReceivingAnswer(getColor(userId));
             location = LocalGameLocation.ONE_IS_ANSWERING;
+        }
+    }
+
+    private String getColor(String userId) {
+        if (green.status.participantId.equals(userId)) {
+            return "green";
+        } else {
+            return "red";
         }
     }
 
@@ -220,6 +279,13 @@ public class LocalGameAdminLogic {
     public void minusPoint(int userNumber) {
         // TODO
         (userNumber == 1 ? green : red).score--;
+    }
+
+    public void finishGame() {
+        if (timer != null) {
+            timer.cancel();
+            timer = null;
+        }
     }
 
     /** Class to store current score and status of user */

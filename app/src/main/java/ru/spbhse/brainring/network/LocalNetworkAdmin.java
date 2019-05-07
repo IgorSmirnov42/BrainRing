@@ -48,6 +48,7 @@ public class LocalNetworkAdmin extends LocalNetwork {
             @Override
             public void onLeftRoom(int i, @NonNull String s) {
                 Log.d("BrainRing", "Left room");
+                Controller.finishLocalGameAsAdmin();
             }
 
             @Override
@@ -59,9 +60,9 @@ public class LocalNetworkAdmin extends LocalNetwork {
                 }
                 LocalNetworkAdmin.this.room = room;
                 if (code == GamesCallbackStatusCodes.OK) {
-                    Log.d("BrainRing","CONNECTED");
+                    Log.d("BrainRing","Connected");
                 } else {
-                    Log.d("BrainRing","CONNECTING ERROR");
+                    Log.d("BrainRing","Connecting error");
                 }
                 Games.getPlayersClient(Controller.getJuryActivity(), googleSignInAccount)
                         .getCurrentPlayerId()
@@ -146,18 +147,18 @@ public class LocalNetworkAdmin extends LocalNetwork {
         Log.d("BrainRing", "Message sent");
     }
 
-    /** Blocking waiter for one's handshake response */
-    private void waitHandshake() {
-        if (!handshaked) {
-            synchronized (handshakeBlock) {
-                while (!handshaked) {
-                    try {
-                        handshakeBlock.wait();
-                    } catch (InterruptedException e) {
-                    }
-                }
-            }
+    @Override
+    public void leaveRoom() {
+        if (room != null) {
+            Games.getRealTimeMultiplayerClient(Controller.getJuryActivity(),
+                    googleSignInAccount).leave(mRoomConfig, room.getRoomId());
+            room = null;
         }
+    }
+
+    /** Sends message to all users in a room (and to itself) */
+    public void sendMessageToAll(byte[] message) {
+        mRealTimeMultiplayerClient.sendUnreliableMessageToOthers(message, room.getRoomId());
     }
 
     public String getGreenId() {

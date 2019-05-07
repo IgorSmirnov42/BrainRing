@@ -54,6 +54,7 @@ public class LocalNetworkPlayer extends LocalNetwork {
             @Override
             public void onLeftRoom(int i, @NonNull String s) {
                 Log.d("BrainRing", "Left room");
+                Controller.finishLocalGameAsPlayer();
             }
 
             @Override
@@ -66,9 +67,9 @@ public class LocalNetworkPlayer extends LocalNetwork {
                     }
                     LocalNetworkPlayer.this.room = room;
                     if (code == GamesCallbackStatusCodes.OK) {
-                        System.out.println("CONNECTED");
+                        Log.d("BrainRing","Connected");
                     } else {
-                        System.out.println("ERROR WHILE CONNECTING");
+                        Log.d("BrainRing","Error during connecting");
                     }
                     LocalNetworkPlayer.this.notifyAll();
                 }
@@ -107,7 +108,7 @@ public class LocalNetworkPlayer extends LocalNetwork {
 
         try (DataInputStream is = new DataInputStream(new ByteArrayInputStream(buf))) {
             int identifier = is.readInt();
-            System.out.println("IDENTIFIER IS" + identifier);
+            Log.d("BrainRing","Identifier is " + identifier);
 
             if (Message.messageIsToServer(identifier)) {
                 Log.wtf("BrainRing", "Client got message to server\n");
@@ -116,10 +117,16 @@ public class LocalNetworkPlayer extends LocalNetwork {
 
             switch (identifier) {
                 case Message.FORBIDDEN_TO_ANSWER:
-                    //Controller.UserLogicController.onForbiddenToAnswer();
+                    Controller.LocalPlayerLogicController.onForbiddenToAnswer();
                     break;
                 case Message.ALLOWED_TO_ANSWER:
-                    //Controller.UserLogicController.onAllowedToAnswer();
+                    Controller.LocalPlayerLogicController.onAllowedToAnswer();
+                    break;
+                case Message.FALSE_START:
+                    Controller.LocalPlayerLogicController.onFalseStart();
+                    break;
+                case Message.TIME_START:
+                    Controller.LocalPlayerLogicController.onTimeStart();
                     break;
                 default:
                     Log.wtf("BrainRing", "Unexpected message received");
@@ -127,7 +134,6 @@ public class LocalNetworkPlayer extends LocalNetwork {
 
         } catch (IOException e) {
             e.printStackTrace();
-            // TODO: нормальная обработка
         }
     }
 
@@ -159,6 +165,15 @@ public class LocalNetworkPlayer extends LocalNetwork {
             Log.d("BrainRing", "Sending message before handshake");
         } else {
             sendMessageToConcreteUser(serverId, message);
+        }
+    }
+
+    @Override
+    public void leaveRoom() {
+        if (room != null) {
+            Games.getRealTimeMultiplayerClient(Controller.getPlayerActivity(),
+                    googleSignInAccount).leave(mRoomConfig, room.getRoomId());
+            room = null;
         }
     }
 }
