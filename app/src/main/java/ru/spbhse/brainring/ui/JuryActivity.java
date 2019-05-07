@@ -27,39 +27,68 @@ public class JuryActivity extends AppCompatActivity {
     private Button mainButton;
     private TextView redTeamScore;
     private TextView greenTeamScore;
+    private TextView greenStatus;
+    private TextView redStatus;
     private LocalGameLocation currentLocation = LocalGameLocation.GAME_WAITING_START;
     private static final int RC_SIGN_IN = 42;
+    private final View.OnClickListener longerClick = v -> {
+        Toast toast = Toast.makeText(JuryActivity.this, "Надо нажимать дольше",
+                Toast.LENGTH_LONG);
+        toast.setGravity(Gravity.CENTER, 0, 0);
+        toast.show();
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_jury);
         Controller.setUI(this);
-        Controller.initializeLocalGame();
+        Controller.initializeLocalGame(getIntent().getIntExtra("firstTimer", 20),
+                getIntent().getIntExtra("secondTimer", 20));
         statusText = findViewById(R.id.gameStatusInfo);
         mainButton = findViewById(R.id.mainButton);
-        mainButton.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                if (!Controller.LocalAdminLogicController.toNextState()) {
-                    Toast.makeText(JuryActivity.this, "Невозможно в данный момент переключиться.",
-                            Toast.LENGTH_LONG).show();
-                }
-                return true;
+        mainButton.setOnLongClickListener(v -> {
+            if (!Controller.LocalAdminLogicController.toNextState()) {
+                Toast.makeText(JuryActivity.this, "Невозможно в данный момент переключиться.",
+                        Toast.LENGTH_LONG).show();
             }
+            return true;
         });
-        mainButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast toast = Toast.makeText(JuryActivity.this, "Надо нажимать дольше",
-                        Toast.LENGTH_LONG);
-                toast.setGravity(Gravity.CENTER, 0, 0);
-                toast.show();
-            }
+        mainButton.setOnClickListener(longerClick);
+
+        Button minusGreenButton = findViewById(R.id.minusGreenTeamButton);
+        minusGreenButton.setOnLongClickListener(v -> {
+            Controller.LocalAdminLogicController.minusPoint(1);
+            return true;
         });
+        minusGreenButton.setOnClickListener(longerClick);
+
+        Button plusGreenButton = findViewById(R.id.plusGreenTeamButton);
+        plusGreenButton.setOnLongClickListener(v -> {
+            Controller.LocalAdminLogicController.plusPoint(1);
+            return true;
+        });
+        plusGreenButton.setOnClickListener(longerClick);
+
+        Button minusRedButton = findViewById(R.id.minusRedTeamButton);
+        minusRedButton.setOnLongClickListener(v -> {
+            Controller.LocalAdminLogicController.minusPoint(2);
+            return true;
+        });
+        minusRedButton.setOnClickListener(longerClick);
+
+        Button plusRedButton = findViewById(R.id.plusRedTeamButton);
+        plusRedButton.setOnLongClickListener(v -> {
+            Controller.LocalAdminLogicController.plusPoint(2);
+            return true;
+        });
+        plusRedButton.setOnClickListener(longerClick);
 
         greenTeamScore = findViewById(R.id.greenTeamScore);
         redTeamScore = findViewById(R.id.redTeamScore);
+
+        greenStatus = findViewById(R.id.greenStatus);
+        redStatus = findViewById(R.id.redStatus);
 
         redrawLocation();
 
@@ -104,6 +133,14 @@ public class JuryActivity extends AppCompatActivity {
         Intent intent = new Intent(JuryActivity.this, Judging.class);
         intent.putExtra("color", color);
         startActivity(intent);
+    }
+
+    public void setGreenStatus(String status) {
+        greenStatus.setText(status);
+    }
+
+    public void setRedStatus(String status) {
+        redStatus.setText(status);
     }
 
     public void showTime(long time) {
