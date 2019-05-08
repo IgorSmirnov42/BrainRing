@@ -262,6 +262,15 @@ public class Network {
         onMessageReceived(message, myParticipantId);
     }
 
+    /** Sends message to all users in a room (and to itself). Guarantees delivering. May be slow... */
+    public void sendReliableMessageToAll(byte[] message) {
+        Log.d("BrainRing", "Sending message to all");
+
+        for (String participantId : room.getParticipantIds()) {
+            sendReliableMessageToConcreteUser(participantId, message);
+        }
+    }
+
     /** Sends message to user with given id */
     public void sendMessageToConcreteUser(String userId, byte[] message) {
         if (myParticipantId == null || userId == null) {
@@ -275,11 +284,33 @@ public class Network {
         }
     }
 
+    /** Sends message to user with given id. Guarantees delivering. May be slow... */
+    public void sendReliableMessageToConcreteUser(String userId, byte[] message) {
+        if (myParticipantId == null || userId == null) {
+            Log.e("BrainRing", "Cannot send message before initialization");
+            return;
+        }
+        if (userId.equals(myParticipantId)) {
+            onMessageReceived(message, myParticipantId);
+        } else {
+            mRealTimeMultiplayerClient.sendReliableMessage(message, room.getRoomId(), userId, (i, i1, s) -> {
+            });
+        }
+    }
+
     public void sendMessageToServer(byte[] message) {
         if (isServer) {
             onMessageReceived(message, myParticipantId);
         } else {
             sendMessageToConcreteUser(serverId, message);
+        }
+    }
+
+    public void sendReliableMessageToServer(byte[] message) {
+        if (isServer) {
+            onMessageReceived(message, myParticipantId);
+        } else {
+            sendReliableMessageToConcreteUser(serverId, message);
         }
     }
 

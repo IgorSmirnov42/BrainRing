@@ -65,6 +65,10 @@ public class LocalController extends Controller {
     public static class LocalAdminLogicController {
         private static LocalGameAdminLogic adminLogic;
 
+        public static void onHandshakeAccept(String userId) {
+            adminLogic.onHandshakeAccept(userId);
+        }
+
         public static String getGreenScore() {
             return adminLogic.getGreenScore();
         }
@@ -91,12 +95,12 @@ public class LocalController extends Controller {
 
         public static void plusPoint(int userNumber) {
             adminLogic.plusPoint(userNumber);
-            LocalNetworkAdminUIController.redraw();
+            LocalAdminUIController.redraw();
         }
 
         public static void minusPoint(int userNumber) {
             adminLogic.minusPoint(userNumber);
-            LocalNetworkAdminUIController.redraw();
+            LocalAdminUIController.redraw();
         }
     }
 
@@ -124,7 +128,7 @@ public class LocalController extends Controller {
         }
     }
 
-    public static class LocalNetworkAdminUIController {
+    public static class LocalAdminUIController {
         public static void redraw() {
             juryActivity.get().redrawLocation();
         }
@@ -156,7 +160,6 @@ public class LocalController extends Controller {
         public static void createLocalGame() {
             network = new LocalNetworkAdmin();
             LocalNetworkController.network = network;
-            System.out.println("BEGIN LOGIN");
             juryActivity.get().signIn();
         }
 
@@ -165,13 +168,9 @@ public class LocalController extends Controller {
                     network.getRedId());
         }
 
-        /*public static String getGreenParticipantId() {
-            return network.getGreenId();
+        public static void handshake() {
+            network.regularHandshake();
         }
-
-        public static String getRedParticipantId() {
-            return network.getRedId();
-        }*/
     }
 
     public static class LocalNetworkPlayerController {

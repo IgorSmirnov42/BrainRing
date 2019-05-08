@@ -113,7 +113,7 @@ public class OnlineGameUserLogic {
     /** Sends written answer to server */
     public void answerIsWritten(String answer) {
         OnlineController.NetworkUIController.setLocation(GameActivityLocation.OPPONENT_IS_ANSWERING);
-        OnlineController.NetworkController.sendMessageToServer(Message.generateMessage(
+        OnlineController.NetworkController.sendReliableMessageToServer(Message.generateMessage(
                 Message.ANSWER_IS_WRITTEN, answer));
     }
 }

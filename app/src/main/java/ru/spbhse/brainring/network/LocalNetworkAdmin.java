@@ -10,7 +10,6 @@ import com.google.android.gms.games.GamesCallbackStatusCodes;
 import com.google.android.gms.games.multiplayer.realtime.Room;
 import com.google.android.gms.games.multiplayer.realtime.RoomConfig;
 import com.google.android.gms.games.multiplayer.realtime.RoomUpdateCallback;
-import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
@@ -24,9 +23,9 @@ import ru.spbhse.brainring.network.messages.Message;
  * Used by admin in a local network mode
  */
 public class LocalNetworkAdmin extends LocalNetwork {
-    private final Object handshakeBlock = new Object();
     private String redId;
     private String greenId;
+    private static final byte[] HANDSHAKE = Message.generateMessage(Message.HANDSHAKE, "");
 
     /**
      * Creates new instance. Fills {@code mRoomUpdateCallback} with an instance that
@@ -66,12 +65,7 @@ public class LocalNetworkAdmin extends LocalNetwork {
                 }
                 Games.getPlayersClient(LocalController.getJuryActivity(), googleSignInAccount)
                         .getCurrentPlayerId()
-                        .addOnSuccessListener(new OnSuccessListener<String>() {
-                            @Override
-                            public void onSuccess(String myPlayerId) {
-                                myParticipantId = room.getParticipantId(myPlayerId);
-                            }
-                        });
+                        .addOnSuccessListener(myPlayerId -> myParticipantId = room.getParticipantId(myPlayerId));
                 Log.d("BrainRing", "Start handshake");
                 handshake();
             }
@@ -103,12 +97,15 @@ public class LocalNetworkAdmin extends LocalNetwork {
         }
         try (DataInputStream is = new DataInputStream(new ByteArrayInputStream(buf))) {
             int identifier = is.readInt();
-            System.out.println("IDENTIFIER IS" + identifier);
+            Log.d("BrainRing", "Identifier is " + identifier);
 
-            if (identifier == Message.ANSWER_IS_READY) {
-                LocalController.LocalAdminLogicController.onAnswerIsReady(userId);
-            } else {
-                Log.wtf("BrainRing", "Unexpected message received");
+            switch(identifier) {
+                case Message.ANSWER_IS_READY:
+                    LocalController.LocalAdminLogicController.onAnswerIsReady(userId);
+                    break;
+                case Message.HANDSHAKE:
+                    LocalController.LocalAdminLogicController.onHandshakeAccept(userId);
+                    break;
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -141,10 +138,14 @@ public class LocalNetworkAdmin extends LocalNetwork {
      * After execution starts game cycle
      */
     private void handshake() {
-        byte[] message = new byte[20];
+        byte[] message = new byte[0];
         Log.d("BrainRing", "Writing message");
-        mRealTimeMultiplayerClient.sendUnreliableMessageToOthers(message, room.getRoomId());
+        sendMessageToOthers(message);
         Log.d("BrainRing", "Message sent");
+    }
+
+    public void regularHandshake() {
+        sendMessageToOthers(HANDSHAKE);
     }
 
     @Override
@@ -154,11 +155,6 @@ public class LocalNetworkAdmin extends LocalNetwork {
                     googleSignInAccount).leave(mRoomConfig, room.getRoomId());
             room = null;
         }
-    }
-
-    /** Sends message to all users in a room (and to itself) */
-    public void sendMessageToAll(byte[] message) {
-        mRealTimeMultiplayerClient.sendUnreliableMessageToOthers(message, room.getRoomId());
     }
 
     public String getGreenId() {

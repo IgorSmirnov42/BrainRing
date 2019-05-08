@@ -22,15 +22,17 @@ import ru.spbhse.brainring.controllers.LocalController;
 import ru.spbhse.brainring.R;
 
 public class JuryActivity extends AppCompatActivity {
-
     private TextView statusText;
     private Button mainButton;
     private TextView redTeamScore;
     private TextView greenTeamScore;
     private TextView greenStatus;
     private TextView redStatus;
+
     private LocalGameLocation currentLocation = LocalGameLocation.GAME_WAITING_START;
+
     private static final int RC_SIGN_IN = 42;
+
     private final View.OnClickListener longerClick = v -> {
         Toast toast = Toast.makeText(JuryActivity.this, "Надо нажимать дольше",
                 Toast.LENGTH_LONG);
@@ -49,7 +51,7 @@ public class JuryActivity extends AppCompatActivity {
         mainButton = findViewById(R.id.mainButton);
         mainButton.setOnLongClickListener(v -> {
             if (!LocalController.LocalAdminLogicController.toNextState()) {
-                Toast.makeText(JuryActivity.this, "Невозможно в данный момент переключиться.",
+                Toast.makeText(JuryActivity.this, "Невозможно переключиться в данный момент",
                         Toast.LENGTH_LONG).show();
             }
             return true;
@@ -91,6 +93,7 @@ public class JuryActivity extends AppCompatActivity {
         redStatus = findViewById(R.id.redStatus);
 
         redrawLocation();
+        statusText.setText("Ожидаем подключение игроков");
 
         LocalController.LocalNetworkAdminController.createLocalGame();
     }
@@ -104,7 +107,7 @@ public class JuryActivity extends AppCompatActivity {
         greenTeamScore.setText(LocalController.LocalAdminLogicController.getGreenScore());
         redTeamScore.setText(LocalController.LocalAdminLogicController.getRedScore());
         if (currentLocation == LocalGameLocation.GAME_WAITING_START) {
-            statusText.setText("Ожидаем подключения игроков");
+            statusText.setText("Проверяем подключение");
             mainButton.setVisibility(View.GONE);
         }
         if (currentLocation == LocalGameLocation.NOT_STARTED) {

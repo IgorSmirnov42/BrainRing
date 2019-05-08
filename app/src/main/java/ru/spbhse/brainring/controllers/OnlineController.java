@@ -161,7 +161,7 @@ public class OnlineController extends Controller {
     public static class NetworkController {
         private static Network network;
         private static CountDownTimer handshakeTimer;
-        private static final int HANDSHAKE_TIME = 20000;
+        private static final int HANDSHAKE_TIME = 10000;
 
         public static void createOnlineGame() {
             network = new Network();
@@ -221,6 +221,14 @@ public class OnlineController extends Controller {
             network.sendMessageToServer(message);
         }
 
+        public static void sendReliableMessageToServer(byte[] message) {
+            if (network == null) {
+                Log.wtf("BrainRing", "Sending message to server but network is null");
+                return;
+            }
+            network.sendReliableMessageToServer(message);
+        }
+
         public static String getMyParticipantId() {
             if (network == null) {
                 Log.wtf("BrainRing", "Getting id but network is null");
@@ -245,12 +253,28 @@ public class OnlineController extends Controller {
             network.sendMessageToConcreteUser(userId, message);
         }
 
+        public static void sendReliableMessageToConcreteUser(String userId, byte[] message) {
+            if (network == null) {
+                Log.wtf("BrainRing", "Sending message but network is null");
+                return;
+            }
+            network.sendReliableMessageToConcreteUser(userId, message);
+        }
+
         public static void sendMessageToAll(byte[] message) {
             if (network == null) {
                 Log.wtf("BrainRing", "Sending message but network is null");
                 return;
             }
             network.sendMessageToAll(message);
+        }
+
+        public static void sendReliableMessageToAll(byte[] message) {
+            if (network == null) {
+                Log.wtf("BrainRing", "Sending message but network is null");
+                return;
+            }
+            network.sendReliableMessageToAll(message);
         }
     }
 }

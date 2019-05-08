@@ -128,6 +128,9 @@ public class LocalNetworkPlayer extends LocalNetwork {
                 case Message.TIME_START:
                     LocalController.LocalPlayerLogicController.onTimeStart();
                     break;
+                case Message.HANDSHAKE:
+                    sendMessageToConcreteUser(userId, buf);
+                    break;
                 default:
                     Log.wtf("BrainRing", "Unexpected message received");
             }
