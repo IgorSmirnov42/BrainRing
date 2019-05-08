@@ -15,7 +15,7 @@ import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 
-import ru.spbhse.brainring.Controller;
+import ru.spbhse.brainring.controllers.LocalController;
 import ru.spbhse.brainring.network.messages.Message;
 
 /**
@@ -54,7 +54,7 @@ public class LocalNetworkPlayer extends LocalNetwork {
             @Override
             public void onLeftRoom(int i, @NonNull String s) {
                 Log.d("BrainRing", "Left room");
-                Controller.finishLocalGameAsPlayer();
+                LocalController.finishLocalGameAsPlayer();
             }
 
             @Override
@@ -78,7 +78,7 @@ public class LocalNetworkPlayer extends LocalNetwork {
     }
 
     /**
-     * Decodes byte message received by player and calls needed functions in Controller
+     * Decodes byte message received by player and calls needed functions in LocalController
      * If it is a first message to player, sends response if green
      */
     @Override
@@ -117,16 +117,16 @@ public class LocalNetworkPlayer extends LocalNetwork {
 
             switch (identifier) {
                 case Message.FORBIDDEN_TO_ANSWER:
-                    Controller.LocalPlayerLogicController.onForbiddenToAnswer();
+                    LocalController.LocalPlayerLogicController.onForbiddenToAnswer();
                     break;
                 case Message.ALLOWED_TO_ANSWER:
-                    Controller.LocalPlayerLogicController.onAllowedToAnswer();
+                    LocalController.LocalPlayerLogicController.onAllowedToAnswer();
                     break;
                 case Message.FALSE_START:
-                    Controller.LocalPlayerLogicController.onFalseStart();
+                    LocalController.LocalPlayerLogicController.onFalseStart();
                     break;
                 case Message.TIME_START:
-                    Controller.LocalPlayerLogicController.onTimeStart();
+                    LocalController.LocalPlayerLogicController.onTimeStart();
                     break;
                 default:
                     Log.wtf("BrainRing", "Unexpected message received");
@@ -140,7 +140,7 @@ public class LocalNetworkPlayer extends LocalNetwork {
     /** Starts quick game with auto matched server and player */
     @Override
     public void startQuickGame() {
-        mRealTimeMultiplayerClient = Games.getRealTimeMultiplayerClient(Controller.getPlayerActivity(),
+        mRealTimeMultiplayerClient = Games.getRealTimeMultiplayerClient(LocalController.getPlayerActivity(),
                 googleSignInAccount);
         final int MIN_OPPONENTS = 2, MAX_OPPONENTS = 2;
         Bundle autoMatchCriteria = RoomConfig.createAutoMatchCriteria(MIN_OPPONENTS,
@@ -152,7 +152,7 @@ public class LocalNetworkPlayer extends LocalNetwork {
                 .setAutoMatchCriteria(autoMatchCriteria)
                 .build();
 
-        Games.getRealTimeMultiplayerClient(Controller.getPlayerActivity(), googleSignInAccount)
+        Games.getRealTimeMultiplayerClient(LocalController.getPlayerActivity(), googleSignInAccount)
                 .create(mRoomConfig);
     }
 
@@ -171,7 +171,7 @@ public class LocalNetworkPlayer extends LocalNetwork {
     @Override
     public void leaveRoom() {
         if (room != null) {
-            Games.getRealTimeMultiplayerClient(Controller.getPlayerActivity(),
+            Games.getRealTimeMultiplayerClient(LocalController.getPlayerActivity(),
                     googleSignInAccount).leave(mRoomConfig, room.getRoomId());
             room = null;
         }

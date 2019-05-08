@@ -8,7 +8,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import ru.spbhse.brainring.Controller;
+import ru.spbhse.brainring.controllers.OnlineController;
+import ru.spbhse.brainring.controllers.DatabaseController;
 import ru.spbhse.brainring.network.messages.Message;
 import ru.spbhse.brainring.utils.Question;
 
@@ -46,7 +47,7 @@ public class OnlineGameAdminLogic {
             }
             Log.d("BrainRing", "Tick first timer");
             if (millisUntilFinished <= SENDING_COUNTDOWN * SECOND) {
-                Controller.NetworkController.sendMessageToAll(
+                OnlineController.NetworkController.sendMessageToAll(
                         Message.generateMessage(Message.TICK,
                                 String.valueOf(millisUntilFinished / SECOND)));
             }
@@ -72,7 +73,7 @@ public class OnlineGameAdminLogic {
             }
             Log.d("BrainRing", "Tick second timer");
             if (millisUntilFinished <= SENDING_COUNTDOWN * SECOND) {
-                Controller.NetworkController.sendMessageToAll(
+                OnlineController.NetworkController.sendMessageToAll(
                         Message.generateMessage(Message.TICK,
                                 String.valueOf(millisUntilFinished / SECOND)));
             }
@@ -93,8 +94,8 @@ public class OnlineGameAdminLogic {
 
     /** Returns UserScore object connected with given user */
     public OnlineGameAdminLogic() {
-        user1 = new UserScore(Controller.NetworkController.getMyParticipantId());
-        user2 = new UserScore(Controller.NetworkController.getOpponentParticipantId());
+        user1 = new UserScore(OnlineController.NetworkController.getMyParticipantId());
+        user2 = new UserScore(OnlineController.NetworkController.getOpponentParticipantId());
     }
 
     /** Returns UserScore object connected with given user */
@@ -115,17 +116,17 @@ public class OnlineGameAdminLogic {
         System.out.println("THREAD ID" + Thread.currentThread().getId());
         if (readingTime) {
             getThisUser(userId).status.alreadyAnswered = true;
-            Controller.NetworkController.sendMessageToConcreteUser(userId, FALSE_START);
+            OnlineController.NetworkController.sendMessageToConcreteUser(userId, FALSE_START);
             return;
         }
         timer.cancel();
         UserScore user = getThisUser(userId);
         if (user.status.alreadyAnswered || answeringUserId != null) {
-            Controller.NetworkController.sendMessageToConcreteUser(userId, FORBID_ANSWER);
+            OnlineController.NetworkController.sendMessageToConcreteUser(userId, FORBID_ANSWER);
         } else {
             answeringUserId = userId;
             user.status.alreadyAnswered = true;
-            Controller.NetworkController.sendMessageToConcreteUser(userId, ALLOW_ANSWER);
+            OnlineController.NetworkController.sendMessageToConcreteUser(userId, ALLOW_ANSWER);
             final String currentUser = userId;
             timer = new CountDownTimer(TIME_TO_WRITE_ANSWER * SECOND,
                     TIME_TO_WRITE_ANSWER * SECOND) {
@@ -141,7 +142,7 @@ public class OnlineGameAdminLogic {
                 }
             };
             timer.start();
-            Controller.NetworkController.sendMessageToConcreteUser(
+            OnlineController.NetworkController.sendMessageToConcreteUser(
                     getOtherUser(userId).status.participantId, OPPONENT_ANSWERING);
         }
     }
@@ -151,7 +152,7 @@ public class OnlineGameAdminLogic {
             showAnswer();
             return;
         }
-        Controller.NetworkController.sendMessageToConcreteUser(
+        OnlineController.NetworkController.sendMessageToConcreteUser(
                 getOtherUser(previousUserId).status.participantId,
                 Message.generateMessage(Message.SENDING_INCORRECT_OPPONENT_ANSWER, previousAnswer));
         timer = secondGameTimer;
@@ -162,7 +163,7 @@ public class OnlineGameAdminLogic {
     private void stopAnswering() {
         String userId = answeringUserId;
         answeringUserId = null;
-        Controller.NetworkController.sendMessageToConcreteUser(userId, TIME_OUT);
+        OnlineController.NetworkController.sendMessageToConcreteUser(userId, TIME_OUT);
         restartTime(userId, "");
     }
 
@@ -191,14 +192,14 @@ public class OnlineGameAdminLogic {
     /** Sends answer and shows it for {@code TIME_TO_SHOW_ANSWER} seconds */
     private void showAnswer() {
         System.out.println("THREAD ID" + Thread.currentThread().getId());
-        Controller.NetworkController.sendMessageToAll(generateAnswer());
+        OnlineController.NetworkController.sendMessageToAll(generateAnswer());
         new Handler().postDelayed(this::newQuestion, TIME_TO_SHOW_ANSWER * SECOND);
     }
 
     /** Determines if game is finished. If not, generates new question and sends it */
     public void newQuestion() {
         if (user1.score >= WINNER_SCORE || user2.score >= WINNER_SCORE) {
-            Controller.finishOnlineGame();
+            OnlineController.finishOnlineGame();
             return;
         }
 
@@ -206,10 +207,10 @@ public class OnlineGameAdminLogic {
         user1.status.onNewQuestion();
         user2.status.onNewQuestion();
 
-        currentQuestion = Controller.DatabaseController.getRandomQuestion();
+        currentQuestion = DatabaseController.getRandomQuestion();
         readingTime = true;
         byte[] message = Message.generateMessage(Message.SENDING_QUESTION, currentQuestion.getQuestion());
-        Controller.NetworkController.sendQuestion(message);
+        OnlineController.NetworkController.sendQuestion(message);
     }
 
     public void publishing() {
@@ -227,7 +228,7 @@ public class OnlineGameAdminLogic {
         }
         readingTime = false;
         if (!bothAnswered()) {
-            Controller.NetworkController.sendMessageToAll(TIME_START);
+            OnlineController.NetworkController.sendMessageToAll(TIME_START);
             timer = firstGameTimer;
             timer.start();
         } else {

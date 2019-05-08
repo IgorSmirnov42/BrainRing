@@ -14,7 +14,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.games.GamesActivityResultCodes;
 
-import ru.spbhse.brainring.Controller;
+import ru.spbhse.brainring.controllers.OnlineController;
 import ru.spbhse.brainring.database.QuestionDataBase;
 
 public class OnlineGameActivity extends GameActivity {
@@ -32,13 +32,13 @@ public class OnlineGameActivity extends GameActivity {
         /////////////
         super.onCreate(savedInstanceState);
 
-        Controller.setUI(OnlineGameActivity.this);
+        OnlineController.setUI(OnlineGameActivity.this);
         dataBase = new QuestionDataBase(OnlineGameActivity.this);
         dataBase.openDataBase();
 
         drawLocation();
 
-        Controller.NetworkController.createOnlineGame();
+        OnlineController.NetworkController.createOnlineGame();
     }
 
     /* I know that this function is out of content here,
@@ -56,7 +56,7 @@ public class OnlineGameActivity extends GameActivity {
         if (requestCode == RC_SIGN_IN) {
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
             if (result.isSuccess()) {
-                Controller.NetworkController.loggedIn(result.getSignInAccount());
+                OnlineController.NetworkController.loggedIn(result.getSignInAccount());
             } else {
                 String message = result.getStatus().getStatusMessage();
                 if (message == null || message.isEmpty()) {
@@ -67,7 +67,7 @@ public class OnlineGameActivity extends GameActivity {
             }
         } else if (requestCode == GamesActivityResultCodes.RESULT_LEFT_ROOM) {
             Log.d("BrainRing", "Left room from activity");
-            Controller.NetworkController.leaveRoom();
+            OnlineController.NetworkController.leaveRoom();
         } else if (requestCode == GamesActivityResultCodes.RESULT_SEND_REQUEST_FAILED) {
             Log.d("BrainRing", "Send request failed");
         } else if (requestCode == GamesActivityResultCodes.RESULT_NETWORK_FAILURE) {
@@ -79,6 +79,6 @@ public class OnlineGameActivity extends GameActivity {
     protected void onStop() {
         Log.d("BrainRing", "Stopping activity. Leaving room");
         super.onStop();
-        Controller.NetworkController.leaveRoom();
+        OnlineController.NetworkController.leaveRoom();
     }
 }

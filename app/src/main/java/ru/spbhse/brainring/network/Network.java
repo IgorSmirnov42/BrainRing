@@ -21,7 +21,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
-import ru.spbhse.brainring.Controller;
+import ru.spbhse.brainring.controllers.OnlineController;
 import ru.spbhse.brainring.network.messages.Message;
 
 /** Class for working with network in online mode */
@@ -114,7 +114,7 @@ public class Network {
         @Override
         public void onLeftRoom(int i, @NonNull String s) {
             Log.d("BrainRing", "Left room");
-            Controller.finishOnlineGame();
+            OnlineController.finishOnlineGame();
         }
 
         @Override
@@ -133,7 +133,7 @@ public class Network {
             }
             serverId = Collections.min(room.getParticipantIds());
 
-            Games.getPlayersClient(Controller.getOnlineGameActivity(), googleSignInAccount)
+            Games.getPlayersClient(OnlineController.getOnlineGameActivity(), googleSignInAccount)
                     .getCurrentPlayerId()
                     .addOnSuccessListener(myPlayerId -> {
                         myParticipantId = room.getParticipantId(myPlayerId);
@@ -141,7 +141,7 @@ public class Network {
                         if (myParticipantId.equals(serverId)) {
                             isServer = true;
                             Log.d("BrainRing", "I am server");
-                            Controller.startOnlineGame();
+                            OnlineController.startOnlineGame();
                         }
                     });
         }
@@ -155,11 +155,11 @@ public class Network {
 
     public void leaveRoom() {
         if (room != null) {
-            Games.getRealTimeMultiplayerClient(Controller.getOnlineGameActivity(),
+            Games.getRealTimeMultiplayerClient(OnlineController.getOnlineGameActivity(),
                     googleSignInAccount).leave(mRoomConfig, room.getRoomId());
             room = null;
         }
-        //Controller.finishOnlineGame();
+        //OnlineController.finishOnlineGame();
     }
 
     /** Reacts on received message */
@@ -177,50 +177,50 @@ public class Network {
 
             switch (identifier) {
                 case Message.ANSWER_IS_READY:
-                    Controller.OnlineAdminLogicController.onAnswerIsReady(userId);
+                    OnlineController.OnlineAdminLogicController.onAnswerIsReady(userId);
                     break;
                 case Message.ANSWER_IS_WRITTEN:
                     String answer = Message.readString(is);
-                    Controller.OnlineAdminLogicController.onAnswerIsWritten(answer, userId);
+                    OnlineController.OnlineAdminLogicController.onAnswerIsWritten(answer, userId);
                     break;
                 case Message.FORBIDDEN_TO_ANSWER:
-                    Controller.OnlineUserLogicController.onForbiddenToAnswer();
+                    OnlineController.OnlineUserLogicController.onForbiddenToAnswer();
                     break;
                 case Message.ALLOWED_TO_ANSWER:
-                    Controller.OnlineUserLogicController.onAllowedToAnswer();
+                    OnlineController.OnlineUserLogicController.onAllowedToAnswer();
                     break;
                 case Message.SENDING_QUESTION:
                     String question = Message.readString(is);
-                    Controller.OnlineUserLogicController.onReceivingQuestion(question);
+                    OnlineController.OnlineUserLogicController.onReceivingQuestion(question);
                     break;
                 case Message.SENDING_INCORRECT_OPPONENT_ANSWER:
                     String opponentAnswer = Message.readString(is);
-                    Controller.OnlineUserLogicController.onIncorrectOpponentAnswer(opponentAnswer);
+                    OnlineController.OnlineUserLogicController.onIncorrectOpponentAnswer(opponentAnswer);
                     break;
                 case Message.SENDING_CORRECT_ANSWER_AND_SCORE:
                     int firstUserScore = is.readInt();
                     int secondUserScore = is.readInt();
                     String correctAnswer = Message.readString(is);
-                    Controller.OnlineUserLogicController.onReceivingAnswer(firstUserScore, secondUserScore, correctAnswer);
+                    OnlineController.OnlineUserLogicController.onReceivingAnswer(firstUserScore, secondUserScore, correctAnswer);
                     break;
                 case Message.OPPONENT_IS_ANSWERING:
-                    Controller.OnlineUserLogicController.onOpponentIsAnswering();
+                    OnlineController.OnlineUserLogicController.onOpponentIsAnswering();
                     break;
                 case Message.TICK:
-                    Controller.OnlineUserLogicController.onReceivingTick(Message.readString(is));
+                    OnlineController.OnlineUserLogicController.onReceivingTick(Message.readString(is));
                     break;
                 case Message.TIME_START:
-                    Controller.OnlineUserLogicController.onTimeStart();
+                    OnlineController.OnlineUserLogicController.onTimeStart();
                     break;
                 case Message.FALSE_START:
-                    Controller.OnlineUserLogicController.onFalseStart();
+                    OnlineController.OnlineUserLogicController.onFalseStart();
                     break;
                 case Message.TIME_TO_WRITE_ANSWER_IS_OUT:
-                    Controller.OnlineUserLogicController.onTimeToWriteAnswerIsOut();
+                    OnlineController.OnlineUserLogicController.onTimeToWriteAnswerIsOut();
                     break;
                 case Message.HANDSHAKE:
                     if (isServer) {
-                        Controller.continueGame();
+                        OnlineController.continueGame();
                     } else {
                         Log.wtf("BrainRing", "Unexpected message");
                     }
@@ -238,7 +238,7 @@ public class Network {
     public void startQuickGame() {
         isServer = false;
         // quick-start a game with 1 randomly selected opponent
-        mRealTimeMultiplayerClient = Games.getRealTimeMultiplayerClient(Controller.getOnlineGameActivity(),
+        mRealTimeMultiplayerClient = Games.getRealTimeMultiplayerClient(OnlineController.getOnlineGameActivity(),
                 googleSignInAccount);
         final int MIN_OPPONENTS = 1, MAX_OPPONENTS = 1;
         Bundle autoMatchCriteria = RoomConfig.createAutoMatchCriteria(MIN_OPPONENTS,
@@ -250,7 +250,7 @@ public class Network {
                 .setAutoMatchCriteria(autoMatchCriteria)
                 .build();
 
-        Games.getRealTimeMultiplayerClient(Controller.getOnlineGameActivity(), googleSignInAccount)
+        Games.getRealTimeMultiplayerClient(OnlineController.getOnlineGameActivity(), googleSignInAccount)
                 .create(mRoomConfig);
     }
 

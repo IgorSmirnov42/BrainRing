@@ -6,7 +6,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import ru.spbhse.brainring.Controller;
+import ru.spbhse.brainring.controllers.LocalController;
 import ru.spbhse.brainring.R;
 
 public class Judging extends AppCompatActivity {
@@ -24,7 +24,7 @@ public class Judging extends AppCompatActivity {
         acceptButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Controller.LocalAdminLogicController.onAcceptAnswer();
+                LocalController.LocalAdminLogicController.onAcceptAnswer();
                 Judging.this.finish();
             }
         });
@@ -33,7 +33,7 @@ public class Judging extends AppCompatActivity {
         rejectButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Controller.LocalAdminLogicController.onRejectAnswer();
+                LocalController.LocalAdminLogicController.onRejectAnswer();
                 Judging.this.finish();
             }
         });
