@@ -264,6 +264,10 @@ public class Network {
 
     /** Sends message to user with given id */
     public void sendMessageToConcreteUser(String userId, byte[] message) {
+        if (myParticipantId == null || userId == null) {
+            Log.e("BrainRing", "Cannot send message before initialization");
+            return;
+        }
         if (userId.equals(myParticipantId)) {
             onMessageReceived(message, myParticipantId);
         } else {
