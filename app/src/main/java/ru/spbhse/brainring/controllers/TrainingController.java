@@ -1,10 +1,10 @@
-package ru.spbhse.brainring;
+package ru.spbhse.brainring.controllers;
 
 import java.lang.ref.WeakReference;
 
 import ru.spbhse.brainring.ui.TrainingGameActivity;
 
-public class TrainingController {
+public class TrainingController extends Controller{
     private static WeakReference<TrainingGameActivity> trainingGameActivity;
 
     public static void setUI(TrainingGameActivity ui) {

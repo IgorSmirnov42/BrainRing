@@ -3,7 +3,7 @@ package ru.spbhse.brainring.logic;
 import android.media.MediaPlayer;
 import android.widget.Toast;
 
-import ru.spbhse.brainring.Controller;
+import ru.spbhse.brainring.controllers.OnlineController;
 import ru.spbhse.brainring.R;
 import ru.spbhse.brainring.network.messages.Message;
 import ru.spbhse.brainring.ui.GameActivityLocation;
@@ -16,81 +16,81 @@ public class OnlineGameUserLogic {
     private static final byte[] HANDSHAKE = Message.generateMessage(Message.HANDSHAKE, "");
 
     public OnlineGameUserLogic() {
-        userStatus = new UserStatus(Controller.NetworkController.getMyParticipantId());
+        userStatus = new UserStatus(OnlineController.NetworkController.getMyParticipantId());
     }
 
     /** Reacts on server's forbiddance to answer (not false start) */
     public void onForbiddenToAnswer() {
-        Toast.makeText(Controller.getOnlineGameActivity(), "Сервер запретил Вам отвечать",
+        Toast.makeText(OnlineController.getOnlineGameActivity(), "Сервер запретил Вам отвечать",
                 Toast.LENGTH_LONG).show();
     }
 
     public void onFalseStart() {
-        Toast.makeText(Controller.getOnlineGameActivity(), "Фальстарт!", Toast.LENGTH_LONG).show();
+        Toast.makeText(OnlineController.getOnlineGameActivity(), "Фальстарт!", Toast.LENGTH_LONG).show();
     }
 
     public void onTimeStart() {
         new Thread(() -> {
-            MediaPlayer player = MediaPlayer.create(Controller.getOnlineGameActivity(), R.raw.start);
+            MediaPlayer player = MediaPlayer.create(OnlineController.getOnlineGameActivity(), R.raw.start);
             player.setOnCompletionListener(MediaPlayer::release);
             player.start();
         }).start();
-        Controller.NetworkUIController.setButtonText("ЖМЯК!!");
+        OnlineController.NetworkUIController.setButtonText("ЖМЯК!!");
     }
 
     public void onReceivingTick(String secondsLeft) {
         new Thread(() -> {
-            MediaPlayer player = MediaPlayer.create(Controller.getOnlineGameActivity(), R.raw.countdown);
+            MediaPlayer player = MediaPlayer.create(OnlineController.getOnlineGameActivity(), R.raw.countdown);
             player.setOnCompletionListener(MediaPlayer::release);
             player.start();
         }).start();
-        Controller.NetworkUIController.setTime(secondsLeft);
+        OnlineController.NetworkUIController.setTime(secondsLeft);
     }
 
     /** Reacts on server's allowance to answer */
     public void onAllowedToAnswer() {
-        Controller.NetworkUIController.setLocation(GameActivityLocation.WRITE_ANSWER);
+        OnlineController.NetworkUIController.setLocation(GameActivityLocation.WRITE_ANSWER);
     }
 
     /** Gets question and prints it on the screen */
     public void onReceivingQuestion(String question) {
         userStatus.onNewQuestion();
         currentQuestion = question;
-        Controller.NetworkUIController.onNewQuestion();
-        Controller.NetworkUIController.setQuestionText(question);
-        Controller.NetworkUIController.setLocation(GameActivityLocation.SHOW_QUESTION);
-        if (!Controller.NetworkController.iAmServer()) {
-            Controller.NetworkController.sendMessageToServer(HANDSHAKE);
+        OnlineController.NetworkUIController.onNewQuestion();
+        OnlineController.NetworkUIController.setQuestionText(question);
+        OnlineController.NetworkUIController.setLocation(GameActivityLocation.SHOW_QUESTION);
+        if (!OnlineController.NetworkController.iAmServer()) {
+            OnlineController.NetworkController.sendMessageToServer(HANDSHAKE);
         }
     }
 
     /** Reacts on opponent's incorrect answer */
     public void onIncorrectOpponentAnswer(String opponentAnswer) {
         userStatus.opponentAnswer = opponentAnswer;
-        Controller.NetworkUIController.setTime("");
-        Controller.NetworkUIController.setOpponentAnswer(opponentAnswer);
-        Controller.NetworkUIController.setLocation(GameActivityLocation.SHOW_QUESTION);
+        OnlineController.NetworkUIController.setTime("");
+        OnlineController.NetworkUIController.setOpponentAnswer(opponentAnswer);
+        OnlineController.NetworkUIController.setLocation(GameActivityLocation.SHOW_QUESTION);
     }
 
     /** Shows answer and score (no) on the screen */
     public void onReceivingAnswer(int firstUserScore, int secondUserScore, String correctAnswer) {
         new Thread(() -> {
-            MediaPlayer player = MediaPlayer.create(Controller.getOnlineGameActivity(), R.raw.beep);
+            MediaPlayer player = MediaPlayer.create(OnlineController.getOnlineGameActivity(), R.raw.beep);
             player.setOnCompletionListener(MediaPlayer::release);
             player.start();
         }).start();
-        if (Controller.NetworkController.iAmServer()) {
-            Controller.NetworkUIController.setScore(firstUserScore, secondUserScore);
+        if (OnlineController.NetworkController.iAmServer()) {
+            OnlineController.NetworkUIController.setScore(firstUserScore, secondUserScore);
         } else {
-            Controller.NetworkUIController.setScore(secondUserScore, firstUserScore);
+            OnlineController.NetworkUIController.setScore(secondUserScore, firstUserScore);
         }
-        Controller.NetworkUIController.setAnswer(correctAnswer);
-        Controller.NetworkUIController.setLocation(GameActivityLocation.SHOW_ANSWER);
+        OnlineController.NetworkUIController.setAnswer(correctAnswer);
+        OnlineController.NetworkUIController.setLocation(GameActivityLocation.SHOW_ANSWER);
     }
 
     /** Reacts on opponent's pushing */
     public void onOpponentIsAnswering() {
-        Controller.NetworkUIController.setLocation(GameActivityLocation.OPPONENT_IS_ANSWERING);
+        OnlineController.NetworkUIController.setLocation(GameActivityLocation.OPPONENT_IS_ANSWERING);
     }
 
     /** Sends request to server trying to answer */
@@ -100,20 +100,20 @@ public class OnlineGameUserLogic {
             onForbiddenToAnswer();
             return;
         }
-        Controller.NetworkController.sendMessageToServer(IS_READY);
+        OnlineController.NetworkController.sendMessageToServer(IS_READY);
     }
 
     public void onTimeToWriteAnswerIsOut() {
-        Toast.makeText(Controller.getOnlineGameActivity(), "Время на ввод ответа истекло",
+        Toast.makeText(OnlineController.getOnlineGameActivity(), "Время на ввод ответа истекло",
                 Toast.LENGTH_LONG).show();
-        Controller.NetworkUIController.hideKeyboard();
-        Controller.NetworkUIController.setLocation(GameActivityLocation.OPPONENT_IS_ANSWERING);
+        OnlineController.NetworkUIController.hideKeyboard();
+        OnlineController.NetworkUIController.setLocation(GameActivityLocation.OPPONENT_IS_ANSWERING);
     }
 
     /** Sends written answer to server */
     public void answerIsWritten(String answer) {
-        Controller.NetworkUIController.setLocation(GameActivityLocation.OPPONENT_IS_ANSWERING);
-        Controller.NetworkController.sendMessageToServer(Message.generateMessage(
+        OnlineController.NetworkUIController.setLocation(GameActivityLocation.OPPONENT_IS_ANSWERING);
+        OnlineController.NetworkController.sendMessageToServer(Message.generateMessage(
                 Message.ANSWER_IS_WRITTEN, answer));
     }
 }

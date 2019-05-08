@@ -6,7 +6,7 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 import android.widget.Toast;
 
-import ru.spbhse.brainring.Controller;
+import ru.spbhse.brainring.controllers.LocalController;
 import ru.spbhse.brainring.R;
 import ru.spbhse.brainring.network.messages.Message;
 import ru.spbhse.brainring.ui.LocalGameLocation;
@@ -47,12 +47,12 @@ public class LocalGameAdminLogic {
             public void onTick(long millisUntilFinished) {
                 Log.d("BrainRing", "Tick first timer");
                 if (timer == this) {
-                    Controller.LocalNetworkAdminUIController.showTime(
+                    LocalController.LocalNetworkAdminUIController.showTime(
                             min(millisUntilFinished / SECOND + 1, firstCountdown));
 
                     if (millisUntilFinished <= SENDING_COUNTDOWN * SECOND) {
                         new Thread(() -> {
-                            MediaPlayer player = MediaPlayer.create(Controller.getJuryActivity(), R.raw.countdown);
+                            MediaPlayer player = MediaPlayer.create(LocalController.getJuryActivity(), R.raw.countdown);
                             player.setOnCompletionListener(MediaPlayer::release);
                             player.start();
                         }).start();
@@ -66,7 +66,7 @@ public class LocalGameAdminLogic {
                 synchronized (LocalGameAdminLogic.this) {
                     if (timer == this) {
                         new Thread(() -> {
-                            MediaPlayer player = MediaPlayer.create(Controller.getJuryActivity(), R.raw.beep);
+                            MediaPlayer player = MediaPlayer.create(LocalController.getJuryActivity(), R.raw.beep);
                             player.setOnCompletionListener(MediaPlayer::release);
                             player.start();
                         }).start();
@@ -82,12 +82,12 @@ public class LocalGameAdminLogic {
             public void onTick(long millisUntilFinished) {
                 Log.d("BrainRing", "Tick first timer");
                 if (timer == this) {
-                    Controller.LocalNetworkAdminUIController.showTime(
+                    LocalController.LocalNetworkAdminUIController.showTime(
                             min(millisUntilFinished / SECOND + 1, secondCountdown));
 
                     if (millisUntilFinished <= SENDING_COUNTDOWN * SECOND) {
                         new Thread(() -> {
-                            MediaPlayer player = MediaPlayer.create(Controller.getJuryActivity(), R.raw.countdown);
+                            MediaPlayer player = MediaPlayer.create(LocalController.getJuryActivity(), R.raw.countdown);
                             player.setOnCompletionListener(MediaPlayer::release);
                             player.start();
                         }).start();
@@ -101,7 +101,7 @@ public class LocalGameAdminLogic {
                 synchronized (LocalGameAdminLogic.this) {
                     if (timer == this) {
                         new Thread(() -> {
-                            MediaPlayer player = MediaPlayer.create(Controller.getJuryActivity(), R.raw.beep);
+                            MediaPlayer player = MediaPlayer.create(LocalController.getJuryActivity(), R.raw.beep);
                             player.setOnCompletionListener(MediaPlayer::release);
                             player.start();
                         }).start();
@@ -122,15 +122,15 @@ public class LocalGameAdminLogic {
     public void onRejectAnswer() {
         UserScore other = getOtherUser(answeringUserId);
         if (isGreen(answeringUserId)) {
-            Controller.LocalNetworkAdminUIController.setGreenStatus("Ответил");
+            LocalController.LocalNetworkAdminUIController.setGreenStatus("Ответил");
         } else {
-            Controller.LocalNetworkAdminUIController.setRedStatus("Ответил");
+            LocalController.LocalNetworkAdminUIController.setRedStatus("Ответил");
         }
         answeringUserId = null;
         if (!other.status.alreadyAnswered) {
-            Controller.LocalNetworkAdminUIController.showTime(secondCountdown);
+            LocalController.LocalNetworkAdminUIController.showTime(secondCountdown);
             location = LocalGameLocation.COUNTDOWN;
-            Controller.LocalNetworkAdminUIController.setLocation(location);
+            LocalController.LocalNetworkAdminUIController.setLocation(location);
             timer = secondGameTimer;
             timer.start();
         } else {
@@ -155,22 +155,22 @@ public class LocalGameAdminLogic {
         if (location == LocalGameLocation.NOT_STARTED) {
             newQuestion();
             location = LocalGameLocation.READING_QUESTION;
-            Controller.LocalNetworkAdminUIController.setLocation(location);
+            LocalController.LocalNetworkAdminUIController.setLocation(location);
             return true;
         }
         // Переклчение на таймер
         if (location == LocalGameLocation.READING_QUESTION) {
-            Controller.LocalNetworkAdminUIController.showTime(firstCountdown);
+            LocalController.LocalNetworkAdminUIController.showTime(firstCountdown);
             location = LocalGameLocation.COUNTDOWN;
-            Controller.LocalNetworkAdminUIController.setLocation(location);
+            LocalController.LocalNetworkAdminUIController.setLocation(location);
             timer = firstGameTimer;
             timer.start();
             new Thread(() -> {
-                MediaPlayer player = MediaPlayer.create(Controller.getJuryActivity(), R.raw.start);
+                MediaPlayer player = MediaPlayer.create(LocalController.getJuryActivity(), R.raw.start);
                 player.setOnCompletionListener(MediaPlayer::release);
                 player.start();
             }).start();
-            Controller.LocalNetworkController.sendMessageToOthers(TIME_START);
+            LocalController.LocalNetworkController.sendMessageToOthers(TIME_START);
             return true;
         }
         // Начало нового раунда
@@ -180,7 +180,7 @@ public class LocalGameAdminLogic {
                 timer = null;
             }
             location = LocalGameLocation.NOT_STARTED;
-            Controller.LocalNetworkAdminUIController.setLocation(location);
+            LocalController.LocalNetworkAdminUIController.setLocation(location);
             return true;
         }
         return false;
@@ -216,11 +216,11 @@ public class LocalGameAdminLogic {
         UserScore user = getThisUser(userId);
         if (location == LocalGameLocation.READING_QUESTION) {
             user.status.alreadyAnswered = true;
-            Controller.LocalNetworkController.sendMessageToConcreteUser(userId, FALSE_START);
+            LocalController.LocalNetworkController.sendMessageToConcreteUser(userId, FALSE_START);
             if (isGreen(userId)) {
-                Controller.LocalNetworkAdminUIController.setGreenStatus("Фальстарт");
+                LocalController.LocalNetworkAdminUIController.setGreenStatus("Фальстарт");
             } else {
-                Controller.LocalNetworkAdminUIController.setRedStatus("Фальстарт");
+                LocalController.LocalNetworkAdminUIController.setRedStatus("Фальстарт");
             }
             if (bothAnswered()) {
                 newQuestion();
@@ -228,19 +228,19 @@ public class LocalGameAdminLogic {
             return;
         }
         if (user.status.alreadyAnswered || location != LocalGameLocation.COUNTDOWN) {
-            Controller.LocalNetworkController.sendMessageToConcreteUser(userId, FORBID_ANSWER);
+            LocalController.LocalNetworkController.sendMessageToConcreteUser(userId, FORBID_ANSWER);
         } else {
             user.status.alreadyAnswered = true;
             answeringUserId = userId;
             new Thread(() -> {
-                MediaPlayer player = MediaPlayer.create(Controller.getJuryActivity(), R.raw.answering);
+                MediaPlayer player = MediaPlayer.create(LocalController.getJuryActivity(), R.raw.answering);
                 player.setOnCompletionListener(MediaPlayer::release);
                 player.start();
             }).start();
-            Controller.LocalNetworkController.sendMessageToConcreteUser(userId, ALLOW_ANSWER);
-            //Controller.NetworkController.sendMessageToConcreteUser(
+            LocalController.LocalNetworkController.sendMessageToConcreteUser(userId, ALLOW_ANSWER);
+            //LocalController.NetworkController.sendMessageToConcreteUser(
             //        getOtherUser(userId).status.participantId, OPPONENT_ANSWERING);
-            Controller.LocalNetworkAdminUIController.onReceivingAnswer(getColor(userId));
+            LocalController.LocalNetworkAdminUIController.onReceivingAnswer(getColor(userId));
             location = LocalGameLocation.ONE_IS_ANSWERING;
         }
     }
@@ -266,13 +266,13 @@ public class LocalGameAdminLogic {
             timer.cancel();
             timer = null;
         }
-        Controller.LocalNetworkAdminUIController.setGreenStatus("");
-        Controller.LocalNetworkAdminUIController.setRedStatus("");
+        LocalController.LocalNetworkAdminUIController.setGreenStatus("");
+        LocalController.LocalNetworkAdminUIController.setRedStatus("");
         answeringUserId = null;
         green.status.onNewQuestion();
         red.status.onNewQuestion();
         location = LocalGameLocation.NOT_STARTED;
-        Controller.LocalNetworkAdminUIController.setLocation(location);
+        LocalController.LocalNetworkAdminUIController.setLocation(location);
     }
 
     /** Returns score of red table if it is initialized and "?" otherwise */
@@ -297,7 +297,7 @@ public class LocalGameAdminLogic {
         if (location == LocalGameLocation.NOT_STARTED && red != null && green != null) {
             return true;
         } else {
-            Toast.makeText(Controller.getJuryActivity(), "Изменение счёта невозможно во время вопроса.",
+            Toast.makeText(LocalController.getJuryActivity(), "Изменение счёта невозможно во время вопроса.",
                     Toast.LENGTH_LONG).show();
             return false;
         }

@@ -14,7 +14,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 
-import ru.spbhse.brainring.Controller;
+import ru.spbhse.brainring.controllers.LocalController;
 import ru.spbhse.brainring.R;
 
 public class PlayerActivity extends AppCompatActivity {
@@ -27,18 +27,18 @@ public class PlayerActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_player);
-        Controller.initializeLocalPlayer();
+        LocalController.initializeLocalPlayer();
         String color = getIntent().getStringExtra("color");
 
         TextView textView = findViewById(R.id.tableColor);
         textView.setText(color);
 
-        Controller.setUI(this);
+        LocalController.setUI(this);
 
         Button button = findViewById(R.id.buttonPush);
-        button.setOnClickListener(v -> Controller.LocalPlayerLogicController.answerButtonPushed());
+        button.setOnClickListener(v -> LocalController.LocalPlayerLogicController.answerButtonPushed());
 
-        Controller.LocalNetworkPlayerController.createLocalGame(color);
+        LocalController.LocalNetworkPlayerController.createLocalGame(color);
     }
 
     /* I know that this function is out of content here,
@@ -56,7 +56,7 @@ public class PlayerActivity extends AppCompatActivity {
         if (requestCode == RC_SIGN_IN) {
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
             if (result.isSuccess()) {
-                Controller.LocalNetworkController.loggedIn(result.getSignInAccount());
+                LocalController.LocalNetworkController.loggedIn(result.getSignInAccount());
             } else {
                 String message = result.getStatus().getStatusMessage();
                 if (message == null || message.isEmpty()) {

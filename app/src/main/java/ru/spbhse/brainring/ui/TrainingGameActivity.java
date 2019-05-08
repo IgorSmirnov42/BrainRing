@@ -7,9 +7,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 
-import ru.spbhse.brainring.Controller;
+import ru.spbhse.brainring.controllers.Controller;
 import ru.spbhse.brainring.R;
-import ru.spbhse.brainring.TrainingController;
+import ru.spbhse.brainring.controllers.TrainingController;
 import ru.spbhse.brainring.database.QuestionDataBase;
 
 public class TrainingGameActivity extends GameActivity {

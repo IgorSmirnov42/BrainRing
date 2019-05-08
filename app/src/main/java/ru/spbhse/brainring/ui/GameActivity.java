@@ -6,7 +6,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import ru.spbhse.brainring.Controller;
+import ru.spbhse.brainring.controllers.Controller;
+import ru.spbhse.brainring.controllers.OnlineController;
+import ru.spbhse.brainring.controllers.OnlineController;
 import ru.spbhse.brainring.R;
 
 import static ru.spbhse.brainring.ui.GameActivityLocation.GAME_WAITING_START;
@@ -45,7 +47,7 @@ abstract public class GameActivity extends AppCompatActivity {
             TextView timeLeft = findViewById(R.id.timeLeft);
             timeLeft.setText(this.timeLeft);
 
-            answerButton.setOnClickListener(v -> Controller.OnlineUserLogicController.answerButtonPushed());
+            answerButton.setOnClickListener(v -> OnlineController.OnlineUserLogicController.answerButtonPushed());
         }
         if (currentLocation == WRITE_ANSWER) {
             setContentView(R.layout.activity_writing_answer);
@@ -56,7 +58,7 @@ abstract public class GameActivity extends AppCompatActivity {
             EditText answerEditor = findViewById(R.id.answerEditor);
             Button answerWrittenButton = findViewById(R.id.answerWrittenButton);
             answerWrittenButton.setOnClickListener(
-                    v -> Controller.OnlineUserLogicController.answerIsWritten(
+                    v -> OnlineController.OnlineUserLogicController.answerIsWritten(
                             answerEditor.getText().toString()));
         }
         if (currentLocation == SHOW_ANSWER) {

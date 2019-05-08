@@ -16,7 +16,7 @@ import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 
-import ru.spbhse.brainring.Controller;
+import ru.spbhse.brainring.controllers.LocalController;
 import ru.spbhse.brainring.network.messages.Message;
 
 /**
@@ -48,7 +48,7 @@ public class LocalNetworkAdmin extends LocalNetwork {
             @Override
             public void onLeftRoom(int i, @NonNull String s) {
                 Log.d("BrainRing", "Left room");
-                Controller.finishLocalGameAsAdmin();
+                LocalController.finishLocalGameAsAdmin();
             }
 
             @Override
@@ -64,7 +64,7 @@ public class LocalNetworkAdmin extends LocalNetwork {
                 } else {
                     Log.d("BrainRing","Connecting error");
                 }
-                Games.getPlayersClient(Controller.getJuryActivity(), googleSignInAccount)
+                Games.getPlayersClient(LocalController.getJuryActivity(), googleSignInAccount)
                         .getCurrentPlayerId()
                         .addOnSuccessListener(new OnSuccessListener<String>() {
                             @Override
@@ -80,7 +80,7 @@ public class LocalNetworkAdmin extends LocalNetwork {
 
 
     /**
-     * Decodes byte message received by server and calls needed functions in Controller
+     * Decodes byte message received by server and calls needed functions in LocalController
      * If it is a first message to server fills player's ids
      */
     @Override
@@ -98,7 +98,7 @@ public class LocalNetworkAdmin extends LocalNetwork {
             Log.d("BrainRing","Successful handshake");
 
             assert redId != null;
-            Controller.LocalNetworkAdminController.startGameCycle();
+            LocalController.LocalNetworkAdminController.startGameCycle();
             return;
         }
         try (DataInputStream is = new DataInputStream(new ByteArrayInputStream(buf))) {
@@ -106,7 +106,7 @@ public class LocalNetworkAdmin extends LocalNetwork {
             System.out.println("IDENTIFIER IS" + identifier);
 
             if (identifier == Message.ANSWER_IS_READY) {
-                Controller.LocalAdminLogicController.onAnswerIsReady(userId);
+                LocalController.LocalAdminLogicController.onAnswerIsReady(userId);
             } else {
                 Log.wtf("BrainRing", "Unexpected message received");
             }
@@ -119,7 +119,7 @@ public class LocalNetworkAdmin extends LocalNetwork {
     /** Starts quick game with two auto matched players */
     @Override
     public void startQuickGame() {
-        mRealTimeMultiplayerClient = Games.getRealTimeMultiplayerClient(Controller.getJuryActivity(),
+        mRealTimeMultiplayerClient = Games.getRealTimeMultiplayerClient(LocalController.getJuryActivity(),
                 googleSignInAccount);
         final int MIN_OPPONENTS = 2, MAX_OPPONENTS = 2;
         Bundle autoMatchCriteria = RoomConfig.createAutoMatchCriteria(MIN_OPPONENTS,
@@ -131,7 +131,7 @@ public class LocalNetworkAdmin extends LocalNetwork {
                 .setAutoMatchCriteria(autoMatchCriteria)
                 .build();
 
-        Games.getRealTimeMultiplayerClient(Controller.getJuryActivity(), googleSignInAccount)
+        Games.getRealTimeMultiplayerClient(LocalController.getJuryActivity(), googleSignInAccount)
                 .create(mRoomConfig);
     }
 
@@ -150,7 +150,7 @@ public class LocalNetworkAdmin extends LocalNetwork {
     @Override
     public void leaveRoom() {
         if (room != null) {
-            Games.getRealTimeMultiplayerClient(Controller.getJuryActivity(),
+            Games.getRealTimeMultiplayerClient(LocalController.getJuryActivity(),
                     googleSignInAccount).leave(mRoomConfig, room.getRoomId());
             room = null;
         }

@@ -18,7 +18,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 
-import ru.spbhse.brainring.Controller;
+import ru.spbhse.brainring.controllers.LocalController;
 import ru.spbhse.brainring.R;
 
 public class JuryActivity extends AppCompatActivity {
@@ -42,13 +42,13 @@ public class JuryActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_jury);
-        Controller.setUI(this);
-        Controller.initializeLocalGame(getIntent().getIntExtra("firstTimer", 20),
+        LocalController.setUI(this);
+        LocalController.initializeLocalGame(getIntent().getIntExtra("firstTimer", 20),
                 getIntent().getIntExtra("secondTimer", 20));
         statusText = findViewById(R.id.gameStatusInfo);
         mainButton = findViewById(R.id.mainButton);
         mainButton.setOnLongClickListener(v -> {
-            if (!Controller.LocalAdminLogicController.toNextState()) {
+            if (!LocalController.LocalAdminLogicController.toNextState()) {
                 Toast.makeText(JuryActivity.this, "Невозможно в данный момент переключиться.",
                         Toast.LENGTH_LONG).show();
             }
@@ -58,28 +58,28 @@ public class JuryActivity extends AppCompatActivity {
 
         Button minusGreenButton = findViewById(R.id.minusGreenTeamButton);
         minusGreenButton.setOnLongClickListener(v -> {
-            Controller.LocalAdminLogicController.minusPoint(1);
+            LocalController.LocalAdminLogicController.minusPoint(1);
             return true;
         });
         minusGreenButton.setOnClickListener(longerClick);
 
         Button plusGreenButton = findViewById(R.id.plusGreenTeamButton);
         plusGreenButton.setOnLongClickListener(v -> {
-            Controller.LocalAdminLogicController.plusPoint(1);
+            LocalController.LocalAdminLogicController.plusPoint(1);
             return true;
         });
         plusGreenButton.setOnClickListener(longerClick);
 
         Button minusRedButton = findViewById(R.id.minusRedTeamButton);
         minusRedButton.setOnLongClickListener(v -> {
-            Controller.LocalAdminLogicController.minusPoint(2);
+            LocalController.LocalAdminLogicController.minusPoint(2);
             return true;
         });
         minusRedButton.setOnClickListener(longerClick);
 
         Button plusRedButton = findViewById(R.id.plusRedTeamButton);
         plusRedButton.setOnLongClickListener(v -> {
-            Controller.LocalAdminLogicController.plusPoint(2);
+            LocalController.LocalAdminLogicController.plusPoint(2);
             return true;
         });
         plusRedButton.setOnClickListener(longerClick);
@@ -92,7 +92,7 @@ public class JuryActivity extends AppCompatActivity {
 
         redrawLocation();
 
-        Controller.LocalNetworkAdminController.createLocalGame();
+        LocalController.LocalNetworkAdminController.createLocalGame();
     }
 
     public void setLocation(LocalGameLocation location) {
@@ -101,8 +101,8 @@ public class JuryActivity extends AppCompatActivity {
     }
 
     public void redrawLocation() {
-        greenTeamScore.setText(Controller.LocalAdminLogicController.getGreenScore());
-        redTeamScore.setText(Controller.LocalAdminLogicController.getRedScore());
+        greenTeamScore.setText(LocalController.LocalAdminLogicController.getGreenScore());
+        redTeamScore.setText(LocalController.LocalAdminLogicController.getRedScore());
         if (currentLocation == LocalGameLocation.GAME_WAITING_START) {
             statusText.setText("Ожидаем подключения игроков");
             mainButton.setVisibility(View.GONE);
@@ -162,7 +162,7 @@ public class JuryActivity extends AppCompatActivity {
         if (requestCode == RC_SIGN_IN) {
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
             if (result.isSuccess()) {
-                Controller.LocalNetworkController.loggedIn(result.getSignInAccount());
+                LocalController.LocalNetworkController.loggedIn(result.getSignInAccount());
             } else {
                 String message = result.getStatus().getStatusMessage();
                 if (message == null || message.isEmpty()) {
@@ -178,6 +178,6 @@ public class JuryActivity extends AppCompatActivity {
     protected void onDestroy() {
         Log.d("BrainRing", "Destroying activity. Leaving room");
         super.onDestroy();
-        Controller.LocalNetworkController.leaveRoom();
+        LocalController.LocalNetworkController.leaveRoom();
     }
 }
