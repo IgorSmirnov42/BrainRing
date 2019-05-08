@@ -18,8 +18,8 @@ public class OnlineGameAdminLogic {
     private UserScore user2;
     private Question currentQuestion;
     private String answeringUserId;
-    private volatile boolean readingTime;
-    private volatile boolean interrupted;
+    private boolean readingTime;
+    private boolean interrupted;
 
     private static final byte[] ALLOW_ANSWER = Message.generateMessage(Message.ALLOWED_TO_ANSWER, "");
     private static final byte[] FORBID_ANSWER = Message.generateMessage(Message.FORBIDDEN_TO_ANSWER, "");
@@ -36,6 +36,7 @@ public class OnlineGameAdminLogic {
     private static final int TIME_TO_SHOW_ANSWER = 5;
     private static final int TIME_TO_READ_QUESTION = 10;
     private static final int TIME_TO_WRITE_ANSWER = 10;
+
     private final CountDownTimer firstGameTimer = new CountDownTimer(FIRST_COUNTDOWN * SECOND,
             SECOND) {
         @Override
@@ -57,10 +58,8 @@ public class OnlineGameAdminLogic {
                 return;
             }
             Log.d("BrainRing", "Finish first timer");
-            synchronized (OnlineGameAdminLogic.this) {
-                if (answeringUserId == null) {
-                    showAnswer();
-                }
+            if (answeringUserId == null) {
+                showAnswer();
             }
         }
     };
@@ -85,10 +84,8 @@ public class OnlineGameAdminLogic {
                 return;
             }
             Log.d("BrainRing", "Finish second timer");
-            synchronized (OnlineGameAdminLogic.this) {
-                if (answeringUserId == null) {
-                    showAnswer();
-                }
+            if (answeringUserId == null) {
+                showAnswer();
             }
         }
     };
@@ -114,7 +111,8 @@ public class OnlineGameAdminLogic {
      * Allows or forbids to answer team that pushed answer button
      * Determines false starts
      */
-    public synchronized void onAnswerIsReady(String userId) {
+    public void onAnswerIsReady(String userId) {
+        System.out.println("THREAD ID" + Thread.currentThread().getId());
         if (readingTime) {
             getThisUser(userId).status.alreadyAnswered = true;
             Controller.NetworkController.sendMessageToConcreteUser(userId, FALSE_START);
@@ -137,10 +135,8 @@ public class OnlineGameAdminLogic {
 
                 @Override
                 public void onFinish() {
-                    synchronized (OnlineGameAdminLogic.this) {
-                        if (answeringUserId != null && answeringUserId.equals(currentUser)) {
-                            stopAnswering();
-                        }
+                    if (answeringUserId != null && answeringUserId.equals(currentUser)) {
+                        stopAnswering();
                     }
                 }
             };
@@ -171,7 +167,8 @@ public class OnlineGameAdminLogic {
     }
 
     /** Rejects or accepts answer written by user */
-    public synchronized void onAnswerIsWritten(String writtenAnswer, String id) {
+    public void onAnswerIsWritten(String writtenAnswer, String id) {
+        System.out.println("THREAD ID" + Thread.currentThread().getId());
         Log.d("BrainRing","GOT ANSWER: " + writtenAnswer + " from user " + id);
         if (!id.equals(answeringUserId)) {
             return;
@@ -193,6 +190,7 @@ public class OnlineGameAdminLogic {
 
     /** Sends answer and shows it for {@code TIME_TO_SHOW_ANSWER} seconds */
     private void showAnswer() {
+        System.out.println("THREAD ID" + Thread.currentThread().getId());
         Controller.NetworkController.sendMessageToAll(generateAnswer());
         new Handler().postDelayed(this::newQuestion, TIME_TO_SHOW_ANSWER * SECOND);
     }
@@ -210,9 +208,11 @@ public class OnlineGameAdminLogic {
 
         currentQuestion = Controller.DatabaseController.getRandomQuestion();
         readingTime = true;
-        Controller.NetworkController.sendMessageToAll(
-                Message.generateMessage(Message.SENDING_QUESTION, currentQuestion.getQuestion()));
+        byte[] message = Message.generateMessage(Message.SENDING_QUESTION, currentQuestion.getQuestion());
+        Controller.NetworkController.sendQuestion(message);
+    }
 
+    public void publishing() {
         new Handler().postDelayed(this::publishQuestion, TIME_TO_READ_QUESTION * SECOND);
     }
 
@@ -221,6 +221,7 @@ public class OnlineGameAdminLogic {
     }
 
     private void publishQuestion() {
+        System.out.println("THREAD ID" + Thread.currentThread().getId());
         if (interrupted) {
             return;
         }

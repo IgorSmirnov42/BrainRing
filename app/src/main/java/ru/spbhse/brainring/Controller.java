@@ -1,6 +1,7 @@
 package ru.spbhse.brainring;
 
 import android.app.Activity;
+import android.os.CountDownTimer;
 import android.util.Log;
 
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -314,15 +315,42 @@ public class Controller {
 
     public static class NetworkController {
         private static Network network;
-        // функция, которую должен вызывать UI при нажатии на кнопку в layout 1
+        private static CountDownTimer handshakeTimer;
+        private static final int HANDSHAKE_TIME = 20000;
         public static void createOnlineGame() {
             network = new Network();
+            OnlineUserLogicController.userLogic = new OnlineGameUserLogic();
             onlineGameActivity.get().signIn();
         }
 
         public static void leaveRoom() {
             if (network != null) {
                 network.leaveRoom();
+            }
+        }
+
+        public static void sendQuestion(byte[] message) {
+            if (network != null) {
+                if (iAmServer()) {
+                    handshakeTimer = new CountDownTimer(HANDSHAKE_TIME, 1000) {
+                        @Override
+                        public void onTick(long millisUntilFinished) {
+                            if (handshakeTimer == this) {
+                                Log.d("BrainRing", "Handshake timer tick");
+                                network.sendMessageToAll(message);
+                            }
+                        }
+
+                        @Override
+                        public void onFinish() {
+                            if (handshakeTimer == this) {
+                                Log.d("BrainRing", "Unsuccessful handshake");
+                                finishOnlineGame();
+                            }
+                        }
+                    };
+                    handshakeTimer.start();
+                }
             }
         }
 
@@ -396,8 +424,15 @@ public class Controller {
 
     public static void startOnlineGame() {
         OnlineAdminLogicController.adminLogic = new OnlineGameAdminLogic();
-        OnlineUserLogicController.userLogic = new OnlineGameUserLogic();
         OnlineAdminLogicController.adminLogic.newQuestion();
+    }
+
+    public static void continueGame() {
+        if (NetworkController.handshakeTimer != null) {
+            NetworkController.handshakeTimer.cancel();
+            NetworkController.handshakeTimer = null;
+            OnlineAdminLogicController.adminLogic.publishing();
+        }
     }
 
     public static void finishOnlineGame() {
