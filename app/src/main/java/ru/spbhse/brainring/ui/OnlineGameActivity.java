@@ -5,28 +5,17 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.WindowManager;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
 
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
+import com.google.android.gms.games.GamesActivityResultCodes;
 
 import ru.spbhse.brainring.Controller;
-import ru.spbhse.brainring.R;
 import ru.spbhse.brainring.database.QuestionDataBase;
-
-import static ru.spbhse.brainring.ui.GameActivityLocation.GAME_WAITING_START;
-import static ru.spbhse.brainring.ui.GameActivityLocation.OPPONENT_IS_ANSWERING;
-import static ru.spbhse.brainring.ui.GameActivityLocation.SHOW_ANSWER;
-import static ru.spbhse.brainring.ui.GameActivityLocation.SHOW_QUESTION;
-import static ru.spbhse.brainring.ui.GameActivityLocation.WRITE_ANSWER;
 
 public class OnlineGameActivity extends GameActivity {
 
@@ -76,13 +65,20 @@ public class OnlineGameActivity extends GameActivity {
                 new AlertDialog.Builder(this).setMessage(message)
                         .setNeutralButton(android.R.string.ok, (dialog, which) -> finish()).show();
             }
+        } else if (requestCode == GamesActivityResultCodes.RESULT_LEFT_ROOM) {
+            Log.d("BrainRing", "Left room from activity");
+            Controller.NetworkController.leaveRoom();
+        } else if (requestCode == GamesActivityResultCodes.RESULT_SEND_REQUEST_FAILED) {
+            Log.d("BrainRing", "Send request failed");
+        } else if (requestCode == GamesActivityResultCodes.RESULT_NETWORK_FAILURE) {
+            Log.d("BrainRing", "Network failure");
         }
     }
 
     @Override
-    protected void onDestroy() {
-        Log.d("BrainRing", "Destroying activity. Leaving room");
-        super.onDestroy();
+    protected void onStop() {
+        Log.d("BrainRing", "Stopping activity. Leaving room");
+        super.onStop();
         Controller.NetworkController.leaveRoom();
     }
 }

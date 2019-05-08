@@ -10,12 +10,10 @@ import com.google.android.gms.games.Games;
 import com.google.android.gms.games.GamesCallbackStatusCodes;
 import com.google.android.gms.games.RealTimeMultiplayerClient;
 import com.google.android.gms.games.multiplayer.realtime.OnRealTimeMessageReceivedListener;
-import com.google.android.gms.games.multiplayer.realtime.RealTimeMessage;
 import com.google.android.gms.games.multiplayer.realtime.Room;
 import com.google.android.gms.games.multiplayer.realtime.RoomConfig;
 import com.google.android.gms.games.multiplayer.realtime.RoomStatusUpdateCallback;
 import com.google.android.gms.games.multiplayer.realtime.RoomUpdateCallback;
-import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
@@ -104,11 +102,13 @@ public class Network {
         @Override
         public void onRoomCreated(int i, @Nullable Room room) {
             Log.d("BrainRing", "Room was created");
+            //Network.this.room = room;
         }
 
         @Override
         public void onJoinedRoom(int i, @Nullable Room room) {
             Log.d("BrainRing", "Joined room");
+            //Network.this.room = room;
         }
 
         @Override
@@ -119,6 +119,7 @@ public class Network {
 
         @Override
         public void onRoomConnected(int code, @Nullable Room room) {
+            System.out.println("THREAD ID" + Thread.currentThread().getId());
             Log.d("BrainRing", "Connected to room");
             if (room == null) {
                 Log.wtf("BrainRing", "onRoomConnected got null as room");
@@ -126,32 +127,30 @@ public class Network {
             }
             Network.this.room = room;
             if (code == GamesCallbackStatusCodes.OK) {
-                System.out.println("CONNECTED");
+                Log.d("BrainRing","CONNECTED");
             } else {
-                System.out.println("ERROR WHILE CONNECTING");
+                Log.d("BrainRing","ERROR WHILE CONNECTING");
             }
-            String minimalId = Collections.min(room.getParticipantIds());
-            serverId = minimalId;
+            serverId = Collections.min(room.getParticipantIds());
+
             Games.getPlayersClient(Controller.getOnlineGameActivity(), googleSignInAccount)
                     .getCurrentPlayerId()
-                    .addOnSuccessListener(new OnSuccessListener<String>() {
-                        @Override
-                        public void onSuccess(String myPlayerId) {
-                            myParticipantId = room.getParticipantId(myPlayerId);
-                            if (myParticipantId.equals(minimalId)) {
-                                isServer = true;
-                                Controller.startOnlineGame();
-                            }
+                    .addOnSuccessListener(myPlayerId -> {
+                        myParticipantId = room.getParticipantId(myPlayerId);
+                        Log.d("BrainRing", "Received participant id");
+                        if (myParticipantId.equals(serverId)) {
+                            isServer = true;
+                            Log.d("BrainRing", "I am server");
+                            Controller.startOnlineGame();
                         }
                     });
         }
     };
-    private OnRealTimeMessageReceivedListener mOnRealTimeMessageReceivedListener = new OnRealTimeMessageReceivedListener() {
-        @Override
-        public void onRealTimeMessageReceived(@NonNull RealTimeMessage realTimeMessage) {
-            byte[] buf = realTimeMessage.getMessageData();
-            onMessageReceived(buf, realTimeMessage.getSenderParticipantId());
-        }
+    private OnRealTimeMessageReceivedListener mOnRealTimeMessageReceivedListener = realTimeMessage -> {
+        System.out.println("THREAD ID" + Thread.currentThread().getId());
+        Log.d("BrainRing","Received message");
+        byte[] buf = realTimeMessage.getMessageData();
+        onMessageReceived(buf, realTimeMessage.getSenderParticipantId());
     };
 
     public void leaveRoom() {
@@ -165,10 +164,11 @@ public class Network {
 
     /** Reacts on received message */
     private void onMessageReceived(byte[] buf, String userId) {
-        System.out.println("RECEIVED MESSAGE!");
+        System.out.println("THREAD ID" + Thread.currentThread().getId());
+        Log.d("BrainRing","RECEIVED MESSAGE! User id is " + userId);
         try (DataInputStream is = new DataInputStream(new ByteArrayInputStream(buf))) {
             int identifier = is.readInt();
-            System.out.println("IDENTIFIER IS" + identifier);
+            Log.d("BrainRing","IDENTIFIER IS " + identifier);
 
             if (Message.messageIsToServer(identifier) && !isServer) {
                 Log.wtf("BrainRing", "Not server got message to server\n");
@@ -218,11 +218,17 @@ public class Network {
                 case Message.TIME_TO_WRITE_ANSWER_IS_OUT:
                     Controller.OnlineUserLogicController.onTimeToWriteAnswerIsOut();
                     break;
+                case Message.HANDSHAKE:
+                    if (isServer) {
+                        Controller.continueGame();
+                    } else {
+                        Log.wtf("BrainRing", "Unexpected message");
+                    }
+                    break;
             }
 
         } catch (IOException e) {
             e.printStackTrace();
-            // TODO: нормальная обработка
         }
     }
 
@@ -250,6 +256,8 @@ public class Network {
 
     /** Sends message to all users in a room (and to itself) */
     public void sendMessageToAll(byte[] message) {
+        Log.d("BrainRing", "Sending message to all");
+
         mRealTimeMultiplayerClient.sendUnreliableMessageToOthers(message, room.getRoomId());
         onMessageReceived(message, myParticipantId);
     }

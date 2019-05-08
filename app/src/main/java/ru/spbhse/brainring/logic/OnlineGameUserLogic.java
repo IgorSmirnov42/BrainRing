@@ -13,6 +13,7 @@ public class OnlineGameUserLogic {
     private UserStatus userStatus;
     private String currentQuestion;
     private static final byte[] IS_READY = Message.generateMessage(Message.ANSWER_IS_READY, "");
+    private static final byte[] HANDSHAKE = Message.generateMessage(Message.HANDSHAKE, "");
 
     public OnlineGameUserLogic() {
         userStatus = new UserStatus(Controller.NetworkController.getMyParticipantId());
@@ -58,6 +59,9 @@ public class OnlineGameUserLogic {
         Controller.NetworkUIController.onNewQuestion();
         Controller.NetworkUIController.setQuestionText(question);
         Controller.NetworkUIController.setLocation(GameActivityLocation.SHOW_QUESTION);
+        if (!Controller.NetworkController.iAmServer()) {
+            Controller.NetworkController.sendMessageToServer(HANDSHAKE);
+        }
     }
 
     /** Reacts on opponent's incorrect answer */
