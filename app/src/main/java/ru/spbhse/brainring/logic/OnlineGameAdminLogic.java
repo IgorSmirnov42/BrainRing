@@ -36,7 +36,7 @@ public class OnlineGameAdminLogic {
     private static final int SECOND = 1000;
     private static final int TIME_TO_SHOW_ANSWER = 5;
     private static final int TIME_TO_READ_QUESTION = 10;
-    private static final int TIME_TO_WRITE_ANSWER = 10;
+    private static final int TIME_TO_WRITE_ANSWER = 20;
 
     private final CountDownTimer firstGameTimer = new CountDownTimer(FIRST_COUNTDOWN * SECOND,
             SECOND) {
@@ -126,7 +126,7 @@ public class OnlineGameAdminLogic {
         } else {
             answeringUserId = userId;
             user.status.alreadyAnswered = true;
-            OnlineController.NetworkController.sendMessageToConcreteUser(userId, ALLOW_ANSWER);
+            OnlineController.NetworkController.sendReliableMessageToConcreteUser(userId, ALLOW_ANSWER);
             final String currentUser = userId;
             timer = new CountDownTimer(TIME_TO_WRITE_ANSWER * SECOND,
                     TIME_TO_WRITE_ANSWER * SECOND) {
@@ -152,7 +152,7 @@ public class OnlineGameAdminLogic {
             showAnswer();
             return;
         }
-        OnlineController.NetworkController.sendMessageToConcreteUser(
+        OnlineController.NetworkController.sendReliableMessageToConcreteUser(
                 getOtherUser(previousUserId).status.participantId,
                 Message.generateMessage(Message.SENDING_INCORRECT_OPPONENT_ANSWER, previousAnswer));
         timer = secondGameTimer;
@@ -163,7 +163,7 @@ public class OnlineGameAdminLogic {
     private void stopAnswering() {
         String userId = answeringUserId;
         answeringUserId = null;
-        OnlineController.NetworkController.sendMessageToConcreteUser(userId, TIME_OUT);
+        OnlineController.NetworkController.sendReliableMessageToConcreteUser(userId, TIME_OUT);
         restartTime(userId, "");
     }
 
@@ -192,7 +192,7 @@ public class OnlineGameAdminLogic {
     /** Sends answer and shows it for {@code TIME_TO_SHOW_ANSWER} seconds */
     private void showAnswer() {
         System.out.println("THREAD ID" + Thread.currentThread().getId());
-        OnlineController.NetworkController.sendMessageToAll(generateAnswer());
+        OnlineController.NetworkController.sendReliableMessageToAll(generateAnswer());
         new Handler().postDelayed(this::newQuestion, TIME_TO_SHOW_ANSWER * SECOND);
     }
 
@@ -228,7 +228,7 @@ public class OnlineGameAdminLogic {
         }
         readingTime = false;
         if (!bothAnswered()) {
-            OnlineController.NetworkController.sendMessageToAll(TIME_START);
+            OnlineController.NetworkController.sendReliableMessageToAll(TIME_START);
             timer = firstGameTimer;
             timer.start();
         } else {
