@@ -177,6 +177,8 @@ public class OnlineGameAdminLogic {
     /** Determines if game is finished. If not, generates new question and sends it */
     public void newQuestion() {
         if (user1.score >= WINNER_SCORE || user2.score >= WINNER_SCORE) {
+            OnlineController.NetworkController.sendMessageToAll(
+                    Message.generateMessage(Message.FINISH, ""));
             OnlineController.finishOnlineGame();
             return;
         }
