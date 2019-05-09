@@ -47,7 +47,6 @@ public class LocalGameAdminLogic {
                 SECOND) {
             @Override
             public void onTick(long millisUntilFinished) {
-                Log.d("BrainRing", "Tick first timer");
                 if (timer == this) {
                     LocalController.LocalAdminUIController.showTime(
                             max((millisUntilFinished - FAULT) / SECOND, 0));
@@ -64,7 +63,6 @@ public class LocalGameAdminLogic {
 
             @Override
             public void onFinish() {
-                System.out.println("THREAD ID IS " + Thread.currentThread().getId());
                 Log.d("BrainRing", "Finish first timer");
                 if (timer == this) {
                     new Thread(() -> {
@@ -81,7 +79,6 @@ public class LocalGameAdminLogic {
                 SECOND) {
             @Override
             public void onTick(long millisUntilFinished) {
-                Log.d("BrainRing", "Tick first timer");
                 if (timer == this) {
                     LocalController.LocalAdminUIController.showTime(
                             max((millisUntilFinished - FAULT) / SECOND, 0));
@@ -98,8 +95,7 @@ public class LocalGameAdminLogic {
 
             @Override
             public void onFinish() {
-                System.out.println("THREAD ID IS " + Thread.currentThread().getId());
-                Log.d("BrainRing", "Finish first timer");
+                Log.d("BrainRing", "Finish second timer");
                 if (timer == this) {
                     new Thread(() -> {
                         MediaPlayer player = MediaPlayer.create(LocalController.getJuryActivity(), R.raw.beep);
@@ -206,10 +202,9 @@ public class LocalGameAdminLogic {
 
     /**
      * Allows or forbids to answer team that pushed answer button
-     * Determines (no) false starts
+     * Determines false starts
      */
     public void onAnswerIsReady(@NonNull String userId) {
-        System.out.println("THREAD ID IS " + Thread.currentThread().getId());
         if (timer != null) {
             timer.cancel();
             timer = null;

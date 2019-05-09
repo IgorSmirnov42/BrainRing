@@ -1,5 +1,8 @@
 package ru.spbhse.brainring.utils;
 
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+
 /** Class to store questions. Allows to check if user's answer is right */
 public class Question {
     final private String question;
@@ -31,11 +34,8 @@ public class Question {
      *                     Symbol "/" if forbidden as a part of answer. May be null
      * @param comment comment to answer. May be null
      */
-    public Question(String question, String mainAnswer, String validAnswers, String comment) {
-        if (question == null) {
-            throw new IllegalArgumentException("Question constructor was given null as question. It is forbidden.");
-        }
-
+    public Question(@NonNull String question, @NonNull String mainAnswer,
+                    @Nullable String validAnswers, @Nullable String comment) {
         this.question = question;
         this.answer = new Answer(mainAnswer, validAnswers);
         this.comment = comment == null ? "" : comment;

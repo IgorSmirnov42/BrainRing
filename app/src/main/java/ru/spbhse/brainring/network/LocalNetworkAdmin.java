@@ -79,7 +79,7 @@ public class LocalNetworkAdmin extends LocalNetwork {
      */
     @Override
     protected void onMessageReceived(byte[] buf, String userId) {
-        Log.d("BrainRing", "RECEIVED MESSAGE AS ADMIN!");
+        Log.d("BrainRing", "Received message as admin!");
         if (!handshaked) {
             greenId = userId;
             handshaked = true;

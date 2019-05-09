@@ -1,6 +1,7 @@
 package ru.spbhse.brainring.network;
 
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -9,6 +10,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.games.Games;
 import com.google.android.gms.games.GamesCallbackStatusCodes;
 import com.google.android.gms.games.RealTimeMultiplayerClient;
+import com.google.android.gms.games.multiplayer.Participant;
 import com.google.android.gms.games.multiplayer.realtime.OnRealTimeMessageReceivedListener;
 import com.google.android.gms.games.multiplayer.realtime.Room;
 import com.google.android.gms.games.multiplayer.realtime.RoomConfig;
@@ -33,6 +35,10 @@ public class Network {
     public GoogleSignInAccount googleSignInAccount;
     private RealTimeMultiplayerClient mRealTimeMultiplayerClient;
     private String myParticipantId;
+    private CountDownTimer handshakeTimer;
+    private static final int HANDSHAKE_TIME = 5000;
+    private static final int MAXIMUM_TIME_WITHOUT_MESSAGES = 80 * 1000;
+    private static CountDownTimer timer;
     private RoomStatusUpdateCallback mRoomStatusUpdateCallback = new RoomStatusUpdateCallback() {
         @Override
         public void onRoomConnecting(@Nullable Room room) {
@@ -102,13 +108,12 @@ public class Network {
         @Override
         public void onRoomCreated(int i, @Nullable Room room) {
             Log.d("BrainRing", "Room was created");
-            //Network.this.room = room;
+            startNewTimer();
         }
 
         @Override
         public void onJoinedRoom(int i, @Nullable Room room) {
             Log.d("BrainRing", "Joined room");
-            //Network.this.room = room;
         }
 
         @Override
@@ -119,7 +124,6 @@ public class Network {
 
         @Override
         public void onRoomConnected(int code, @Nullable Room room) {
-            System.out.println("THREAD ID" + Thread.currentThread().getId());
             Log.d("BrainRing", "Connected to room");
             if (room == null) {
                 Log.wtf("BrainRing", "onRoomConnected got null as room");
@@ -127,9 +131,9 @@ public class Network {
             }
             Network.this.room = room;
             if (code == GamesCallbackStatusCodes.OK) {
-                Log.d("BrainRing","CONNECTED");
+                Log.d("BrainRing","Connected");
             } else {
-                Log.d("BrainRing","ERROR WHILE CONNECTING");
+                Log.d("BrainRing","Error during connecting");
             }
             serverId = Collections.min(room.getParticipantIds());
 
@@ -144,6 +148,7 @@ public class Network {
                             OnlineController.startOnlineGame();
                         }
                     });
+            printRoomMembers();
         }
     };
     private OnRealTimeMessageReceivedListener mOnRealTimeMessageReceivedListener = realTimeMessage -> {
@@ -152,22 +157,34 @@ public class Network {
         onMessageReceived(buf, realTimeMessage.getSenderParticipantId());
     };
 
+    private void printRoomMembers() {
+        Log.d("BrainRing", "Start printing room members");
+        if (room != null) {
+            for (Participant participant : room.getParticipants()) {
+                Log.d("BrainRing", participant.getDisplayName());
+            }
+        }
+        Log.d("BrainRing", "Finish printing room members");
+    }
+
     public void leaveRoom() {
         if (room != null) {
             Games.getRealTimeMultiplayerClient(OnlineController.getOnlineGameActivity(),
                     googleSignInAccount).leave(mRoomConfig, room.getRoomId());
             room = null;
         }
-        //OnlineController.finishOnlineGame();
     }
 
     /** Reacts on received message */
-    private void onMessageReceived(byte[] buf, String userId) {
-        System.out.println("THREAD ID" + Thread.currentThread().getId());
-        Log.d("BrainRing","RECEIVED MESSAGE! User id is " + userId);
+    private void onMessageReceived(byte[] buf, @NonNull String userId) {
+        if (timer != null && !userId.equals(myParticipantId)) {
+            timer.cancel();
+            startNewTimer();
+        }
+        Log.d("BrainRing","Received message! User id is " + userId);
         try (DataInputStream is = new DataInputStream(new ByteArrayInputStream(buf))) {
             int identifier = is.readInt();
-            Log.d("BrainRing","IDENTIFIER IS " + identifier);
+            Log.d("BrainRing","Identifier is " + identifier);
 
             switch (identifier) {
                 case Message.ANSWER_IS_READY:
@@ -209,7 +226,7 @@ public class Network {
                     break;
                 case Message.HANDSHAKE:
                     if (isServer) {
-                        OnlineController.continueGame();
+                        continueGame();
                     } else {
                         Log.wtf("BrainRing", "Unexpected message");
                     }
@@ -218,6 +235,9 @@ public class Network {
                     long roundNumber = is.readLong();
                     OnlineController.OnlineAdminLogicController.onTimeLimit(roundNumber, userId);
                     break;
+                case Message.FINISH:
+                    OnlineController.finishOnlineGame();
+                    break;
             }
 
         } catch (IOException e) {
@@ -225,7 +245,30 @@ public class Network {
         }
     }
 
-    //public Network() {}
+    private void startNewTimer() {
+        timer = new CountDownTimer(MAXIMUM_TIME_WITHOUT_MESSAGES, MAXIMUM_TIME_WITHOUT_MESSAGES) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+            }
+
+            @Override
+            public void onFinish() {
+                if (timer == this) {
+                    sendMessageToAll(Message.generateMessage(Message.FINISH, ""));
+                    OnlineController.finishOnlineGame();
+                }
+            }
+        };
+        timer.start();
+    }
+
+    private void continueGame() {
+        if (handshakeTimer != null) {
+            handshakeTimer.cancel();
+            handshakeTimer = null;
+            OnlineController.OnlineAdminLogicController.publishing();
+        }
+    }
 
     /** Starts quick game with 1 auto matched player */
     public void startQuickGame() {
@@ -248,18 +291,16 @@ public class Network {
     }
 
     /** Sends message to all users in a room (and to itself). Guarantees delivering. May be slow... */
-    public void sendReliableMessageToAll(byte[] message) {
-        Log.d("BrainRing", "Sending message to all");
-
+    public void sendMessageToAll(byte[] message) {
         for (String participantId : room.getParticipantIds()) {
-            sendReliableMessageToConcreteUser(participantId, message);
+            sendMessageToConcreteUser(participantId, message);
         }
     }
 
 
     /** Sends message to user with given id. Guarantees delivering. May be slow... */
-    public void sendReliableMessageToConcreteUser(String userId, byte[] message) {
-        if (myParticipantId == null || userId == null) {
+    public void sendMessageToConcreteUser(String userId, byte[] message) {
+        if (myParticipantId == null || userId == null || room == null) {
             Log.e("BrainRing", "Cannot send message before initialization");
             return;
         }
@@ -271,11 +312,31 @@ public class Network {
         }
     }
 
-    public void sendReliableMessageToServer(byte[] message) {
+    public void sendQuestion(byte[] message) {
+        handshakeTimer = new CountDownTimer(HANDSHAKE_TIME, 1000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                if (handshakeTimer == this) {
+                    sendMessageToAll(message);
+                }
+            }
+
+            @Override
+            public void onFinish() {
+                if (handshakeTimer == this) {
+                    Log.wtf("BrainRing", "Unsuccessful handshake");
+                    OnlineController.finishOnlineGame();
+                }
+            }
+        };
+        handshakeTimer.start();
+    }
+
+    public void sendMessageToServer(byte[] message) {
         if (isServer) {
             onMessageReceived(message, myParticipantId);
         } else {
-            sendReliableMessageToConcreteUser(serverId, message);
+            sendMessageToConcreteUser(serverId, message);
         }
     }
 

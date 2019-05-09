@@ -25,7 +25,6 @@ public class OnlineGameUserLogic {
 
     private CountDownTimer timer;
 
-
     /** Reacts on server's forbiddance to answer (not false start) */
     public void onForbiddenToAnswer() {
         Toast.makeText(OnlineController.getOnlineGameActivity(), "Сервер запретил Вам отвечать",
@@ -34,7 +33,7 @@ public class OnlineGameUserLogic {
 
     private void onFalseStart() {
         Toast.makeText(OnlineController.getOnlineGameActivity(), "Фальстарт!", Toast.LENGTH_LONG).show();
-        OnlineController.NetworkController.sendReliableMessageToServer(FALSE_START);
+        OnlineController.NetworkController.sendMessageToServer(FALSE_START);
     }
 
     public void onTimeStart() {
@@ -51,7 +50,6 @@ public class OnlineGameUserLogic {
             @Override
             public void onTick(long millisUntilFinished) {
                 if (timer == this) {
-                    Log.d("BrainRing", "Tick first timer");
                     if (millisUntilFinished <= SENDING_COUNTDOWN * SECOND) {
                         onReceivingTick(millisUntilFinished / SECOND);
                     }
@@ -106,7 +104,7 @@ public class OnlineGameUserLogic {
         OnlineController.NetworkUIController.setQuestionText(question);
         OnlineController.NetworkUIController.setLocation(GameActivityLocation.SHOW_QUESTION);
         if (!OnlineController.NetworkController.iAmServer()) {
-            OnlineController.NetworkController.sendReliableMessageToServer(HANDSHAKE);
+            OnlineController.NetworkController.sendMessageToServer(HANDSHAKE);
         }
 
         questionReceived = true;
@@ -124,7 +122,6 @@ public class OnlineGameUserLogic {
             @Override
             public void onTick(long millisUntilFinished) {
                 if (timer == this) {
-                    Log.d("BrainRing", "Tick second timer");
                     if (millisUntilFinished <= SENDING_COUNTDOWN * SECOND) {
                         onReceivingTick(millisUntilFinished / SECOND);
                     }
@@ -143,7 +140,7 @@ public class OnlineGameUserLogic {
     }
 
     private void sendTimeLimitedAnswer(int roundNumber) {
-        OnlineController.NetworkController.sendReliableMessageToServer(
+        OnlineController.NetworkController.sendMessageToServer(
                 Message.generateMessageLongBody(Message.TIME_LIMIT, roundNumber));
     }
 
@@ -189,7 +186,7 @@ public class OnlineGameUserLogic {
             timer = null;
         }
         long time = System.currentTimeMillis() - startQuestionTime;
-        OnlineController.NetworkController.sendReliableMessageToServer(
+        OnlineController.NetworkController.sendMessageToServer(
                 Message.generateMessageLongBody(Message.ANSWER_IS_READY, time));
     }
 
@@ -199,8 +196,16 @@ public class OnlineGameUserLogic {
             timer.cancel();
             timer = null;
         }
+        OnlineController.NetworkUIController.setTime("");
         OnlineController.NetworkUIController.setLocation(GameActivityLocation.SHOW_QUESTION);
-        OnlineController.NetworkController.sendReliableMessageToServer(Message.generateMessage(
+        OnlineController.NetworkController.sendMessageToServer(Message.generateMessage(
                 Message.ANSWER_IS_WRITTEN, answer));
+    }
+
+    public void finishGame() {
+        if (timer != null) {
+            timer.cancel();
+            timer = null;
+        }
     }
 }
