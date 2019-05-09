@@ -186,12 +186,12 @@ public class OnlineController extends Controller {
             network.startQuickGame();
         }
 
-        public static void sendReliableMessageToServer(byte[] message) {
+        public static void sendMessageToServer(byte[] message) {
             if (network == null) {
                 Log.wtf("BrainRing", "Sending message to server but network is null");
                 return;
             }
-            network.sendReliableMessageToServer(message);
+            network.sendMessageToServer(message);
         }
 
         public static String getMyParticipantId() {
@@ -210,20 +210,20 @@ public class OnlineController extends Controller {
             return network.getOpponentParticipantId();
         }
 
-        public static void sendReliableMessageToConcreteUser(String userId, byte[] message) {
+        public static void sendMessageToConcreteUser(String userId, byte[] message) {
             if (network == null) {
                 Log.wtf("BrainRing", "Sending message but network is null");
                 return;
             }
-            network.sendReliableMessageToConcreteUser(userId, message);
+            network.sendMessageToConcreteUser(userId, message);
         }
 
-        public static void sendReliableMessageToAll(byte[] message) {
+        public static void sendMessageToAll(byte[] message) {
             if (network == null) {
                 Log.wtf("BrainRing", "Sending message but network is null");
                 return;
             }
-            network.sendReliableMessageToAll(message);
+            network.sendMessageToAll(message);
         }
     }
 }

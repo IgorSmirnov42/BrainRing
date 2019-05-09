@@ -242,7 +242,7 @@ public class Network {
             @Override
             public void onFinish() {
                 if (timer == this) {
-                    sendReliableMessageToAll(Message.generateMessage(Message.FINISH, ""));
+                    sendMessageToAll(Message.generateMessage(Message.FINISH, ""));
                     OnlineController.finishOnlineGame();
                 }
             }
@@ -279,15 +279,15 @@ public class Network {
     }
 
     /** Sends message to all users in a room (and to itself). Guarantees delivering. May be slow... */
-    public void sendReliableMessageToAll(byte[] message) {
+    public void sendMessageToAll(byte[] message) {
         for (String participantId : room.getParticipantIds()) {
-            sendReliableMessageToConcreteUser(participantId, message);
+            sendMessageToConcreteUser(participantId, message);
         }
     }
 
 
     /** Sends message to user with given id. Guarantees delivering. May be slow... */
-    public void sendReliableMessageToConcreteUser(String userId, byte[] message) {
+    public void sendMessageToConcreteUser(String userId, byte[] message) {
         if (myParticipantId == null || userId == null || room == null) {
             Log.e("BrainRing", "Cannot send message before initialization");
             return;
@@ -305,7 +305,7 @@ public class Network {
             @Override
             public void onTick(long millisUntilFinished) {
                 if (handshakeTimer == this) {
-                    sendReliableMessageToAll(message);
+                    sendMessageToAll(message);
                 }
             }
 
@@ -320,11 +320,11 @@ public class Network {
         handshakeTimer.start();
     }
 
-    public void sendReliableMessageToServer(byte[] message) {
+    public void sendMessageToServer(byte[] message) {
         if (isServer) {
             onMessageReceived(message, myParticipantId);
         } else {
-            sendReliableMessageToConcreteUser(serverId, message);
+            sendMessageToConcreteUser(serverId, message);
         }
     }
 

@@ -60,14 +60,14 @@ public class OnlineGameAdminLogic {
         answeringUserId = userId;
         UserScore user = getThisUser(userId);
         user.status.alreadyAnswered = true;
-        OnlineController.NetworkController.sendReliableMessageToConcreteUser(userId, ALLOW_ANSWER);
-        OnlineController.NetworkController.sendReliableMessageToConcreteUser(
+        OnlineController.NetworkController.sendMessageToConcreteUser(userId, ALLOW_ANSWER);
+        OnlineController.NetworkController.sendMessageToConcreteUser(
                 getOtherUser(userId).status.participantId, OPPONENT_ANSWERING);
     }
 
     private void forbidAnswer(String userId) {
         Log.d("BrainRing","Allow to answer " + userId);
-        OnlineController.NetworkController.sendReliableMessageToConcreteUser(userId, FORBID_ANSWER);
+        OnlineController.NetworkController.sendMessageToConcreteUser(userId, FORBID_ANSWER);
     }
 
     public void onTimeLimit(long roundNumber, String userId) {
@@ -143,7 +143,7 @@ public class OnlineGameAdminLogic {
             showAnswer();
             return;
         }
-        OnlineController.NetworkController.sendReliableMessageToConcreteUser(
+        OnlineController.NetworkController.sendMessageToConcreteUser(
                 getOtherUser(previousUserId).status.participantId,
                 Message.generateMessage(Message.SENDING_INCORRECT_OPPONENT_ANSWER, previousAnswer));
     }
@@ -170,7 +170,7 @@ public class OnlineGameAdminLogic {
 
     /** Sends answer and shows it for {@code TIME_TO_SHOW_ANSWER} seconds */
     private void showAnswer() {
-        OnlineController.NetworkController.sendReliableMessageToAll(generateAnswer());
+        OnlineController.NetworkController.sendMessageToAll(generateAnswer());
         new Handler().postDelayed(this::newQuestion, TIME_TO_SHOW_ANSWER * SECOND);
     }
 
@@ -204,7 +204,7 @@ public class OnlineGameAdminLogic {
             return;
         }
         if (!bothAnswered()) {
-            OnlineController.NetworkController.sendReliableMessageToAll(TIME_START);
+            OnlineController.NetworkController.sendMessageToAll(TIME_START);
         } else {
             showAnswer();
         }
