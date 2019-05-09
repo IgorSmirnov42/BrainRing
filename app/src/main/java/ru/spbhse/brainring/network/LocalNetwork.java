@@ -113,13 +113,18 @@ public abstract class LocalNetwork {
 
     /** Sends message to user with given id */
     public void sendMessageToConcreteUser(String userId, byte[] message) {
-        mRealTimeMultiplayerClient.sendUnreliableMessage(message, room.getRoomId(), userId);
+        mRealTimeMultiplayerClient.sendReliableMessage(message, room.getRoomId(), userId, (i, i1, s) -> {
+        });
     }
 
     abstract public void leaveRoom();
 
-    /** Sends message to all users in a room (and to itself) */
+    /** Sends message to all users in a room except itself */
     public void sendMessageToOthers(byte[] message) {
-        mRealTimeMultiplayerClient.sendUnreliableMessageToOthers(message, room.getRoomId());
+        for (String participantId : room.getParticipantIds()) {
+            if (!participantId.equals(myParticipantId)) {
+                sendMessageToConcreteUser(participantId, message);
+            }
+        }
     }
 }
