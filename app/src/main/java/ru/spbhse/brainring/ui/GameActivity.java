@@ -1,15 +1,12 @@
 package ru.spbhse.brainring.ui;
 
 import android.support.v7.app.AppCompatActivity;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import ru.spbhse.brainring.controllers.Controller;
-import ru.spbhse.brainring.controllers.OnlineController;
-import ru.spbhse.brainring.controllers.OnlineController;
 import ru.spbhse.brainring.R;
+import ru.spbhse.brainring.controllers.OnlineController;
 
 import static ru.spbhse.brainring.ui.GameActivityLocation.GAME_WAITING_START;
 import static ru.spbhse.brainring.ui.GameActivityLocation.OPPONENT_IS_ANSWERING;
@@ -122,9 +119,4 @@ abstract public class GameActivity extends AppCompatActivity {
         currentLocation = location;
         drawLocation();
     }
-
-    public void hideKeyboard() {
-        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
-    }
-
 }
