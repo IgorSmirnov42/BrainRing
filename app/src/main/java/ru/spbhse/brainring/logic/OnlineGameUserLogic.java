@@ -196,6 +196,7 @@ public class OnlineGameUserLogic {
             timer.cancel();
             timer = null;
         }
+        OnlineController.NetworkUIController.setTime("");
         OnlineController.NetworkUIController.setLocation(GameActivityLocation.SHOW_QUESTION);
         OnlineController.NetworkController.sendMessageToServer(Message.generateMessage(
                 Message.ANSWER_IS_WRITTEN, answer));

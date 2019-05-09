@@ -10,6 +10,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.games.Games;
 import com.google.android.gms.games.GamesCallbackStatusCodes;
 import com.google.android.gms.games.RealTimeMultiplayerClient;
+import com.google.android.gms.games.multiplayer.Participant;
 import com.google.android.gms.games.multiplayer.realtime.OnRealTimeMessageReceivedListener;
 import com.google.android.gms.games.multiplayer.realtime.Room;
 import com.google.android.gms.games.multiplayer.realtime.RoomConfig;
@@ -147,6 +148,7 @@ public class Network {
                             OnlineController.startOnlineGame();
                         }
                     });
+            printRoomMembers();
         }
     };
     private OnRealTimeMessageReceivedListener mOnRealTimeMessageReceivedListener = realTimeMessage -> {
@@ -154,6 +156,16 @@ public class Network {
         byte[] buf = realTimeMessage.getMessageData();
         onMessageReceived(buf, realTimeMessage.getSenderParticipantId());
     };
+
+    private void printRoomMembers() {
+        Log.d("BrainRing", "Start printing room members");
+        if (room != null) {
+            for (Participant participant : room.getParticipants()) {
+                Log.d("BrainRing", participant.getDisplayName());
+            }
+        }
+        Log.d("BrainRing", "Finish printing room members");
+    }
 
     public void leaveRoom() {
         if (room != null) {

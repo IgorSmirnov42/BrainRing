@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class QuestionTest {
@@ -19,15 +18,12 @@ public class QuestionTest {
         assertEquals("", question.getComment());
 
         new Question("aa", "bb", "aa/bb/dd", null);
-        assertThrows(IllegalArgumentException.class, () -> new Question(null, "aa", "bb", "gg"));
-        assertThrows(IllegalArgumentException.class, () -> new Question("aa", null, "bb", "gg"));
     }
 
     @Test
     public void checkAnswerIncorrectAnswer() {
         Question question = new Question("aa", "bb", "00/cc", "gg");
         assertFalse(question.checkAnswer("Ab"));
-        assertFalse(question.checkAnswer(null));
         assertFalse(question.checkAnswer("dd"));
     }
 
@@ -54,5 +50,26 @@ public class QuestionTest {
         assertTrue(question.checkAnswer("авакадабра"));
         assertFalse(question.checkAnswer("авадакедавра"));
         assertTrue(question.checkAnswer("АБРАКАДАБРА"));
+    }
+
+    @Test
+    public void checkPointsCommasSpacesHaveNoEffect() {
+        Question question = new Question("aa", "о, к, р.", null, null);
+        assertTrue(question.checkAnswer("окр"));
+        assertTrue(question.checkAnswer("о к р"));
+        assertTrue(question.checkAnswer("о, к, р"));
+        assertFalse(question.checkAnswer("о, к, и."));
+    }
+
+    @Test
+    public void checkSquareBrackets() {
+        Question question = new Question("", "[Внебрачным] сыном Петра I", null, null);
+        assertTrue(question.checkAnswer("Внебрачным сыном петра"));
+        assertTrue(question.checkAnswer("сыном петра"));
+        assertTrue(question.checkAnswer("внибрачным сынам питра"));
+        assertTrue(question.checkAnswer("сыном питра"));
+        assertFalse(question.checkAnswer("вне сыном петра I"));
+        assertFalse(question.checkAnswer("внебрачным"));
+        assertFalse(question.checkAnswer("внебрачным сыном"));
     }
 }
