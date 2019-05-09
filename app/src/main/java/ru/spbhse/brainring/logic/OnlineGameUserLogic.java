@@ -25,7 +25,6 @@ public class OnlineGameUserLogic {
 
     private CountDownTimer timer;
 
-
     /** Reacts on server's forbiddance to answer (not false start) */
     public void onForbiddenToAnswer() {
         Toast.makeText(OnlineController.getOnlineGameActivity(), "Сервер запретил Вам отвечать",
@@ -51,7 +50,6 @@ public class OnlineGameUserLogic {
             @Override
             public void onTick(long millisUntilFinished) {
                 if (timer == this) {
-                    Log.d("BrainRing", "Tick first timer");
                     if (millisUntilFinished <= SENDING_COUNTDOWN * SECOND) {
                         onReceivingTick(millisUntilFinished / SECOND);
                     }
@@ -124,7 +122,6 @@ public class OnlineGameUserLogic {
             @Override
             public void onTick(long millisUntilFinished) {
                 if (timer == this) {
-                    Log.d("BrainRing", "Tick second timer");
                     if (millisUntilFinished <= SENDING_COUNTDOWN * SECOND) {
                         onReceivingTick(millisUntilFinished / SECOND);
                     }
@@ -202,5 +199,12 @@ public class OnlineGameUserLogic {
         OnlineController.NetworkUIController.setLocation(GameActivityLocation.SHOW_QUESTION);
         OnlineController.NetworkController.sendReliableMessageToServer(Message.generateMessage(
                 Message.ANSWER_IS_WRITTEN, answer));
+    }
+
+    public void finishGame() {
+        if (timer != null) {
+            timer.cancel();
+            timer = null;
+        }
     }
 }

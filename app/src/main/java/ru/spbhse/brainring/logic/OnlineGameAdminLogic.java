@@ -106,10 +106,8 @@ public class OnlineGameAdminLogic {
             if (getOtherUser(userId).status.alreadyAnswered ||
                     (!userId.equals(OnlineController.NetworkController.getMyParticipantId())
                             && waitingAnswer.isEmpty())) {
-                Log.d("BrainRing","Immediately allow");
                 allowAnswer(userId);
             } else {
-                Log.d("BrainRing", "add to queue");
                 waitingAnswer.add(new AnswerTime(time, userId));
                 if (waitingAnswer.size() == 1) {
                     new Handler().postDelayed(this::judgeFirst, DELIVERING_FAULT_MILLIS);
@@ -148,12 +146,11 @@ public class OnlineGameAdminLogic {
         OnlineController.NetworkController.sendReliableMessageToConcreteUser(
                 getOtherUser(previousUserId).status.participantId,
                 Message.generateMessage(Message.SENDING_INCORRECT_OPPONENT_ANSWER, previousAnswer));
-        // TODO
     }
 
     /** Rejects or accepts answer written by user */
     public void onAnswerIsWritten(String writtenAnswer, String id) {
-        Log.d("BrainRing","GOT ANSWER: " + writtenAnswer + " from user " + id);
+        Log.d("BrainRing","Got answer: " + writtenAnswer + " from user " + id);
         if (!id.equals(answeringUserId)) {
             return;
         }

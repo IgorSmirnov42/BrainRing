@@ -6,23 +6,8 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 public class Message {
-    /*
-    От клиента к серверу:
-        0. Ответ готов (id клиента)
-        1. Ответ написан (строка)
-    От сервера к клиенту:
-        2. Отвечать запрещено
-        3. Отвечать разрешено
-        4. Передача вопроса (строка)
-        5. Передача неправильного ответа соперника (строка)
-        6. Передача ответа и счёта (два инта, строка)
-        7. Передача сообщения "Соперник отвечает"
-     */
-
-    // Messages from client to server
     public static final int ANSWER_IS_READY = 0;
     public static final int ANSWER_IS_WRITTEN = 1;
-    // Messages from server to client
     public static final int FORBIDDEN_TO_ANSWER = 2;
     public static final int ALLOWED_TO_ANSWER = 3;
     public static final int SENDING_QUESTION = 4;
@@ -32,6 +17,7 @@ public class Message {
     public static final int TIME_LIMIT = 8;
     public static final int FALSE_START = 9;
     public static final int TIME_START = 10;
+    public static final int FINISH = 11;
     public static final int HANDSHAKE = 12;
 
     public static String readString(DataInputStream is) throws IOException {

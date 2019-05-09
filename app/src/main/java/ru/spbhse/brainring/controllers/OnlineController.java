@@ -1,6 +1,5 @@
 package ru.spbhse.brainring.controllers;
 
-import android.os.CountDownTimer;
 import android.util.Log;
 
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -29,20 +28,15 @@ public class OnlineController extends Controller {
         OnlineAdminLogicController.adminLogic.newQuestion();
     }
 
-    public static void continueGame() {
-        if (NetworkController.handshakeTimer != null) {
-            NetworkController.handshakeTimer.cancel();
-            NetworkController.handshakeTimer = null;
-            OnlineAdminLogicController.adminLogic.publishing();
-        }
-    }
-
     public static void finishOnlineGame() {
         if (OnlineAdminLogicController.adminLogic != null) {
             OnlineAdminLogicController.adminLogic.finishGame();
             OnlineAdminLogicController.adminLogic = null;
         }
-        OnlineUserLogicController.userLogic = null;
+        if (OnlineUserLogicController.userLogic != null) {
+            OnlineUserLogicController.userLogic.finishGame();
+            OnlineUserLogicController.userLogic = null;
+        }
         NetworkController.network = null;
         if (onlineGameActivity != null) {
             finishActivity(onlineGameActivity.get());
@@ -66,6 +60,10 @@ public class OnlineController extends Controller {
 
         public static void onTimeLimit(long roundNumber, String userId) {
             adminLogic.onTimeLimit(roundNumber, userId);
+        }
+
+        public static void publishing() {
+            adminLogic.publishing();
         }
     }
 
@@ -156,8 +154,6 @@ public class OnlineController extends Controller {
 
     public static class NetworkController {
         private static Network network;
-        private static CountDownTimer handshakeTimer;
-        private static final int HANDSHAKE_TIME = 5000;
 
         public static void createOnlineGame() {
             network = new Network();
@@ -167,26 +163,7 @@ public class OnlineController extends Controller {
 
         public static void sendQuestion(byte[] message) {
             if (network != null) {
-                if (iAmServer()) {
-                    handshakeTimer = new CountDownTimer(HANDSHAKE_TIME, 1000) {
-                        @Override
-                        public void onTick(long millisUntilFinished) {
-                            if (handshakeTimer == this) {
-                                Log.d("BrainRing", "Handshake timer tick");
-                                network.sendReliableMessageToAll(message);
-                            }
-                        }
-
-                        @Override
-                        public void onFinish() {
-                            if (handshakeTimer == this) {
-                                Log.d("BrainRing", "Unsuccessful handshake");
-                                finishOnlineGame();
-                            }
-                        }
-                    };
-                    handshakeTimer.start();
-                }
+                network.sendQuestion(message);
             }
         }
 
