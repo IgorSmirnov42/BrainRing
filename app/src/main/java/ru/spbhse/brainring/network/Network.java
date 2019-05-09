@@ -147,7 +147,6 @@ public class Network {
         }
     };
     private OnRealTimeMessageReceivedListener mOnRealTimeMessageReceivedListener = realTimeMessage -> {
-        System.out.println("THREAD ID" + Thread.currentThread().getId());
         Log.d("BrainRing","Received message");
         byte[] buf = realTimeMessage.getMessageData();
         onMessageReceived(buf, realTimeMessage.getSenderParticipantId());
@@ -170,14 +169,10 @@ public class Network {
             int identifier = is.readInt();
             Log.d("BrainRing","IDENTIFIER IS " + identifier);
 
-            if (Message.messageIsToServer(identifier) && !isServer) {
-                Log.wtf("BrainRing", "Not server got message to server\n");
-                return;
-            }
-
             switch (identifier) {
                 case Message.ANSWER_IS_READY:
-                    OnlineController.OnlineAdminLogicController.onAnswerIsReady(userId);
+                    long time = is.readLong();
+                    OnlineController.OnlineAdminLogicController.onAnswerIsReady(userId, time);
                     break;
                 case Message.ANSWER_IS_WRITTEN:
                     String answer = Message.readString(is);
@@ -206,17 +201,11 @@ public class Network {
                 case Message.OPPONENT_IS_ANSWERING:
                     OnlineController.OnlineUserLogicController.onOpponentIsAnswering();
                     break;
-                case Message.TICK:
-                    OnlineController.OnlineUserLogicController.onReceivingTick(Message.readString(is));
-                    break;
                 case Message.TIME_START:
                     OnlineController.OnlineUserLogicController.onTimeStart();
                     break;
                 case Message.FALSE_START:
-                    OnlineController.OnlineUserLogicController.onFalseStart();
-                    break;
-                case Message.TIME_TO_WRITE_ANSWER_IS_OUT:
-                    OnlineController.OnlineUserLogicController.onTimeToWriteAnswerIsOut();
+                    OnlineController.OnlineAdminLogicController.onFalseStart(userId);
                     break;
                 case Message.HANDSHAKE:
                     if (isServer) {
@@ -224,6 +213,10 @@ public class Network {
                     } else {
                         Log.wtf("BrainRing", "Unexpected message");
                     }
+                    break;
+                case Message.TIME_LIMIT:
+                    long roundNumber = is.readLong();
+                    OnlineController.OnlineAdminLogicController.onTimeLimit(roundNumber, userId);
                     break;
             }
 
@@ -254,14 +247,6 @@ public class Network {
                 .create(mRoomConfig);
     }
 
-    /** Sends message to all users in a room (and to itself) */
-    public void sendMessageToAll(byte[] message) {
-        Log.d("BrainRing", "Sending message to all");
-
-        mRealTimeMultiplayerClient.sendUnreliableMessageToOthers(message, room.getRoomId());
-        onMessageReceived(message, myParticipantId);
-    }
-
     /** Sends message to all users in a room (and to itself). Guarantees delivering. May be slow... */
     public void sendReliableMessageToAll(byte[] message) {
         Log.d("BrainRing", "Sending message to all");
@@ -271,18 +256,6 @@ public class Network {
         }
     }
 
-    /** Sends message to user with given id */
-    public void sendMessageToConcreteUser(String userId, byte[] message) {
-        if (myParticipantId == null || userId == null) {
-            Log.e("BrainRing", "Cannot send message before initialization");
-            return;
-        }
-        if (userId.equals(myParticipantId)) {
-            onMessageReceived(message, myParticipantId);
-        } else {
-            mRealTimeMultiplayerClient.sendUnreliableMessage(message, room.getRoomId(), userId);
-        }
-    }
 
     /** Sends message to user with given id. Guarantees delivering. May be slow... */
     public void sendReliableMessageToConcreteUser(String userId, byte[] message) {
@@ -295,14 +268,6 @@ public class Network {
         } else {
             mRealTimeMultiplayerClient.sendReliableMessage(message, room.getRoomId(), userId, (i, i1, s) -> {
             });
-        }
-    }
-
-    public void sendMessageToServer(byte[] message) {
-        if (isServer) {
-            onMessageReceived(message, myParticipantId);
-        } else {
-            sendMessageToConcreteUser(serverId, message);
         }
     }
 

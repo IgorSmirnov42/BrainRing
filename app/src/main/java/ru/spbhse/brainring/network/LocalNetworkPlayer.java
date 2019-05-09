@@ -110,11 +110,6 @@ public class LocalNetworkPlayer extends LocalNetwork {
             int identifier = is.readInt();
             Log.d("BrainRing","Identifier is " + identifier);
 
-            if (Message.messageIsToServer(identifier)) {
-                Log.wtf("BrainRing", "Client got message to server\n");
-                return;
-            }
-
             switch (identifier) {
                 case Message.FORBIDDEN_TO_ANSWER:
                     LocalController.LocalPlayerLogicController.onForbiddenToAnswer();

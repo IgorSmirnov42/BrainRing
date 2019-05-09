@@ -15,7 +15,7 @@ import static java.lang.Math.max;
 
 /**
  * Class realizing admin's logic (counting time, switching locations etc)
- *      in local network mode
+ *      in local mode
  */
 public class LocalGameAdminLogic {
     private LocalGameLocation location = LocalGameLocation.GAME_WAITING_START;

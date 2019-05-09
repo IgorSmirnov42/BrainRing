@@ -29,19 +29,10 @@ public class Message {
     public static final int SENDING_INCORRECT_OPPONENT_ANSWER = 5;
     public static final int SENDING_CORRECT_ANSWER_AND_SCORE = 6;
     public static final int OPPONENT_IS_ANSWERING = 7;
-    public static final int TICK = 8;
+    public static final int TIME_LIMIT = 8;
     public static final int FALSE_START = 9;
     public static final int TIME_START = 10;
-    public static final int TIME_TO_WRITE_ANSWER_IS_OUT = 11;
     public static final int HANDSHAKE = 12;
-
-    public static boolean messageIsToServer(int identifier) {
-        return identifier <= ANSWER_IS_WRITTEN;
-    }
-
-    public static boolean messageIsToClient(int identifier) {
-        return !messageIsToServer(identifier);
-    }
 
     public static String readString(DataInputStream is) throws IOException {
         StringBuilder string = new StringBuilder();
@@ -58,6 +49,22 @@ public class Message {
              DataOutputStream dout = new DataOutputStream(bout)) {
             dout.writeInt(code);
             dout.writeChars(message);
+            dout.flush();
+            buf = bout.toByteArray();
+        } catch (IOException e) {
+            e.printStackTrace();
+            buf = null;
+        }
+        return buf;
+    }
+
+    /** Generates byte message by code and long value in body*/
+    public static byte[] generateMessageLongBody(int code, long message) {
+        byte[] buf;
+        try (ByteArrayOutputStream bout = new ByteArrayOutputStream();
+             DataOutputStream dout = new DataOutputStream(bout)) {
+            dout.writeInt(code);
+            dout.writeLong(message);
             dout.flush();
             buf = bout.toByteArray();
         } catch (IOException e) {

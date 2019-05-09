@@ -52,12 +52,20 @@ public class OnlineController extends Controller {
     public static class OnlineAdminLogicController {
         private static OnlineGameAdminLogic adminLogic;
 
-        public static void onAnswerIsReady(String userId) {
-            adminLogic.onAnswerIsReady(userId);
+        public static void onFalseStart(String userId) {
+            adminLogic.onFalseStart(userId);
+        }
+
+        public static void onAnswerIsReady(String userId, long time) {
+            adminLogic.onAnswerIsReady(userId, time);
         }
 
         public static void onAnswerIsWritten(String writtenAnswer, String id) {
             adminLogic.onAnswerIsWritten(writtenAnswer, id);
+        }
+
+        public static void onTimeLimit(long roundNumber, String userId) {
+            adminLogic.onTimeLimit(roundNumber, userId);
         }
     }
 
@@ -102,27 +110,15 @@ public class OnlineController extends Controller {
             userLogic.answerIsWritten(answer);
         }
 
-        public static void onReceivingTick(String secondsLeft) {
-            userLogic.onReceivingTick(secondsLeft);
-        }
-
         public static void onTimeStart() {
             userLogic.onTimeStart();
-        }
-
-        public static void onTimeToWriteAnswerIsOut() {
-            userLogic.onTimeToWriteAnswerIsOut();
-        }
-
-        public static void onFalseStart() {
-            userLogic.onFalseStart();
         }
     }
 
     public static class NetworkUIController {
 
-        public static void hideKeyboard() {
-            onlineGameActivity.get().hideKeyboard();
+        public static String getWhatWritten() {
+            return onlineGameActivity.get().getWhatWritten();
         }
 
         public static void setQuestionText(String question) {
@@ -161,7 +157,7 @@ public class OnlineController extends Controller {
     public static class NetworkController {
         private static Network network;
         private static CountDownTimer handshakeTimer;
-        private static final int HANDSHAKE_TIME = 10000;
+        private static final int HANDSHAKE_TIME = 5000;
 
         public static void createOnlineGame() {
             network = new Network();
@@ -177,7 +173,7 @@ public class OnlineController extends Controller {
                         public void onTick(long millisUntilFinished) {
                             if (handshakeTimer == this) {
                                 Log.d("BrainRing", "Handshake timer tick");
-                                network.sendMessageToAll(message);
+                                network.sendReliableMessageToAll(message);
                             }
                         }
 
@@ -213,14 +209,6 @@ public class OnlineController extends Controller {
             network.startQuickGame();
         }
 
-        public static void sendMessageToServer(byte[] message) {
-            if (network == null) {
-                Log.wtf("BrainRing", "Sending message to server but network is null");
-                return;
-            }
-            network.sendMessageToServer(message);
-        }
-
         public static void sendReliableMessageToServer(byte[] message) {
             if (network == null) {
                 Log.wtf("BrainRing", "Sending message to server but network is null");
@@ -245,28 +233,12 @@ public class OnlineController extends Controller {
             return network.getOpponentParticipantId();
         }
 
-        public static void sendMessageToConcreteUser(String userId, byte[] message) {
-            if (network == null) {
-                Log.wtf("BrainRing", "Sending message but network is null");
-                return;
-            }
-            network.sendMessageToConcreteUser(userId, message);
-        }
-
         public static void sendReliableMessageToConcreteUser(String userId, byte[] message) {
             if (network == null) {
                 Log.wtf("BrainRing", "Sending message but network is null");
                 return;
             }
             network.sendReliableMessageToConcreteUser(userId, message);
-        }
-
-        public static void sendMessageToAll(byte[] message) {
-            if (network == null) {
-                Log.wtf("BrainRing", "Sending message but network is null");
-                return;
-            }
-            network.sendMessageToAll(message);
         }
 
         public static void sendReliableMessageToAll(byte[] message) {
