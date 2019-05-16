@@ -129,7 +129,7 @@ public class TrainingPlayerLogic {
             player.setOnCompletionListener(MediaPlayer::release);
             player.start();
         }).start();
-        TrainingController.TrainingUIController.setTime(String.valueOf(secondsLeft));
+//        TrainingController.TrainingUIController.setTime(String.valueOf(secondsLeft));
     }
 
     public void answerButtonPushed() {
