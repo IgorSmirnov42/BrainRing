@@ -44,7 +44,7 @@ public class Network {
     private CountDownTimer handshakeTimer;
     private LeaderboardsClient leaderboardsClient;
     private long scoreSum;
-    private static final int HANDSHAKE_TIME = 5000;
+    private static final int HANDSHAKE_TIME = 1000;
     private static final int MAXIMUM_TIME_WITHOUT_MESSAGES = 80 * 1000;
     private static CountDownTimer timer;
     private RoomStatusUpdateCallback mRoomStatusUpdateCallback = new RoomStatusUpdateCallback() {
@@ -333,7 +333,6 @@ public class Network {
         }
     }
 
-
     /** Sends message to user with given id. Guarantees delivering. May be slow... */
     public void sendMessageToConcreteUser(String userId, byte[] message) {
         if (myParticipantId == null || userId == null || room == null) {
@@ -349,20 +348,18 @@ public class Network {
     }
 
     public void sendQuestion(byte[] message) {
+        sendMessageToAll(message);
         handshakeTimer = new CountDownTimer(HANDSHAKE_TIME, 1000) {
             @Override
             public void onTick(long millisUntilFinished) {
-                if (handshakeTimer == this) {
-                    sendMessageToAll(message);
-                }
             }
 
             @Override
             public void onFinish() {
-                if (handshakeTimer == this) {
+                //if (handshakeTimer == this) {
                     Log.wtf("BrainRing", "Unsuccessful handshake");
                     OnlineController.finishOnlineGame();
-                }
+                //}
             }
         };
         handshakeTimer.start();

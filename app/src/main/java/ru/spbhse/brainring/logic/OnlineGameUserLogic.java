@@ -49,19 +49,19 @@ public class OnlineGameUserLogic {
                 SECOND) {
             @Override
             public void onTick(long millisUntilFinished) {
-                if (timer == this) {
+                //if (timer == this) {
                     if (millisUntilFinished <= SENDING_COUNTDOWN * SECOND) {
                         onReceivingTick(millisUntilFinished / SECOND);
                     }
-                }
+                //}
             }
 
             @Override
             public void onFinish() {
-                if (timer == this) {
+                //if (timer == this) {
                     Log.d("BrainRing", "Finish first timer");
                     sendTimeLimitedAnswer(1);
-                }
+                //}
             }
         };
         timer.start();
@@ -83,16 +83,16 @@ public class OnlineGameUserLogic {
         timer = new CountDownTimer(TIME_TO_WRITE_ANSWER * SECOND, SECOND) {
             @Override
             public void onTick(long millisUntilFinished) {
-                if (timer == this) {
+                //if (timer == this) {
                     // TODO : отображать время
-                }
+                //}
             }
 
             @Override
             public void onFinish() {
-                if (timer == this) {
+                //if (timer == this) {
                     answerIsWritten(OnlineController.NetworkUIController.getWhatWritten());
-                }
+                //}
             }
         };
         timer.start();
@@ -121,19 +121,19 @@ public class OnlineGameUserLogic {
                 SECOND) {
             @Override
             public void onTick(long millisUntilFinished) {
-                if (timer == this) {
+                //if (timer == this) {
                     if (millisUntilFinished <= SENDING_COUNTDOWN * SECOND) {
                         onReceivingTick(millisUntilFinished / SECOND);
                     }
-                }
+                //}
             }
 
             @Override
             public void onFinish() {
-                if (timer == this) {
+                //if (timer == this) {
                     Log.d("BrainRing", "Finish second timer");
                     sendTimeLimitedAnswer(2);
-                }
+                //}
             }
         };
         timer.start();

@@ -47,7 +47,7 @@ public class LocalGameAdminLogic {
                 SECOND) {
             @Override
             public void onTick(long millisUntilFinished) {
-                if (timer == this) {
+                //if (timer == this) {
                     LocalController.LocalAdminUIController.showTime(
                             max((millisUntilFinished - FAULT) / SECOND, 0));
 
@@ -58,20 +58,20 @@ public class LocalGameAdminLogic {
                             player.start();
                         }).start();
                     }
-                }
+                //}
             }
 
             @Override
             public void onFinish() {
                 Log.d("BrainRing", "Finish first timer");
-                if (timer == this) {
+                //if (timer == this) {
                     new Thread(() -> {
                         MediaPlayer player = MediaPlayer.create(LocalController.getJuryActivity(), R.raw.beep);
                         player.setOnCompletionListener(MediaPlayer::release);
                         player.start();
                     }).start();
                     newQuestion();
-                }
+                //}
             }
         };
 
@@ -79,7 +79,7 @@ public class LocalGameAdminLogic {
                 SECOND) {
             @Override
             public void onTick(long millisUntilFinished) {
-                if (timer == this) {
+                //if (timer == this) {
                     LocalController.LocalAdminUIController.showTime(
                             max((millisUntilFinished - FAULT) / SECOND, 0));
 
@@ -90,20 +90,20 @@ public class LocalGameAdminLogic {
                             player.start();
                         }).start();
                     }
-                }
+                //}
             }
 
             @Override
             public void onFinish() {
                 Log.d("BrainRing", "Finish second timer");
-                if (timer == this) {
+                //if (timer == this) {
                     new Thread(() -> {
                         MediaPlayer player = MediaPlayer.create(LocalController.getJuryActivity(), R.raw.beep);
                         player.setOnCompletionListener(MediaPlayer::release);
                         player.start();
                     }).start();
                     newQuestion();
-                }
+                //}
             }
         };
     }
