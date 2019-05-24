@@ -28,6 +28,7 @@ public class OnlineGameAdminLogic {
     private static final byte[] FORBID_ANSWER = Message.generateMessage(Message.FORBIDDEN_TO_ANSWER, "");
     private static final byte[] OPPONENT_ANSWERING = Message.generateMessage(Message.OPPONENT_IS_ANSWERING, "");
     private static final byte[] TIME_START = Message.generateMessage(Message.TIME_START, "");
+    private static final byte[] CORRECT_ANSWER = Message.generateMessage(Message.CORRECT_ANSWER, "");
 
     private static final int WINNER_SCORE = 5;
     private static final int SECOND = 1000;
@@ -156,6 +157,9 @@ public class OnlineGameAdminLogic {
         }
         String userId = answeringUserId;
         answeringUserId = null;
+        if (currentQuestion.checkAnswer(writtenAnswer)) {
+            OnlineController.NetworkController.sendMessageToConcreteUser(id, CORRECT_ANSWER);
+        }
         if (!currentQuestion.checkAnswer(writtenAnswer)) {
             if (!getOtherUser(userId).status.alreadyAnswered) {
                 restartTime(userId, writtenAnswer);

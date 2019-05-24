@@ -17,4 +17,14 @@ public class DatabaseController {
         int questionId = RAND.nextInt((int) dataBase.size());
         return dataBase.getQuestion(questionId);
     }
+
+    public static Question getQ() {
+        QuestionDataBase dataBase = TrainingController.trainingGameActivity.get().dataBase;
+        if (dataBase == null) {
+            dataBase = new QuestionDataBase(OnlineController.onlineGameActivity.get());
+        }
+        dataBase.openDataBase();
+        int questionId = RAND.nextInt((int) dataBase.size());
+        return dataBase.getQuestion(questionId);
+    }
 }

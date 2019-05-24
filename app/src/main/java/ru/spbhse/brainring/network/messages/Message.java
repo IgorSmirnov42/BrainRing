@@ -19,6 +19,7 @@ public class Message {
     public static final int TIME_START = 10;
     public static final int FINISH = 11;
     public static final int HANDSHAKE = 12;
+    public static final int CORRECT_ANSWER = 13;
 
     public static String readString(DataInputStream is) throws IOException {
         StringBuilder string = new StringBuilder();
