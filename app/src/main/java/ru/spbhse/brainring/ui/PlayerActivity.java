@@ -10,12 +10,13 @@ import android.widget.TextView;
 
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 
-import ru.spbhse.brainring.controllers.LocalController;
 import ru.spbhse.brainring.R;
+import ru.spbhse.brainring.controllers.LocalController;
 
 public class PlayerActivity extends AppCompatActivity {
 
@@ -44,10 +45,16 @@ public class PlayerActivity extends AppCompatActivity {
     /* I know that this function is out of content here,
        but it is linked with onActivityResult that can be placed only here */
     public void signIn() {
-        GoogleSignInClient signInClient = GoogleSignIn.getClient(this,
-                GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN);
-        Intent intent = signInClient.getSignInIntent();
-        startActivityForResult(intent, RC_SIGN_IN);
+        GoogleSignInOptions signInOptions = GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN;
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
+        if (GoogleSignIn.hasPermissions(account, signInOptions.getScopeArray())) {
+            LocalController.LocalNetworkController.loggedIn(account);
+        } else {
+            GoogleSignInClient signInClient = GoogleSignIn.getClient(this,
+                    GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN);
+            Intent intent = signInClient.getSignInIntent();
+            startActivityForResult(intent, RC_SIGN_IN);
+        }
     }
 
     @Override

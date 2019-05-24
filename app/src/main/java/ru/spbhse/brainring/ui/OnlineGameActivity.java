@@ -10,6 +10,7 @@ import android.widget.EditText;
 
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
@@ -56,10 +57,17 @@ public class OnlineGameActivity extends GameActivity {
     /* I know that this function is out of content here,
        but it is linked with onActivityResult that can be placed only here */
     public void signIn() {
-        GoogleSignInClient signInClient = GoogleSignIn.getClient(this,
-                GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN);
-        Intent intent = signInClient.getSignInIntent();
-        startActivityForResult(intent, RC_SIGN_IN);
+        GoogleSignInOptions signInOptions = GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN;
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
+        if (GoogleSignIn.hasPermissions(account, signInOptions.getScopeArray())) {
+            Log.d("BrainRing", "Already logged in");
+            OnlineController.NetworkController.loggedIn(account);
+        } else {
+            GoogleSignInClient signInClient = GoogleSignIn.getClient(this,
+                    GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN);
+            Intent intent = signInClient.getSignInIntent();
+            startActivityForResult(intent, RC_SIGN_IN);
+        }
     }
 
     @Override

@@ -37,7 +37,10 @@ public class OnlineController extends Controller {
             OnlineUserLogicController.userLogic.finishGame();
             OnlineUserLogicController.userLogic = null;
         }
-        NetworkController.network = null;
+        if (NetworkController.network != null) {
+            NetworkController.network.updateRating();
+            NetworkController.network = null;
+        }
         if (onlineGameActivity != null) {
             finishActivity(onlineGameActivity.get());
         }
@@ -97,13 +100,10 @@ public class OnlineController extends Controller {
             userLogic.onOpponentIsAnswering();
         }
 
-        // функция, которую должен вызывать UI при нажатии на кнопку в layout 2a
         public static void answerButtonPushed() {
             userLogic.answerButtonPushed();
         }
 
-        // функция, которую должен вызывать UI при нажатии на кнопку в layout 2b
-        // answer -- введенный текст
         public static void answerIsWritten(String answer) {
             userLogic.answerIsWritten(answer);
         }
@@ -169,6 +169,7 @@ public class OnlineController extends Controller {
 
         public static void leaveRoom() {
             if (network != null) {
+                network.updateRating();
                 network.leaveRoom();
             }
         }
@@ -182,7 +183,11 @@ public class OnlineController extends Controller {
                 Log.wtf("BrainRing", "Logged in but network is null");
                 return;
             }
-            network.googleSignInAccount = signedInAccount;
+            Log.d("BrainRing", "Logged in");
+            network.onSignedIn(signedInAccount);
+        }
+
+        public static void startGame() {
             network.startQuickGame();
         }
 
