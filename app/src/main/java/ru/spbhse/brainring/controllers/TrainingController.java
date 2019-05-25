@@ -7,7 +7,7 @@ import ru.spbhse.brainring.ui.GameActivityLocation;
 import ru.spbhse.brainring.ui.TrainingGameActivity;
 
 public class TrainingController extends Controller {
-    static WeakReference<TrainingGameActivity> trainingGameActivity;
+    private static WeakReference<TrainingGameActivity> trainingGameActivity;
 
     public static void setUI(TrainingGameActivity ui) {
         trainingGameActivity = new WeakReference<>(ui);
@@ -23,8 +23,9 @@ public class TrainingController extends Controller {
         TrainingLogicController.trainingPlayerLogic.newQuestion();
     }
 
-    public static class TrainingLogicController extends Controller {
+    public static class TrainingLogicController implements GameController {
         private static TrainingPlayerLogic trainingPlayerLogic;
+        private GameController gameController;
         /*public static void onForbiddenToAnswer() {
             trainingPlayerLogic.onForbiddenToAnswer();
         }
@@ -52,14 +53,24 @@ public class TrainingController extends Controller {
             trainingPlayerLogic.onOpponentIsAnswering();
         }*/
 
+        @Override
+        public GameController getInstance() {
+            if (gameController == null) {
+                gameController = new TrainingLogicController();
+            }
+            return gameController;
+        }
+
         // функция, которую должен вызывать UI при нажатии на кнопку в layout 2a
-        public static void answerButtonPushed() {
+        @Override
+        public void answerButtonPushed() {
             trainingPlayerLogic.answerButtonPushed();
         }
 
         // функция, которую должен вызывать UI при нажатии на кнопку в layout 2b
         // answer -- введенный текст
-        public static void answerIsWritten(String answer) {
+        @Override
+        public void answerIsWritten(String answer) {
             trainingPlayerLogic.answerIsWritten(answer);
         }
 

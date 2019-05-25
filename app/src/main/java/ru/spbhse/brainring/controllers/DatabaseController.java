@@ -3,28 +3,22 @@ package ru.spbhse.brainring.controllers;
 import java.util.Random;
 
 import ru.spbhse.brainring.database.QuestionDataBase;
+import ru.spbhse.brainring.utils.DataBaseTableEntry;
 import ru.spbhse.brainring.utils.Question;
 
 public class DatabaseController {
     private static final Random RAND = new Random();
+    private static QuestionDataBase database;
+
     /** Gets random question from database */
     public static Question getRandomQuestion() {
-        QuestionDataBase dataBase = OnlineController.onlineGameActivity.get().dataBase;
-        if (dataBase == null) {
-            dataBase = new QuestionDataBase(OnlineController.onlineGameActivity.get());
-        }
-        dataBase.openDataBase();
-        int questionId = RAND.nextInt((int) dataBase.size());
-        return dataBase.getQuestion(questionId);
+        DataBaseTableEntry baseTable = database.getBaseTable();
+        database.openDataBase();
+        int questionId = RAND.nextInt((int) database.size(baseTable));
+        return database.getQuestion(baseTable, questionId);
     }
 
-    public static Question getQ() {
-        QuestionDataBase dataBase = TrainingController.trainingGameActivity.get().dataBase;
-        if (dataBase == null) {
-            dataBase = new QuestionDataBase(OnlineController.onlineGameActivity.get());
-        }
-        dataBase.openDataBase();
-        int questionId = RAND.nextInt((int) dataBase.size());
-        return dataBase.getQuestion(questionId);
+    public static void setDatabase(QuestionDataBase database) {
+        DatabaseController.database = database;
     }
 }
