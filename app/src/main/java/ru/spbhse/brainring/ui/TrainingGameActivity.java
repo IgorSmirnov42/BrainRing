@@ -3,28 +3,15 @@ package ru.spbhse.brainring.ui;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.StrictMode;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import ru.spbhse.brainring.controllers.Controller;
-import ru.spbhse.brainring.R;
 import ru.spbhse.brainring.controllers.DatabaseController;
 import ru.spbhse.brainring.controllers.TrainingController;
 import ru.spbhse.brainring.database.QuestionDataBase;
 import ru.spbhse.brainring.utils.DataBaseTableEntry;
-
-import static ru.spbhse.brainring.ui.GameActivityLocation.GAME_WAITING_START;
-import static ru.spbhse.brainring.ui.GameActivityLocation.OPPONENT_IS_ANSWERING;
-import static ru.spbhse.brainring.ui.GameActivityLocation.SHOW_ANSWER;
-import static ru.spbhse.brainring.ui.GameActivityLocation.SHOW_QUESTION;
-import static ru.spbhse.brainring.ui.GameActivityLocation.WRITE_ANSWER;
 
 public class TrainingGameActivity extends GameActivity {
     public QuestionDataBase dataBase;
@@ -60,21 +47,19 @@ public class TrainingGameActivity extends GameActivity {
         TrainingController.createTrainingGame();
     }
 
-    /*public String getWhatWritten() {
-        EditText answerEditor = findViewById(R.id.answerEditor);
-        if (answerEditor != null) {
-            return answerEditor.getText().toString();
-        } else {
-            Log.wtf("BrainRing", "Answer editing wasn't open but should");
-            return "";
-        }
-    }*/
-
     @Override
     protected void onStop() {
         Log.d("BrainRing", "Stop training game");
         super.onStop();
         TrainingController.TrainingLogicController.finishGame();
-        //dataBase.deleteEntries(table);
+        //TODO: придумать что с этим делать
+        // dataBase.deleteEntries(table);
+    }
+
+    @Override
+    public void onNewQuestion() {
+        setOpponentAnswer("");
+        setTime("");
+        buttonText = "ЖМЯК!!";
     }
 }
