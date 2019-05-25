@@ -26,32 +26,6 @@ public class TrainingController extends Controller {
     public static class TrainingLogicController implements GameController {
         private static TrainingPlayerLogic trainingPlayerLogic;
         private GameController gameController;
-        /*public static void onForbiddenToAnswer() {
-            trainingPlayerLogic.onForbiddenToAnswer();
-        }
-
-        public static void onAllowedToAnswer() {
-            trainingPlayerLogic.onAllowedToAnswer();
-        }
-
-        public static void onReceivingQuestion(String question) {
-            if (trainingPlayerLogic == null) {
-                trainingPlayerLogic = new TrainingPlayerLogic();
-            }
-            trainingPlayerLogic.onReceivingQuestion(question);
-        }
-
-        public static void onIncorrectOpponentAnswer(String opponentAnswer) {
-            trainingPlayerLogic.onIncorrectOpponentAnswer(opponentAnswer);
-        }
-
-        public static void onReceivingAnswer(int firstUserScore, int secondUserScore, String correctAnswer) {
-            trainingPlayerLogic.onReceivingAnswer(firstUserScore, secondUserScore, correctAnswer);
-        }
-
-        public static void onOpponentIsAnswering() {
-            trainingPlayerLogic.onOpponentIsAnswering();
-        }*/
 
         @Override
         public GameController getInstance() {
@@ -61,14 +35,11 @@ public class TrainingController extends Controller {
             return gameController;
         }
 
-        // функция, которую должен вызывать UI при нажатии на кнопку в layout 2a
         @Override
         public void answerButtonPushed() {
             trainingPlayerLogic.answerButtonPushed();
         }
 
-        // функция, которую должен вызывать UI при нажатии на кнопку в layout 2b
-        // answer -- введенный текст
         @Override
         public void answerIsWritten(String answer) {
             trainingPlayerLogic.answerIsWritten(answer);
@@ -77,10 +48,6 @@ public class TrainingController extends Controller {
         public static void finishGame() {
             trainingPlayerLogic.finishGame();
         }
-
-        /*public static void onTimeStart() {
-            trainingPlayerLogic.onTimeStart();
-        }*/
     }
 
     public static class TrainingUIController extends Controller {
@@ -90,10 +57,6 @@ public class TrainingController extends Controller {
 
         public static void onNewQuestion() {
             trainingGameActivity.get().onNewQuestion();
-        }
-
-        public static void setButtonText(String text) {
-            trainingGameActivity.get().setButtonText(text);
         }
 
         public static void setTime(String time) {
