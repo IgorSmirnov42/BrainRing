@@ -25,10 +25,9 @@ public class TrainingController extends Controller {
 
     public static class TrainingLogicController implements GameController {
         private static TrainingPlayerLogic trainingPlayerLogic;
-        private GameController gameController;
+        private static GameController gameController;
 
-        @Override
-        public GameController getInstance() {
+        public static GameController getInstance() {
             if (gameController == null) {
                 gameController = new TrainingLogicController();
             }

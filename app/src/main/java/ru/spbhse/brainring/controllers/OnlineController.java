@@ -72,7 +72,7 @@ public class OnlineController extends Controller {
 
     public static class OnlineUserLogicController implements GameController {
         private static OnlineGameUserLogic userLogic;
-        private GameController gameController;
+        private static GameController gameController;
 
         public static void onForbiddenToAnswer() {
             userLogic.onForbiddenToAnswer();
@@ -101,8 +101,7 @@ public class OnlineController extends Controller {
             userLogic.onOpponentIsAnswering();
         }
 
-        @Override
-        public GameController getInstance() {
+        public static GameController getInstance() {
             if (gameController == null) {
                 gameController = new OnlineUserLogicController();
             }
