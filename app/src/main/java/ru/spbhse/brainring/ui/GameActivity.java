@@ -47,7 +47,7 @@ abstract public class GameActivity extends AppCompatActivity {
             TextView timeLeft = findViewById(R.id.timeLeft);
             timeLeft.setText(this.timeLeft);
 
-            answerButton.setOnClickListener(v -> gameController.getInstance().answerButtonPushed());
+            answerButton.setOnClickListener(v -> gameController.answerButtonPushed());
         }
         if (currentLocation == WRITE_ANSWER) {
             setContentView(R.layout.activity_writing_answer);
@@ -58,7 +58,7 @@ abstract public class GameActivity extends AppCompatActivity {
             EditText answerEditor = findViewById(R.id.answerEditor);
             Button answerWrittenButton = findViewById(R.id.answerWrittenButton);
             answerWrittenButton.setOnClickListener(
-                    v -> gameController.getInstance().answerIsWritten(
+                    v -> gameController.answerIsWritten(
                             answerEditor.getText().toString()));
         }
         if (currentLocation == SHOW_ANSWER) {
