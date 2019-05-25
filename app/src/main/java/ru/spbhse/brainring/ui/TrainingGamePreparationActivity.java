@@ -19,7 +19,7 @@ public class TrainingGamePreparationActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_select_training_packages);
-        String[] packageName = { "" };
+        String[] packageName = { null };
 
         Button startTrainingGameButton = findViewById(R.id.startTrainingGameButton);
         startTrainingGameButton.setOnClickListener(new View.OnClickListener() {
