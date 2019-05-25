@@ -1,11 +1,13 @@
 package ru.spbhse.brainring.ui;
 
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import ru.spbhse.brainring.R;
+import ru.spbhse.brainring.controllers.GameController;
 import ru.spbhse.brainring.controllers.OnlineController;
 
 import static ru.spbhse.brainring.ui.GameActivityLocation.GAME_WAITING_START;
@@ -24,6 +26,7 @@ abstract public class GameActivity extends AppCompatActivity {
     protected String answer;
     protected String myScore;
     protected String opponentScore;
+    protected GameController gameController;
 
     protected void drawLocation() {
         if (currentLocation == GAME_WAITING_START) {
@@ -44,7 +47,7 @@ abstract public class GameActivity extends AppCompatActivity {
             TextView timeLeft = findViewById(R.id.timeLeft);
             timeLeft.setText(this.timeLeft);
 
-            answerButton.setOnClickListener(v -> OnlineController.OnlineUserLogicController.answerButtonPushed());
+            answerButton.setOnClickListener(v -> gameController.answerButtonPushed());
         }
         if (currentLocation == WRITE_ANSWER) {
             setContentView(R.layout.activity_writing_answer);
@@ -55,7 +58,7 @@ abstract public class GameActivity extends AppCompatActivity {
             EditText answerEditor = findViewById(R.id.answerEditor);
             Button answerWrittenButton = findViewById(R.id.answerWrittenButton);
             answerWrittenButton.setOnClickListener(
-                    v -> OnlineController.OnlineUserLogicController.answerIsWritten(
+                    v -> gameController.answerIsWritten(
                             answerEditor.getText().toString()));
         }
         if (currentLocation == SHOW_ANSWER) {
@@ -118,5 +121,15 @@ abstract public class GameActivity extends AppCompatActivity {
     public void setLocation(GameActivityLocation location) {
         currentLocation = location;
         drawLocation();
+    }
+
+    public String getWhatWritten() {
+        EditText answerEditor = findViewById(R.id.answerEditor);
+        if (answerEditor != null) {
+            return answerEditor.getText().toString();
+        } else {
+            Log.wtf("BrainRing", "Answer editing wasn't open but should");
+            return "";
+        }
     }
 }

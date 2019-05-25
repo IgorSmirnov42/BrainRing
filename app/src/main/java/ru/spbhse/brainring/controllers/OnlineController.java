@@ -70,8 +70,9 @@ public class OnlineController extends Controller {
         }
     }
 
-    public static class OnlineUserLogicController {
+    public static class OnlineUserLogicController implements GameController {
         private static OnlineGameUserLogic userLogic;
+        private static GameController gameController;
 
         public static void onForbiddenToAnswer() {
             userLogic.onForbiddenToAnswer();
@@ -100,11 +101,20 @@ public class OnlineController extends Controller {
             userLogic.onOpponentIsAnswering();
         }
 
-        public static void answerButtonPushed() {
+        public static GameController getInstance() {
+            if (gameController == null) {
+                gameController = new OnlineUserLogicController();
+            }
+            return gameController;
+        }
+
+        @Override
+        public void answerButtonPushed() {
             userLogic.answerButtonPushed();
         }
 
-        public static void answerIsWritten(String answer) {
+        @Override
+        public void answerIsWritten(String answer) {
             userLogic.answerIsWritten(answer);
         }
 

@@ -7,7 +7,7 @@ import ru.spbhse.brainring.ui.GameActivityLocation;
 import ru.spbhse.brainring.ui.TrainingGameActivity;
 
 public class TrainingController extends Controller {
-    static WeakReference<TrainingGameActivity> trainingGameActivity;
+    private static WeakReference<TrainingGameActivity> trainingGameActivity;
 
     public static void setUI(TrainingGameActivity ui) {
         trainingGameActivity = new WeakReference<>(ui);
@@ -23,53 +23,30 @@ public class TrainingController extends Controller {
         TrainingLogicController.trainingPlayerLogic.newQuestion();
     }
 
-    public static class TrainingLogicController extends Controller {
+    public static class TrainingLogicController implements GameController {
         private static TrainingPlayerLogic trainingPlayerLogic;
-        /*public static void onForbiddenToAnswer() {
-            trainingPlayerLogic.onForbiddenToAnswer();
-        }
+        private static GameController gameController;
 
-        public static void onAllowedToAnswer() {
-            trainingPlayerLogic.onAllowedToAnswer();
-        }
-
-        public static void onReceivingQuestion(String question) {
-            if (trainingPlayerLogic == null) {
-                trainingPlayerLogic = new TrainingPlayerLogic();
+        public static GameController getInstance() {
+            if (gameController == null) {
+                gameController = new TrainingLogicController();
             }
-            trainingPlayerLogic.onReceivingQuestion(question);
+            return gameController;
         }
 
-        public static void onIncorrectOpponentAnswer(String opponentAnswer) {
-            trainingPlayerLogic.onIncorrectOpponentAnswer(opponentAnswer);
-        }
-
-        public static void onReceivingAnswer(int firstUserScore, int secondUserScore, String correctAnswer) {
-            trainingPlayerLogic.onReceivingAnswer(firstUserScore, secondUserScore, correctAnswer);
-        }
-
-        public static void onOpponentIsAnswering() {
-            trainingPlayerLogic.onOpponentIsAnswering();
-        }*/
-
-        // функция, которую должен вызывать UI при нажатии на кнопку в layout 2a
-        public static void answerButtonPushed() {
+        @Override
+        public void answerButtonPushed() {
             trainingPlayerLogic.answerButtonPushed();
         }
 
-        // функция, которую должен вызывать UI при нажатии на кнопку в layout 2b
-        // answer -- введенный текст
-        public static void answerIsWritten(String answer) {
+        @Override
+        public void answerIsWritten(String answer) {
             trainingPlayerLogic.answerIsWritten(answer);
         }
 
         public static void finishGame() {
             trainingPlayerLogic.finishGame();
         }
-
-        /*public static void onTimeStart() {
-            trainingPlayerLogic.onTimeStart();
-        }*/
     }
 
     public static class TrainingUIController extends Controller {
@@ -79,10 +56,6 @@ public class TrainingController extends Controller {
 
         public static void onNewQuestion() {
             trainingGameActivity.get().onNewQuestion();
-        }
-
-        public static void setButtonText(String text) {
-            trainingGameActivity.get().setButtonText(text);
         }
 
         public static void setTime(String time) {

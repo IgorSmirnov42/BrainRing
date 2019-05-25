@@ -17,6 +17,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.games.GamesActivityResultCodes;
 
 import ru.spbhse.brainring.R;
+import ru.spbhse.brainring.controllers.DatabaseController;
 import ru.spbhse.brainring.controllers.OnlineController;
 import ru.spbhse.brainring.database.QuestionDataBase;
 
@@ -37,14 +38,17 @@ public class OnlineGameActivity extends GameActivity {
 
         OnlineController.setUI(OnlineGameActivity.this);
         dataBase = new QuestionDataBase(OnlineGameActivity.this);
+        DatabaseController.setDatabase(dataBase);
         dataBase.openDataBase();
+        dataBase.createTable(dataBase.getBaseTable());
+        gameController = OnlineController.OnlineUserLogicController.getInstance();
 
         drawLocation();
 
         OnlineController.NetworkController.createOnlineGame();
     }
 
-    public String getWhatWritten() {
+    /*public String getWhatWritten() {
         EditText answerEditor = findViewById(R.id.answerEditor);
         if (answerEditor != null) {
             return answerEditor.getText().toString();
@@ -52,7 +56,7 @@ public class OnlineGameActivity extends GameActivity {
             Log.wtf("BrainRing", "Answer editing wasn't open but should");
             return "";
         }
-    }
+    }*/
 
     /* I know that this function is out of content here,
        but it is linked with onActivityResult that can be placed only here */

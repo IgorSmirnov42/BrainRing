@@ -22,26 +22,12 @@ public class TrainingPlayerLogic {
     private static final int SECOND = 1000;
     private CountDownTimer timer;
 
-    /*CountDownTimer timer = new CountDownTimer(TIME_TO_WRITE_ANSWER * SECOND, SECOND) {
-        @Override
-        public void onTick(long millisUntilFinished) {
-            if (millisUntilFinished <= TIME_TO_WRITE_ANSWER * SECOND) {
-                onReceivingTick(millisUntilFinished / SECOND);
-            }
-        }
-
-        @Override
-        public void onFinish() {
-
-        }
-    };*/
-
     public void newQuestion() {
         if (timer != null) {
             timer.cancel();
             timer = null;
         }
-        currentQuestion = DatabaseController.getQ();
+        currentQuestion = DatabaseController.getRandomQuestion();
         maxScore++;
         TrainingController.TrainingUIController.setQuestionText(currentQuestion.getQuestion());
         TrainingController.TrainingUIController.onNewQuestion();
@@ -49,7 +35,6 @@ public class TrainingPlayerLogic {
         TrainingController.TrainingUIController.setAnswer(currentQuestion.getAllAnswers());
         TrainingController.TrainingUIController.setLocation(GameActivityLocation.SHOW_QUESTION);
         Log.d("BrainRing", "New question");
-//        new Handler().postDelayed(this::startAnswer, TIME_TO_READ_QUESTION * SECOND);
         timer = new CountDownTimer(TIME_TO_READ_QUESTION * SECOND, SECOND) {
             @Override
             public void onTick(long millisUntilFinished) {
@@ -75,7 +60,6 @@ public class TrainingPlayerLogic {
         }
         TrainingController.TrainingUIController.setLocation(GameActivityLocation.WRITE_ANSWER);
 
-//        TrainingController.TrainingUIController.setButtonText("ЖМЯК!");
         timer = new CountDownTimer(TIME_TO_WRITE_ANSWER * SECOND, SECOND) {
             @Override
             public void onTick(long millisUntilFinished) {
@@ -89,7 +73,6 @@ public class TrainingPlayerLogic {
             @Override
             public void onFinish() {
                 answerIsWritten(TrainingController.TrainingUIController.getWhatWritten());
-//                Toast.makeText(TrainingController.getTrainingGameActivity(), "KEK", Toast.LENGTH_LONG).show();
             }
         };
         timer.start();
@@ -107,8 +90,6 @@ public class TrainingPlayerLogic {
         }
         TrainingController.TrainingUIController.setScore(playerScore, maxScore);
         TrainingController.TrainingUIController.setLocation(GameActivityLocation.SHOW_ANSWER);
-//        newQuestion, TIME_TO_SHOW_ANSWER * SECOND);
-//        new Handler().postDelayed(this::newQuestion, TIME_TO_SHOW_ANSWER * SECOND);
         timer = new CountDownTimer(TIME_TO_SHOW_ANSWER * SECOND, SECOND) {
             @Override
             public void onTick(long millisUntilFinished) {
@@ -129,7 +110,6 @@ public class TrainingPlayerLogic {
             player.setOnCompletionListener(MediaPlayer::release);
             player.start();
         }).start();
-//        TrainingController.TrainingUIController.setTime(String.valueOf(secondsLeft));
     }
 
     public void answerButtonPushed() {
