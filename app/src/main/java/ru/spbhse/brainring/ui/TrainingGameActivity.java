@@ -42,7 +42,7 @@ public class TrainingGameActivity extends GameActivity {
         }
         dataBase.setBaseTable(table);
         dataBase.createTable(table);
-        gameController = new TrainingController.TrainingLogicController();
+        gameController = TrainingController.TrainingLogicController.getInstance();
 
         TrainingController.createTrainingGame();
     }

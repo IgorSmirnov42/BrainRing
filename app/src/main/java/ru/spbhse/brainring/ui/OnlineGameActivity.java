@@ -41,7 +41,7 @@ public class OnlineGameActivity extends GameActivity {
         DatabaseController.setDatabase(dataBase);
         dataBase.openDataBase();
         dataBase.createTable(dataBase.getBaseTable());
-        gameController = new OnlineController.OnlineUserLogicController();
+        gameController = OnlineController.OnlineUserLogicController.getInstance();
 
         drawLocation();
 
