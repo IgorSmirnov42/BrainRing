@@ -144,7 +144,7 @@ public class QuestionDataBase extends SQLiteOpenHelper {
                         replaceAll("Ответ:", "");
             } while (cursor.moveToNext());
         }
-        return new Question(question, answer, null, "");
+        return new Question(question, answer, null, "", id);
     }
 
     private boolean checkDataBase() {
