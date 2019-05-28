@@ -16,7 +16,9 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.411" />
+        app:layout_constraintVertical_bias="0.411"
+        android:maxLines = "100"
+        android:scrollbars = "vertical" />
 
     <TextView
         android:id="@+id/opponentIsAnswering"

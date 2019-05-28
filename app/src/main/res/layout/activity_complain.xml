@@ -30,16 +30,16 @@
 
     <TextView
         android:id="@+id/textView2"
-        android:layout_width="327dp"
-        android:layout_height="58dp"
+        android:layout_width="237dp"
+        android:layout_height="41dp"
         android:text="Список вопросов"
         android:textAlignment="center"
-        android:textSize="36sp"
+        android:textSize="24sp"
         app:layout_constraintBottom_toTopOf="@+id/questionsList"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.532" />
 
     <Button
         android:id="@+id/sendAllButton"

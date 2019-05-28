@@ -61,7 +61,7 @@ public class ComplainsFileHandler {
         saveComplainsToFile(questions);
     }
 
-    private static String allReadable(@NonNull List<ComplainedQuestion> questions) {
+    public static String allReadable(@NonNull List<ComplainedQuestion> questions) {
         StringBuilder result = new StringBuilder();
         for (ComplainedQuestion question : questions) {
             result.append(question.humanReadable());
@@ -89,11 +89,5 @@ public class ComplainsFileHandler {
         JSONArray array = new JSONArray(complains);
 
         rewriteFile(array.toString());
-    }
-
-    private static void sendComplainWithEmail() throws IOException, JSONException {
-        String readableComplains = allReadable(getAllQuestionsFromFile());
-        String receiverMail = "ismirnov.testing@gmail.com";
-        // TODO
     }
 }

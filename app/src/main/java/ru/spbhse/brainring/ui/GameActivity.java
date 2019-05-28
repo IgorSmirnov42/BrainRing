@@ -1,6 +1,7 @@
 package ru.spbhse.brainring.ui;
 
 import android.support.v7.app.AppCompatActivity;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.Gravity;
 import android.widget.Button;
@@ -43,6 +44,7 @@ abstract public class GameActivity extends AppCompatActivity {
 
             TextView questionTextField = findViewById(R.id.questionText);
             questionTextField.setText(question);
+            questionTextField.setMovementMethod(new ScrollingMovementMethod());
 
             TextView opponentAnswer = findViewById(R.id.opponentAnswer);
             opponentAnswer.setText(this.opponentAnswer);
@@ -57,6 +59,7 @@ abstract public class GameActivity extends AppCompatActivity {
 
             TextView questionTextField = findViewById(R.id.questionText);
             questionTextField.setText(question);
+            questionTextField.setMovementMethod(new ScrollingMovementMethod());
 
             EditText answerEditor = findViewById(R.id.answerEditor);
             Button answerWrittenButton = findViewById(R.id.answerWrittenButton);
@@ -99,6 +102,7 @@ abstract public class GameActivity extends AppCompatActivity {
 
             TextView questionTextField = findViewById(R.id.questionText);
             questionTextField.setText(question);
+            questionTextField.setMovementMethod(new ScrollingMovementMethod());
         }
     }
 
