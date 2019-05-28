@@ -12,7 +12,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ui.Judging"></activity>
+        <activity android:name=".ui.ComplainActivity"></activity>
+        <activity android:name=".ui.Judging" />
         <activity android:name=".ui.PlayerActivity" />
         <activity android:name=".ui.JuryActivity" />
 
