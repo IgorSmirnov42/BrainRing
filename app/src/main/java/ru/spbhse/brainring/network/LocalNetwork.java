@@ -7,7 +7,6 @@ import android.util.Log;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.games.RealTimeMultiplayerClient;
 import com.google.android.gms.games.multiplayer.realtime.OnRealTimeMessageReceivedListener;
-import com.google.android.gms.games.multiplayer.realtime.RealTimeMessage;
 import com.google.android.gms.games.multiplayer.realtime.Room;
 import com.google.android.gms.games.multiplayer.realtime.RoomConfig;
 import com.google.android.gms.games.multiplayer.realtime.RoomStatusUpdateCallback;
@@ -96,12 +95,9 @@ public abstract class LocalNetwork {
     protected RoomUpdateCallback mRoomUpdateCallback;
 
     /** Gets message and resubmits it to {@code onMessageReceived} with sender id*/
-    public OnRealTimeMessageReceivedListener mOnRealTimeMessageReceivedListener = new OnRealTimeMessageReceivedListener() {
-        @Override
-        public void onRealTimeMessageReceived(@NonNull RealTimeMessage realTimeMessage) {
-            byte[] buf = realTimeMessage.getMessageData();
-            onMessageReceived(buf, realTimeMessage.getSenderParticipantId());
-        }
+    public OnRealTimeMessageReceivedListener mOnRealTimeMessageReceivedListener = realTimeMessage -> {
+        byte[] buf = realTimeMessage.getMessageData();
+        onMessageReceived(buf, realTimeMessage.getSenderParticipantId());
     };
 
     /** Reacts on received message */

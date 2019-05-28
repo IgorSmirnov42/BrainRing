@@ -1,12 +1,13 @@
 package ru.spbhse.brainring.controllers;
 
-import android.os.CountDownTimer;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 
 import java.lang.ref.WeakReference;
 
+import ru.spbhse.brainring.files.ComplainedQuestion;
 import ru.spbhse.brainring.logic.OnlineGameAdminLogic;
 import ru.spbhse.brainring.logic.OnlineGameUserLogic;
 import ru.spbhse.brainring.network.Network;
@@ -29,21 +30,19 @@ public class OnlineController extends Controller {
         OnlineAdminLogicController.adminLogic.newQuestion();
     }
 
-    public static void continueGame() {
-        if (NetworkController.handshakeTimer != null) {
-            NetworkController.handshakeTimer.cancel();
-            NetworkController.handshakeTimer = null;
-            OnlineAdminLogicController.adminLogic.publishing();
-        }
-    }
-
     public static void finishOnlineGame() {
         if (OnlineAdminLogicController.adminLogic != null) {
             OnlineAdminLogicController.adminLogic.finishGame();
             OnlineAdminLogicController.adminLogic = null;
         }
-        OnlineUserLogicController.userLogic = null;
-        NetworkController.network = null;
+        if (OnlineUserLogicController.userLogic != null) {
+            OnlineUserLogicController.userLogic.finishGame();
+            OnlineUserLogicController.userLogic = null;
+        }
+        if (NetworkController.network != null) {
+            NetworkController.network.updateRating();
+            NetworkController.network = null;
+        }
         if (onlineGameActivity != null) {
             finishActivity(onlineGameActivity.get());
         }
@@ -67,10 +66,19 @@ public class OnlineController extends Controller {
         public static void onTimeLimit(long roundNumber, String userId) {
             adminLogic.onTimeLimit(roundNumber, userId);
         }
+
+        public static void publishing() {
+            adminLogic.publishing();
+        }
     }
 
-    public static class OnlineUserLogicController {
+    public static class OnlineUserLogicController implements GameController {
         private static OnlineGameUserLogic userLogic;
+        private static GameController gameController;
+
+        public static ComplainedQuestion getQuestionData() {
+            return userLogic.getQuestionData();
+        }
 
         public static void onForbiddenToAnswer() {
             userLogic.onForbiddenToAnswer();
@@ -80,18 +88,19 @@ public class OnlineController extends Controller {
             userLogic.onAllowedToAnswer();
         }
 
-        public static void onReceivingQuestion(String question) {
+        public static void onReceivingQuestion(int questionId, @NonNull String question) {
             if (userLogic == null) {
                 userLogic = new OnlineGameUserLogic();
             }
-            userLogic.onReceivingQuestion(question);
+            userLogic.onReceivingQuestion(questionId, question);
         }
 
-        public static void onIncorrectOpponentAnswer(String opponentAnswer) {
+        public static void onIncorrectOpponentAnswer(@NonNull String opponentAnswer) {
             userLogic.onIncorrectOpponentAnswer(opponentAnswer);
         }
 
-        public static void onReceivingAnswer(int firstUserScore, int secondUserScore, String correctAnswer) {
+        public static void onReceivingAnswer(int firstUserScore, int secondUserScore,
+                                             @NonNull String correctAnswer) {
             userLogic.onReceivingAnswer(firstUserScore, secondUserScore, correctAnswer);
         }
 
@@ -99,15 +108,26 @@ public class OnlineController extends Controller {
             userLogic.onOpponentIsAnswering();
         }
 
-        // функция, которую должен вызывать UI при нажатии на кнопку в layout 2a
-        public static void answerButtonPushed() {
+        public static GameController getInstance() {
+            if (gameController == null) {
+                gameController = new OnlineUserLogicController();
+            }
+            return gameController;
+        }
+
+        @Override
+        public void answerButtonPushed() {
             userLogic.answerButtonPushed();
         }
 
-        // функция, которую должен вызывать UI при нажатии на кнопку в layout 2b
-        // answer -- введенный текст
-        public static void answerIsWritten(String answer) {
+        @Override
+        public void answerIsWritten(@NonNull String answer) {
             userLogic.answerIsWritten(answer);
+        }
+
+        @Override
+        public ComplainedQuestion getCurrentQuestionData() {
+            return OnlineUserLogicController.getQuestionData();
         }
 
         public static void onTimeStart() {
@@ -133,15 +153,15 @@ public class OnlineController extends Controller {
             onlineGameActivity.get().setButtonText(text);
         }
 
-        public static void setTime(String time) {
+        public static void setTime(@NonNull String time) {
             onlineGameActivity.get().setTime(time);
         }
 
-        public static void setAnswer(String answer) {
+        public static void setAnswer(@NonNull String answer) {
             onlineGameActivity.get().setAnswer(answer);
         }
 
-        public static void setLocation(GameActivityLocation location) {
+        public static void setLocation(@NonNull GameActivityLocation location) {
             onlineGameActivity.get().setLocation(location);
         }
 
@@ -149,15 +169,13 @@ public class OnlineController extends Controller {
             onlineGameActivity.get().setScore(my, opponent);
         }
 
-        public static void setOpponentAnswer(String answer) {
+        public static void setOpponentAnswer(@NonNull String answer) {
             onlineGameActivity.get().setOpponentAnswer(answer);
         }
     }
 
     public static class NetworkController {
         private static Network network;
-        private static CountDownTimer handshakeTimer;
-        private static final int HANDSHAKE_TIME = 5000;
 
         public static void createOnlineGame() {
             network = new Network();
@@ -167,31 +185,13 @@ public class OnlineController extends Controller {
 
         public static void sendQuestion(byte[] message) {
             if (network != null) {
-                if (iAmServer()) {
-                    handshakeTimer = new CountDownTimer(HANDSHAKE_TIME, 1000) {
-                        @Override
-                        public void onTick(long millisUntilFinished) {
-                            if (handshakeTimer == this) {
-                                Log.d("BrainRing", "Handshake timer tick");
-                                network.sendReliableMessageToAll(message);
-                            }
-                        }
-
-                        @Override
-                        public void onFinish() {
-                            if (handshakeTimer == this) {
-                                Log.d("BrainRing", "Unsuccessful handshake");
-                                finishOnlineGame();
-                            }
-                        }
-                    };
-                    handshakeTimer.start();
-                }
+                network.sendQuestion(message);
             }
         }
 
         public static void leaveRoom() {
             if (network != null) {
+                network.updateRating();
                 network.leaveRoom();
             }
         }
@@ -200,21 +200,25 @@ public class OnlineController extends Controller {
             return network.iAmServer();
         }
 
-        public static void loggedIn(GoogleSignInAccount signedInAccount) {
+        public static void loggedIn(@NonNull GoogleSignInAccount signedInAccount) {
             if (network == null) {
                 Log.wtf("BrainRing", "Logged in but network is null");
                 return;
             }
-            network.googleSignInAccount = signedInAccount;
+            Log.d("BrainRing", "Logged in");
+            network.onSignedIn(signedInAccount);
+        }
+
+        public static void startGame() {
             network.startQuickGame();
         }
 
-        public static void sendReliableMessageToServer(byte[] message) {
+        public static void sendMessageToServer(@NonNull byte[] message) {
             if (network == null) {
                 Log.wtf("BrainRing", "Sending message to server but network is null");
                 return;
             }
-            network.sendReliableMessageToServer(message);
+            network.sendMessageToServer(message);
         }
 
         public static String getMyParticipantId() {
@@ -233,20 +237,20 @@ public class OnlineController extends Controller {
             return network.getOpponentParticipantId();
         }
 
-        public static void sendReliableMessageToConcreteUser(String userId, byte[] message) {
+        public static void sendMessageToConcreteUser(@NonNull String userId, @NonNull byte[] message) {
             if (network == null) {
                 Log.wtf("BrainRing", "Sending message but network is null");
                 return;
             }
-            network.sendReliableMessageToConcreteUser(userId, message);
+            network.sendMessageToConcreteUser(userId, message);
         }
 
-        public static void sendReliableMessageToAll(byte[] message) {
+        public static void sendMessageToAll(@NonNull byte[] message) {
             if (network == null) {
                 Log.wtf("BrainRing", "Sending message but network is null");
                 return;
             }
-            network.sendReliableMessageToAll(message);
+            network.sendMessageToAll(message);
         }
     }
 }

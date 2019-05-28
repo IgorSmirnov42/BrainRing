@@ -1,12 +1,18 @@
 package ru.spbhse.brainring.ui;
 
 import android.support.v7.app.AppCompatActivity;
+import android.text.method.ScrollingMovementMethod;
+import android.util.Log;
+import android.view.Gravity;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import ru.spbhse.brainring.R;
-import ru.spbhse.brainring.controllers.OnlineController;
+import ru.spbhse.brainring.controllers.GameController;
+import ru.spbhse.brainring.files.ComplainedQuestion;
+import ru.spbhse.brainring.files.ComplainsFileHandler;
 
 import static ru.spbhse.brainring.ui.GameActivityLocation.GAME_WAITING_START;
 import static ru.spbhse.brainring.ui.GameActivityLocation.OPPONENT_IS_ANSWERING;
@@ -24,6 +30,7 @@ abstract public class GameActivity extends AppCompatActivity {
     protected String answer;
     protected String myScore;
     protected String opponentScore;
+    protected GameController gameController;
 
     protected void drawLocation() {
         if (currentLocation == GAME_WAITING_START) {
@@ -37,6 +44,7 @@ abstract public class GameActivity extends AppCompatActivity {
 
             TextView questionTextField = findViewById(R.id.questionText);
             questionTextField.setText(question);
+            questionTextField.setMovementMethod(new ScrollingMovementMethod());
 
             TextView opponentAnswer = findViewById(R.id.opponentAnswer);
             opponentAnswer.setText(this.opponentAnswer);
@@ -44,18 +52,19 @@ abstract public class GameActivity extends AppCompatActivity {
             TextView timeLeft = findViewById(R.id.timeLeft);
             timeLeft.setText(this.timeLeft);
 
-            answerButton.setOnClickListener(v -> OnlineController.OnlineUserLogicController.answerButtonPushed());
+            answerButton.setOnClickListener(v -> gameController.answerButtonPushed());
         }
         if (currentLocation == WRITE_ANSWER) {
             setContentView(R.layout.activity_writing_answer);
 
             TextView questionTextField = findViewById(R.id.questionText);
             questionTextField.setText(question);
+            questionTextField.setMovementMethod(new ScrollingMovementMethod());
 
             EditText answerEditor = findViewById(R.id.answerEditor);
             Button answerWrittenButton = findViewById(R.id.answerWrittenButton);
             answerWrittenButton.setOnClickListener(
-                    v -> OnlineController.OnlineUserLogicController.answerIsWritten(
+                    v -> gameController.answerIsWritten(
                             answerEditor.getText().toString()));
         }
         if (currentLocation == SHOW_ANSWER) {
@@ -69,12 +78,31 @@ abstract public class GameActivity extends AppCompatActivity {
 
             TextView opponentScore = findViewById(R.id.opponentScore);
             opponentScore.setText(this.opponentScore);
+
+            Button complainButton = findViewById(R.id.complainButton);
+            complainButton.setOnClickListener(v -> {
+                ComplainedQuestion question = gameController.getCurrentQuestionData();
+                try {
+                    ComplainsFileHandler.appendComplain(question);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    finish();
+                    return;
+                }
+                Toast toast = Toast.makeText(GameActivity.this,
+                        "Вопрос добавлен в список. После игры зайдите во вкладку " +
+                                "\"Пожаловаться на вопрос\", чтобы отправить жалобу",
+                        Toast.LENGTH_LONG);
+                toast.setGravity(Gravity.CENTER, 0, 0);
+                toast.show();
+            });
         }
         if (currentLocation == OPPONENT_IS_ANSWERING) {
             setContentView(R.layout.activity_opponent_answering);
 
             TextView questionTextField = findViewById(R.id.questionText);
             questionTextField.setText(question);
+            questionTextField.setMovementMethod(new ScrollingMovementMethod());
         }
     }
 
@@ -118,5 +146,15 @@ abstract public class GameActivity extends AppCompatActivity {
     public void setLocation(GameActivityLocation location) {
         currentLocation = location;
         drawLocation();
+    }
+
+    public String getWhatWritten() {
+        EditText answerEditor = findViewById(R.id.answerEditor);
+        if (answerEditor != null) {
+            return answerEditor.getText().toString();
+        } else {
+            Log.wtf("BrainRing", "Answer editing wasn't open but should");
+            return "";
+        }
     }
 }

@@ -10,12 +10,14 @@ import android.widget.EditText;
 
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.games.GamesActivityResultCodes;
 
 import ru.spbhse.brainring.R;
+import ru.spbhse.brainring.controllers.DatabaseController;
 import ru.spbhse.brainring.controllers.OnlineController;
 import ru.spbhse.brainring.database.QuestionDataBase;
 
@@ -36,14 +38,17 @@ public class OnlineGameActivity extends GameActivity {
 
         OnlineController.setUI(OnlineGameActivity.this);
         dataBase = new QuestionDataBase(OnlineGameActivity.this);
+        DatabaseController.setDatabase(dataBase);
         dataBase.openDataBase();
+        dataBase.createTable(dataBase.getBaseTable());
+        gameController = OnlineController.OnlineUserLogicController.getInstance();
 
         drawLocation();
 
         OnlineController.NetworkController.createOnlineGame();
     }
 
-    public String getWhatWritten() {
+    /*public String getWhatWritten() {
         EditText answerEditor = findViewById(R.id.answerEditor);
         if (answerEditor != null) {
             return answerEditor.getText().toString();
@@ -51,15 +56,22 @@ public class OnlineGameActivity extends GameActivity {
             Log.wtf("BrainRing", "Answer editing wasn't open but should");
             return "";
         }
-    }
+    }*/
 
     /* I know that this function is out of content here,
        but it is linked with onActivityResult that can be placed only here */
     public void signIn() {
-        GoogleSignInClient signInClient = GoogleSignIn.getClient(this,
-                GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN);
-        Intent intent = signInClient.getSignInIntent();
-        startActivityForResult(intent, RC_SIGN_IN);
+        GoogleSignInOptions signInOptions = GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN;
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
+        if (GoogleSignIn.hasPermissions(account, signInOptions.getScopeArray())) {
+            Log.d("BrainRing", "Already logged in");
+            OnlineController.NetworkController.loggedIn(account);
+        } else {
+            GoogleSignInClient signInClient = GoogleSignIn.getClient(this,
+                    GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN);
+            Intent intent = signInClient.getSignInIntent();
+            startActivityForResult(intent, RC_SIGN_IN);
+        }
     }
 
     @Override

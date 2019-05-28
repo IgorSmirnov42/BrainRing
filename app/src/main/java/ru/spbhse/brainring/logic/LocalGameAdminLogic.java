@@ -47,8 +47,7 @@ public class LocalGameAdminLogic {
                 SECOND) {
             @Override
             public void onTick(long millisUntilFinished) {
-                Log.d("BrainRing", "Tick first timer");
-                if (timer == this) {
+                //if (timer == this) {
                     LocalController.LocalAdminUIController.showTime(
                             max((millisUntilFinished - FAULT) / SECOND, 0));
 
@@ -59,21 +58,20 @@ public class LocalGameAdminLogic {
                             player.start();
                         }).start();
                     }
-                }
+                //}
             }
 
             @Override
             public void onFinish() {
-                System.out.println("THREAD ID IS " + Thread.currentThread().getId());
                 Log.d("BrainRing", "Finish first timer");
-                if (timer == this) {
+                //if (timer == this) {
                     new Thread(() -> {
                         MediaPlayer player = MediaPlayer.create(LocalController.getJuryActivity(), R.raw.beep);
                         player.setOnCompletionListener(MediaPlayer::release);
                         player.start();
                     }).start();
                     newQuestion();
-                }
+                //}
             }
         };
 
@@ -81,8 +79,7 @@ public class LocalGameAdminLogic {
                 SECOND) {
             @Override
             public void onTick(long millisUntilFinished) {
-                Log.d("BrainRing", "Tick first timer");
-                if (timer == this) {
+                //if (timer == this) {
                     LocalController.LocalAdminUIController.showTime(
                             max((millisUntilFinished - FAULT) / SECOND, 0));
 
@@ -93,21 +90,20 @@ public class LocalGameAdminLogic {
                             player.start();
                         }).start();
                     }
-                }
+                //}
             }
 
             @Override
             public void onFinish() {
-                System.out.println("THREAD ID IS " + Thread.currentThread().getId());
-                Log.d("BrainRing", "Finish first timer");
-                if (timer == this) {
+                Log.d("BrainRing", "Finish second timer");
+                //if (timer == this) {
                     new Thread(() -> {
                         MediaPlayer player = MediaPlayer.create(LocalController.getJuryActivity(), R.raw.beep);
                         player.setOnCompletionListener(MediaPlayer::release);
                         player.start();
                     }).start();
                     newQuestion();
-                }
+                //}
             }
         };
     }
@@ -206,10 +202,9 @@ public class LocalGameAdminLogic {
 
     /**
      * Allows or forbids to answer team that pushed answer button
-     * Determines (no) false starts
+     * Determines false starts
      */
     public void onAnswerIsReady(@NonNull String userId) {
-        System.out.println("THREAD ID IS " + Thread.currentThread().getId());
         if (timer != null) {
             timer.cancel();
             timer = null;

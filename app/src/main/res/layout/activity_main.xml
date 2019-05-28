@@ -36,13 +36,7 @@
             android:text="@string/complain" />
 
         <Button
-            android:id="@+id/packagesButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/packages" />
-
-        <Button
-            android:id="@+id/settingsButton"
+            android:id="@+id/ratingButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/settings" />

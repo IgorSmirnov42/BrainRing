@@ -42,7 +42,6 @@ public class LocalGamePlayerLogic {
      * Called when team pushed the button
      */
     public void answerButtonPushed() {
-        System.out.println("SEND ANSWER BUTTON PUSHED");
         LocalController.LocalNetworkPlayerController.sendMessageToServer(PUSHED_BUTTON);
     }
 }

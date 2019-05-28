@@ -1,6 +1,11 @@
 package ru.spbhse.brainring.utils;
 
 
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+
+import static java.lang.Character.isDigit;
+import static java.lang.Character.isLetter;
 import static java.lang.Character.toLowerCase;
 import static java.lang.Math.min;
 
@@ -32,11 +37,7 @@ class Answer {
      *                     If there are several variants, they must be divided with "/"
      *                     Symbol "/" if forbidden as a part of answer
      */
-    Answer(String mainAnswer, String validAnswers) {
-        if (mainAnswer == null) {
-            throw new IllegalArgumentException("Answer constructor was given null as mainAnswer. It is forbidden.");
-        }
-
+    Answer(@NonNull String mainAnswer, @Nullable String validAnswers) {
         String[] validAnswersSplitted;
         if (validAnswers != null) {
             validAnswersSplitted = validAnswers.split("/");
@@ -54,16 +55,40 @@ class Answer {
     }
 
     /** Checks if users answer is right */
-    boolean checkAnswer(String userAnswer) {
-        if (userAnswer == null) {
-            return false;
-        }
+    boolean checkAnswer(@NonNull String userAnswer) {
         for (String answer : possibleAnswers) {
-            if (compareAnswers(answer, userAnswer)) {
+            if (canCompare(answer, userAnswer, 0, new StringBuilder())) {
                 return true;
             }
         }
         return false;
+    }
+
+    private boolean canCompare(@NonNull String answer, @NonNull String userAnswer, int position,
+                               @NonNull StringBuilder builder) {
+        if (position == answer.length()) {
+            return compareAnswers(builder.toString(), userAnswer);
+        }
+        if (answer.charAt(position) == ']') {
+            return canCompare(answer, userAnswer, position + 1, builder);
+        }
+        boolean result;
+        int builderSize = builder.length();
+        if (answer.charAt(position) != '[') {
+            builder.append(answer.charAt(position));
+            result = canCompare(answer, userAnswer, position + 1, builder);
+            builder.deleteCharAt(builderSize);
+            return result;
+        } else {
+            if (canCompare(answer, userAnswer, position + 1, builder)) {
+                return true;
+            } else {
+                while (position < answer.length() && answer.charAt(position) != ']') {
+                    ++position;
+                }
+                return canCompare(answer, userAnswer, position, builder);
+            }
+        }
     }
 
     private static int allowedDistance(String answer) {
@@ -97,8 +122,21 @@ class Answer {
         return distance[correctAnswer.length()][userAnswer.length()];
     }
 
+    /** Leaves only letters and digits */
+    private static String prepareString(@NonNull String string) {
+        StringBuilder builder = new StringBuilder();
+        for (char c : string.toCharArray()) {
+            if (isLetter(c) || isDigit(c)) {
+                builder.append(c);
+            }
+        }
+        return builder.toString();
+    }
+
     /** Checks if answers are similar. */
-    private static boolean compareAnswers(String correctAnswer, String userAnswer) {
+    private static boolean compareAnswers(@NonNull String correctAnswer, @NonNull String userAnswer) {
+        correctAnswer = prepareString(correctAnswer);
+        userAnswer = prepareString(userAnswer);
         return levenshteinDistance(correctAnswer, userAnswer) <= allowedDistance(correctAnswer);
     }
 }
