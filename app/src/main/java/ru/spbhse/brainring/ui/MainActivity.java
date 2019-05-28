@@ -19,6 +19,7 @@ import com.google.android.gms.games.Games;
 import java.util.Objects;
 
 import ru.spbhse.brainring.R;
+import ru.spbhse.brainring.files.ComplainsFileHandler;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -28,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ComplainsFileHandler.setContext(this);
         setContentView(R.layout.activity_main);
 
         Button trainBtn = findViewById(R.id.trainButton);

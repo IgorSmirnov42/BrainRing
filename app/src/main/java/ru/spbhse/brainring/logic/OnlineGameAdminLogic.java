@@ -1,6 +1,7 @@
 package ru.spbhse.brainring.logic;
 
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import java.io.ByteArrayOutputStream;
@@ -140,7 +141,7 @@ public class OnlineGameAdminLogic {
         waitingAnswer.clear();
     }
 
-    private void restartTime(String previousUserId, String previousAnswer) {
+    private void restartTime(@NonNull String previousUserId, @NonNull String previousAnswer) {
         if (bothAnswered()) {
             showAnswer();
             return;
@@ -151,7 +152,7 @@ public class OnlineGameAdminLogic {
     }
 
     /** Rejects or accepts answer written by user */
-    public void onAnswerIsWritten(String writtenAnswer, String id) {
+    public void onAnswerIsWritten(@NonNull String writtenAnswer, @NonNull String id) {
         Log.d("BrainRing","Got answer: " + writtenAnswer + " from user " + id);
         if (!id.equals(answeringUserId)) {
             return;
@@ -193,7 +194,7 @@ public class OnlineGameAdminLogic {
         user2.status.onNewQuestion();
 
         currentQuestion = DatabaseController.getRandomQuestion();
-        byte[] message = Message.generateMessage(Message.SENDING_QUESTION, currentQuestion.getQuestion());
+        byte[] message = Message.generateMessageQuestion(Message.SENDING_QUESTION, currentQuestion.getId(), currentQuestion.getQuestion());
         OnlineController.NetworkController.sendQuestion(message);
         currentRound = 1;
         ++questionNumber;

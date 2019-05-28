@@ -2,6 +2,7 @@ package ru.spbhse.brainring.controllers;
 
 import java.lang.ref.WeakReference;
 
+import ru.spbhse.brainring.files.ComplainedQuestion;
 import ru.spbhse.brainring.logic.TrainingPlayerLogic;
 import ru.spbhse.brainring.ui.GameActivityLocation;
 import ru.spbhse.brainring.ui.TrainingGameActivity;
@@ -42,6 +43,11 @@ public class TrainingController extends Controller {
         @Override
         public void answerIsWritten(String answer) {
             trainingPlayerLogic.answerIsWritten(answer);
+        }
+
+        @Override
+        public ComplainedQuestion getCurrentQuestionData() {
+            return trainingPlayerLogic.getCurrentQuestionData();
         }
 
         public static void finishGame() {
