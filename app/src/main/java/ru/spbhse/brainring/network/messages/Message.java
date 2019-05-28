@@ -60,4 +60,20 @@ public class Message {
         }
         return buf;
     }
+
+    public static byte[] generateMessageQuestion(int code, int id, String message) {
+        byte[] buf;
+        try (ByteArrayOutputStream bout = new ByteArrayOutputStream();
+             DataOutputStream dout = new DataOutputStream(bout)) {
+            dout.writeInt(code);
+            dout.writeInt(id);
+            dout.writeChars(message);
+            dout.flush();
+            buf = bout.toByteArray();
+        } catch (IOException e) {
+            e.printStackTrace();
+            buf = null;
+        }
+        return buf;
+    }
 }

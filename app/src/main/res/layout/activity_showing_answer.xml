@@ -26,11 +26,12 @@
         android:id="@+id/rightAnswerTextField"
         android:layout_width="324dp"
         android:layout_height="179dp"
-        android:layout_marginTop="72dp"
+        android:layout_marginTop="64dp"
         android:text="Поле с ответом"
-        android:textSize="18sp"
+        android:textAlignment="center"
+        android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.321"
+        app:layout_constraintHorizontal_bias="0.551"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -62,4 +63,16 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/count"
         app:layout_constraintVertical_bias="0.0" />
+
+    <Button
+        android:id="@+id/complainButton"
+        android:layout_width="349dp"
+        android:layout_height="84dp"
+        android:text="Пожаловаться на вопрос"
+        android:textSize="24sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/opponentScore" />
 </android.support.constraint.ConstraintLayout>

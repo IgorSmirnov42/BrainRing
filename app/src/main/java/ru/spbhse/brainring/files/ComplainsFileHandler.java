@@ -1,5 +1,6 @@
 package ru.spbhse.brainring.files;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 
 import org.json.JSONArray;
@@ -7,22 +8,32 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ComplainsFileHandler {
     private static final String filename = "complains.json";
+    private static Context context;
+
+    public static void setContext(@NonNull Context mainContext) {
+        context = mainContext;
+    }
 
     @NonNull
     public static List<ComplainedQuestion> getAllQuestionsFromFile() throws IOException, JSONException {
         List<ComplainedQuestion> questions = new ArrayList<>();
-        File file = createFileIfNotExists();
         StringBuilder builder = new StringBuilder();
-        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+        // If file doesn't exist then create
+        try {
+            context.openFileInput(filename);
+        } catch (IOException e) {
+            saveComplainsToFile(new ArrayList<>());
+        }
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(
+                context.openFileInput(filename)))) {
             while (true) {
                 String line = reader.readLine();
                 if (line != null) {
@@ -58,19 +69,13 @@ public class ComplainsFileHandler {
         return result.toString();
     }
 
-    private static File createFileIfNotExists() throws IOException {
-        File file = new File(filename);
-        if (!file.exists()) {
-           if (!file.createNewFile()) {
-               throw new IllegalStateException("Cannot create file");
-           }
+    private static void rewriteFile(@NonNull String text) throws IOException {
+        try (FileOutputStream outputStream = context.openFileOutput(filename, Context.MODE_PRIVATE)) {
+            outputStream.write(text.getBytes());
         }
-        return file;
     }
 
     public static void saveComplainsToFile(@NonNull List<ComplainedQuestion> questions) throws IOException, JSONException {
-        File file = createFileIfNotExists();
-
         List<JSONObject> complains = new ArrayList<>();
         for (ComplainedQuestion question : questions) {
             JSONObject jsonQuestion = new JSONObject();
@@ -83,11 +88,7 @@ public class ComplainsFileHandler {
 
         JSONArray array = new JSONArray(complains);
 
-        try (FileWriter fileWriter = new FileWriter(file)) {
-            fileWriter.write(array.toString());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        rewriteFile(array.toString());
     }
 
     private static void sendComplainWithEmail() throws IOException, JSONException {

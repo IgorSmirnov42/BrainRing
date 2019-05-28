@@ -16,7 +16,7 @@ import ru.spbhse.brainring.files.ComplainsFileHandler;
 
 public class ComplainActivity extends AppCompatActivity {
 
-    private List<ComplainedQuestion> questions = new ArrayList<>(); //
+    private List<ComplainedQuestion> questions;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

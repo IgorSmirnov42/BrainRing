@@ -5,25 +5,33 @@ import android.support.annotation.Nullable;
 
 /** Class to store questions. Allows to check if user's answer is right */
 public class Question {
-    final private String question;
-    final private Answer answer;
-    final private String comment;
+    @NonNull final private String question;
+    @NonNull final private Answer answer;
+    @Nullable final private String comment;
     final private int id;
 
+    @NonNull
     public String getQuestion() {
         return question;
     }
 
+    @NonNull
     public String getAllAnswers() {
         return answer.getAllAnswers();
     }
 
+    @NonNull
     public String getMainAnswer() {
         return answer.getMainAnswer();
     }
 
+    @Nullable
     public String getComment() {
         return comment;
+    }
+
+    public int getId() {
+        return id;
     }
 
     /**

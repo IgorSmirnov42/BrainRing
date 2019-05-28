@@ -2,13 +2,12 @@ package ru.spbhse.brainring.logic;
 
 import android.media.MediaPlayer;
 import android.os.CountDownTimer;
-import android.os.Handler;
 import android.util.Log;
-import android.widget.Toast;
 
 import ru.spbhse.brainring.R;
 import ru.spbhse.brainring.controllers.DatabaseController;
 import ru.spbhse.brainring.controllers.TrainingController;
+import ru.spbhse.brainring.files.ComplainedQuestion;
 import ru.spbhse.brainring.ui.GameActivityLocation;
 import ru.spbhse.brainring.utils.Question;
 
@@ -21,6 +20,11 @@ public class TrainingPlayerLogic {
     private static final int TIME_TO_SHOW_ANSWER = 5;
     private static final int SECOND = 1000;
     private CountDownTimer timer;
+
+    public ComplainedQuestion getCurrentQuestionData() {
+        return new ComplainedQuestion(currentQuestion.getQuestion(),
+                currentQuestion.getAllAnswers(), currentQuestion.getId());
+    }
 
     public void newQuestion() {
         if (timer != null) {

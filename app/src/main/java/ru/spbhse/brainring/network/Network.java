@@ -210,8 +210,9 @@ public class Network {
                     OnlineController.OnlineUserLogicController.onAllowedToAnswer();
                     break;
                 case Message.SENDING_QUESTION:
+                    int questionId = is.readInt();
                     String question = Message.readString(is);
-                    OnlineController.OnlineUserLogicController.onReceivingQuestion(question);
+                    OnlineController.OnlineUserLogicController.onReceivingQuestion(questionId, question);
                     break;
                 case Message.SENDING_INCORRECT_OPPONENT_ANSWER:
                     String opponentAnswer = Message.readString(is);
