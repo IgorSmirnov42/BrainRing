@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.annotation.Nullable;
 import android.util.Log;
-import android.widget.EditText;
 
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -16,16 +15,15 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.games.GamesActivityResultCodes;
 
-import ru.spbhse.brainring.R;
 import ru.spbhse.brainring.controllers.DatabaseController;
 import ru.spbhse.brainring.controllers.OnlineController;
-import ru.spbhse.brainring.database.QuestionDataBase;
+import ru.spbhse.brainring.database.QuestionDatabase;
 
 public class OnlineGameActivity extends GameActivity {
 
     private static final int RC_SIGN_IN = 42;
 
-    public QuestionDataBase dataBase;
+    public QuestionDatabase dataBase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,7 +35,7 @@ public class OnlineGameActivity extends GameActivity {
         super.onCreate(savedInstanceState);
 
         OnlineController.setUI(OnlineGameActivity.this);
-        dataBase = new QuestionDataBase(OnlineGameActivity.this);
+        dataBase = new QuestionDatabase(OnlineGameActivity.this);
         DatabaseController.setDatabase(dataBase);
         dataBase.openDataBase();
         dataBase.createTable(dataBase.getBaseTable());
