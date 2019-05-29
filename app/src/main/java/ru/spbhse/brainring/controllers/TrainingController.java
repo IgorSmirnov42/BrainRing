@@ -35,6 +35,10 @@ public class TrainingController extends Controller {
             return gameController;
         }
 
+        public static void setAnswerTime(int answerTime) {
+            trainingPlayerLogic.setAnswerTime(answerTime);
+        }
+
         @Override
         public void answerButtonPushed() {
             trainingPlayerLogic.answerButtonPushed();
@@ -70,6 +74,10 @@ public class TrainingController extends Controller {
 
         public static void setAnswer(String answer) {
             trainingGameActivity.get().setAnswer(answer);
+        }
+
+        public static void setComment(String comment) {
+            trainingGameActivity.get().setComment(comment);
         }
 
         public static void setScore(int myScore, int maxScore) {
