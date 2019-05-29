@@ -149,6 +149,10 @@ public class OnlineController extends Controller {
             onlineGameActivity.get().setAnswer(answer);
         }
 
+        public static void setComment(String comment) {
+            onlineGameActivity.get().setComment(comment);
+        }
+
         public static void setLocation(GameActivityLocation location) {
             onlineGameActivity.get().setLocation(location);
         }

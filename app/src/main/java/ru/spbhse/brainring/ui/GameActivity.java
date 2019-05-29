@@ -24,6 +24,7 @@ abstract public class GameActivity extends AppCompatActivity {
     protected String timeLeft;
     protected String opponentAnswer;
     protected String answer;
+    protected String comment;
     protected String myScore;
     protected String opponentScore;
     protected GameController gameController;
@@ -65,7 +66,7 @@ abstract public class GameActivity extends AppCompatActivity {
             setContentView(R.layout.activity_showing_answer);
 
             TextView rightAnswerTextField = findViewById(R.id.rightAnswerTextField);
-            rightAnswerTextField.setText(answer);
+            rightAnswerTextField.setText(answer + "\n" + comment);
 
             TextView myScore = findViewById(R.id.myScore);
             myScore.setText(this.myScore);
@@ -94,7 +95,8 @@ abstract public class GameActivity extends AppCompatActivity {
 
     public void setTime(String time) {
         timeLeft = time;
-        drawLocation();
+        TextView timeLeftView = findViewById(R.id.timeLeft);
+        timeLeftView.setText(timeLeft);
     }
 
     public void setOpponentAnswer(String answer) {
@@ -115,6 +117,11 @@ abstract public class GameActivity extends AppCompatActivity {
 
     public void setAnswer(String answer) {
         this.answer = answer;
+        drawLocation();
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
         drawLocation();
     }
 
