@@ -1,11 +1,13 @@
 package ru.spbhse.brainring.controllers;
 
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 
 import java.lang.ref.WeakReference;
 
+import ru.spbhse.brainring.files.ComplainedQuestion;
 import ru.spbhse.brainring.logic.OnlineGameAdminLogic;
 import ru.spbhse.brainring.logic.OnlineGameUserLogic;
 import ru.spbhse.brainring.network.Network;
@@ -74,6 +76,10 @@ public class OnlineController extends Controller {
         private static OnlineGameUserLogic userLogic;
         private static GameController gameController;
 
+        public static ComplainedQuestion getQuestionData() {
+            return userLogic.getQuestionData();
+        }
+
         public static void onForbiddenToAnswer() {
             userLogic.onForbiddenToAnswer();
         }
@@ -82,18 +88,19 @@ public class OnlineController extends Controller {
             userLogic.onAllowedToAnswer();
         }
 
-        public static void onReceivingQuestion(String question) {
+        public static void onReceivingQuestion(int questionId, @NonNull String question) {
             if (userLogic == null) {
                 userLogic = new OnlineGameUserLogic();
             }
-            userLogic.onReceivingQuestion(question);
+            userLogic.onReceivingQuestion(questionId, question);
         }
 
-        public static void onIncorrectOpponentAnswer(String opponentAnswer) {
+        public static void onIncorrectOpponentAnswer(@NonNull String opponentAnswer) {
             userLogic.onIncorrectOpponentAnswer(opponentAnswer);
         }
 
-        public static void onReceivingAnswer(int firstUserScore, int secondUserScore, String correctAnswer) {
+        public static void onReceivingAnswer(int firstUserScore, int secondUserScore,
+                                             @NonNull String correctAnswer) {
             userLogic.onReceivingAnswer(firstUserScore, secondUserScore, correctAnswer);
         }
 
@@ -114,8 +121,13 @@ public class OnlineController extends Controller {
         }
 
         @Override
-        public void answerIsWritten(String answer) {
+        public void answerIsWritten(@NonNull String answer) {
             userLogic.answerIsWritten(answer);
+        }
+
+        @Override
+        public ComplainedQuestion getCurrentQuestionData() {
+            return OnlineUserLogicController.getQuestionData();
         }
 
         public static void onTimeStart() {
@@ -141,11 +153,11 @@ public class OnlineController extends Controller {
             onlineGameActivity.get().setButtonText(text);
         }
 
-        public static void setTime(String time) {
+        public static void setTime(@NonNull String time) {
             onlineGameActivity.get().setTime(time);
         }
 
-        public static void setAnswer(String answer) {
+        public static void setAnswer(@NonNull String answer) {
             onlineGameActivity.get().setAnswer(answer);
         }
 
@@ -153,7 +165,8 @@ public class OnlineController extends Controller {
             onlineGameActivity.get().setComment(comment);
         }
 
-        public static void setLocation(GameActivityLocation location) {
+
+        public static void setLocation(@NonNull GameActivityLocation location) {
             onlineGameActivity.get().setLocation(location);
         }
 
@@ -161,7 +174,7 @@ public class OnlineController extends Controller {
             onlineGameActivity.get().setScore(my, opponent);
         }
 
-        public static void setOpponentAnswer(String answer) {
+        public static void setOpponentAnswer(@NonNull String answer) {
             onlineGameActivity.get().setOpponentAnswer(answer);
         }
     }
@@ -192,7 +205,7 @@ public class OnlineController extends Controller {
             return network.iAmServer();
         }
 
-        public static void loggedIn(GoogleSignInAccount signedInAccount) {
+        public static void loggedIn(@NonNull GoogleSignInAccount signedInAccount) {
             if (network == null) {
                 Log.wtf("BrainRing", "Logged in but network is null");
                 return;
@@ -205,7 +218,7 @@ public class OnlineController extends Controller {
             network.startQuickGame();
         }
 
-        public static void sendMessageToServer(byte[] message) {
+        public static void sendMessageToServer(@NonNull byte[] message) {
             if (network == null) {
                 Log.wtf("BrainRing", "Sending message to server but network is null");
                 return;
@@ -229,7 +242,7 @@ public class OnlineController extends Controller {
             return network.getOpponentParticipantId();
         }
 
-        public static void sendMessageToConcreteUser(String userId, byte[] message) {
+        public static void sendMessageToConcreteUser(@NonNull String userId, @NonNull byte[] message) {
             if (network == null) {
                 Log.wtf("BrainRing", "Sending message but network is null");
                 return;
@@ -237,7 +250,7 @@ public class OnlineController extends Controller {
             network.sendMessageToConcreteUser(userId, message);
         }
 
-        public static void sendMessageToAll(byte[] message) {
+        public static void sendMessageToAll(@NonNull byte[] message) {
             if (network == null) {
                 Log.wtf("BrainRing", "Sending message but network is null");
                 return;

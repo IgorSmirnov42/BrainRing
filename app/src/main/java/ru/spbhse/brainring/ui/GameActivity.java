@@ -1,14 +1,18 @@
 package ru.spbhse.brainring.ui;
 
 import android.support.v7.app.AppCompatActivity;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
+import android.view.Gravity;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import ru.spbhse.brainring.R;
 import ru.spbhse.brainring.controllers.GameController;
-import ru.spbhse.brainring.controllers.OnlineController;
+import ru.spbhse.brainring.files.ComplainedQuestion;
+import ru.spbhse.brainring.files.ComplainsFileHandler;
 
 import static ru.spbhse.brainring.ui.GameActivityLocation.GAME_WAITING_START;
 import static ru.spbhse.brainring.ui.GameActivityLocation.OPPONENT_IS_ANSWERING;
@@ -41,6 +45,7 @@ abstract public class GameActivity extends AppCompatActivity {
 
             TextView questionTextField = findViewById(R.id.questionText);
             questionTextField.setText(question);
+            questionTextField.setMovementMethod(new ScrollingMovementMethod());
 
             TextView opponentAnswer = findViewById(R.id.opponentAnswer);
             opponentAnswer.setText(this.opponentAnswer);
@@ -55,6 +60,7 @@ abstract public class GameActivity extends AppCompatActivity {
 
             TextView questionTextField = findViewById(R.id.questionText);
             questionTextField.setText(question);
+            questionTextField.setMovementMethod(new ScrollingMovementMethod());
 
             EditText answerEditor = findViewById(R.id.answerEditor);
             Button answerWrittenButton = findViewById(R.id.answerWrittenButton);
@@ -73,12 +79,31 @@ abstract public class GameActivity extends AppCompatActivity {
 
             TextView opponentScore = findViewById(R.id.opponentScore);
             opponentScore.setText(this.opponentScore);
+
+            Button complainButton = findViewById(R.id.complainButton);
+            complainButton.setOnClickListener(v -> {
+                ComplainedQuestion question = gameController.getCurrentQuestionData();
+                try {
+                    ComplainsFileHandler.appendComplain(question);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    finish();
+                    return;
+                }
+                Toast toast = Toast.makeText(GameActivity.this,
+                        "Вопрос добавлен в список. После игры зайдите во вкладку " +
+                                "\"Пожаловаться на вопрос\", чтобы отправить жалобу",
+                        Toast.LENGTH_LONG);
+                toast.setGravity(Gravity.CENTER, 0, 0);
+                toast.show();
+            });
         }
         if (currentLocation == OPPONENT_IS_ANSWERING) {
             setContentView(R.layout.activity_opponent_answering);
 
             TextView questionTextField = findViewById(R.id.questionText);
             questionTextField.setText(question);
+            questionTextField.setMovementMethod(new ScrollingMovementMethod());
         }
     }
 

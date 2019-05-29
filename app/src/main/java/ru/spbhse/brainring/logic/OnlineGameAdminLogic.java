@@ -1,6 +1,7 @@
 package ru.spbhse.brainring.logic;
 
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import java.io.ByteArrayOutputStream;
@@ -22,6 +23,7 @@ public class OnlineGameAdminLogic {
     private String answeringUserId;
     private boolean interrupted;
     private long currentRound;
+    private int questionNumber;
     private List<AnswerTime> waitingAnswer= new ArrayList<>();
 
     private static final byte[] ALLOW_ANSWER = Message.generateMessage(Message.ALLOWED_TO_ANSWER, "");
@@ -30,7 +32,7 @@ public class OnlineGameAdminLogic {
     private static final byte[] TIME_START = Message.generateMessage(Message.TIME_START, "");
     private static final byte[] CORRECT_ANSWER = Message.generateMessage(Message.CORRECT_ANSWER, "");
 
-    private static final int WINNER_SCORE = 5;
+    private static final int QUESTIONS_NUMBER_MIN = 5;
     private static final int SECOND = 1000;
     private static final int TIME_TO_SHOW_ANSWER = 5;
     private static final int TIME_TO_READ_QUESTION = 10;
@@ -139,7 +141,7 @@ public class OnlineGameAdminLogic {
         waitingAnswer.clear();
     }
 
-    private void restartTime(String previousUserId, String previousAnswer) {
+    private void restartTime(@NonNull String previousUserId, @NonNull String previousAnswer) {
         if (bothAnswered()) {
             showAnswer();
             return;
@@ -150,7 +152,7 @@ public class OnlineGameAdminLogic {
     }
 
     /** Rejects or accepts answer written by user */
-    public void onAnswerIsWritten(String writtenAnswer, String id) {
+    public void onAnswerIsWritten(@NonNull String writtenAnswer, @NonNull String id) {
         Log.d("BrainRing","Got answer: " + writtenAnswer + " from user " + id);
         if (!id.equals(answeringUserId)) {
             return;
@@ -180,7 +182,7 @@ public class OnlineGameAdminLogic {
 
     /** Determines if game is finished. If not, generates new question and sends it */
     public void newQuestion() {
-        if (user1.score >= WINNER_SCORE || user2.score >= WINNER_SCORE) {
+        if (questionNumber >= QUESTIONS_NUMBER_MIN && user1.score != user2.score) {
             OnlineController.NetworkController.sendMessageToAll(
                     Message.generateMessage(Message.FINISH, ""));
             OnlineController.finishOnlineGame();
@@ -192,9 +194,10 @@ public class OnlineGameAdminLogic {
         user2.status.onNewQuestion();
 
         currentQuestion = DatabaseController.getRandomQuestion();
-        byte[] message = Message.generateMessage(Message.SENDING_QUESTION, currentQuestion.getQuestion());
+        byte[] message = Message.generateMessageQuestion(Message.SENDING_QUESTION, currentQuestion.getId(), currentQuestion.getQuestion());
         OnlineController.NetworkController.sendQuestion(message);
         currentRound = 1;
+        ++questionNumber;
     }
 
     public void publishing() {

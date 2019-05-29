@@ -7,6 +7,7 @@ import android.util.Log;
 import ru.spbhse.brainring.R;
 import ru.spbhse.brainring.controllers.DatabaseController;
 import ru.spbhse.brainring.controllers.TrainingController;
+import ru.spbhse.brainring.files.ComplainedQuestion;
 import ru.spbhse.brainring.ui.GameActivityLocation;
 import ru.spbhse.brainring.utils.Question;
 
@@ -20,6 +21,11 @@ public class TrainingPlayerLogic {
     private static final int SECOND = 1000;
     private CountDownTimer timer;
     private int answerTime = DEFAULT_ANSWER_TIME;
+
+    public ComplainedQuestion getCurrentQuestionData() {
+        return new ComplainedQuestion(currentQuestion.getQuestion(),
+                currentQuestion.getAllAnswers(), currentQuestion.getId());
+    }
 
     public void newQuestion() {
         if (timer != null) {
