@@ -44,7 +44,9 @@ public class Network {
     private CountDownTimer handshakeTimer;
     private LeaderboardsClient leaderboardsClient;
     private long scoreSum;
-    private static final int HANDSHAKE_TIME = 1000;
+    private boolean firstMessage = true;
+    private static final int HANDSHAKE_TIME = 500;
+    private static final int FIRST_HANDSHAKE_TIME = 5000; // first message may take longer time
     private static final int MAXIMUM_TIME_WITHOUT_MESSAGES = 80 * 1000;
     private static CountDownTimer timer;
     private RoomStatusUpdateCallback mRoomStatusUpdateCallback = new RoomStatusUpdateCallback() {
@@ -350,7 +352,12 @@ public class Network {
 
     public void sendQuestion(byte[] message) {
         sendMessageToAll(message);
-        handshakeTimer = new CountDownTimer(HANDSHAKE_TIME, 1000) {
+        int handshakeTime = HANDSHAKE_TIME;
+        if (firstMessage) {
+            handshakeTime = FIRST_HANDSHAKE_TIME;
+            firstMessage = false;
+        }
+        handshakeTimer = new CountDownTimer(handshakeTime, handshakeTime) {
             @Override
             public void onTick(long millisUntilFinished) {
             }
