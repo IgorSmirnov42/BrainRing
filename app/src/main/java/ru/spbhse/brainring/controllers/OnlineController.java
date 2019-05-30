@@ -165,13 +165,12 @@ public class OnlineController extends Controller {
             onlineGameActivity.get().setComment(comment);
         }
 
-
         public static void setLocation(@NonNull GameActivityLocation location) {
             onlineGameActivity.get().setLocation(location);
         }
 
         public static void setScore(int my, int opponent) {
-            onlineGameActivity.get().setScore(my, opponent);
+            onlineGameActivity.get().setScore(String.valueOf(my), String.valueOf(opponent));
         }
 
         public static void setOpponentAnswer(@NonNull String answer) {

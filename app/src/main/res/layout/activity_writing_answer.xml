@@ -46,7 +46,7 @@
 
     <TextView
         android:id="@+id/timeLeft"
-        android:layout_width="72dp"
+        android:layout_width="130dp"
         android:layout_height="143dp"
         android:layout_marginBottom="28dp"
         android:textAlignment="center"

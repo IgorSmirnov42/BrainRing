@@ -1,5 +1,6 @@
 package ru.spbhse.brainring.ui;
 
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
@@ -23,14 +24,14 @@ import static ru.spbhse.brainring.ui.GameActivityLocation.WRITE_ANSWER;
 abstract public class GameActivity extends AppCompatActivity {
     protected GameActivityLocation currentLocation = GAME_WAITING_START;
 
-    protected String question;
-    protected String buttonText;
-    protected String timeLeft;
-    protected String opponentAnswer;
-    protected String answer;
-    protected String comment;
-    protected String myScore;
-    protected String opponentScore;
+    protected String question = "";
+    protected String buttonText = "";
+    protected String timeLeft = "";
+    protected String opponentAnswer = "";
+    protected String answer = "";
+    protected String comment = "";
+    protected String myScore = "0";
+    protected String opponentScore = "0";
     protected GameController gameController;
 
     protected void drawLocation() {
@@ -40,27 +41,23 @@ abstract public class GameActivity extends AppCompatActivity {
         if (currentLocation == SHOW_QUESTION) {
             setContentView(R.layout.activity_showing_question);
 
+            setButtonText(buttonText);
+
+            setQuestionText(question);
+            makeScrollable(findViewById(R.id.questionText));
+
+            setOpponentAnswer(opponentAnswer);
+
+            setTime(timeLeft);
+
             Button answerButton = findViewById(R.id.answerReadyButton);
-            answerButton.setText(buttonText);
-
-            TextView questionTextField = findViewById(R.id.questionText);
-            questionTextField.setText(question);
-            questionTextField.setMovementMethod(new ScrollingMovementMethod());
-
-            TextView opponentAnswer = findViewById(R.id.opponentAnswer);
-            opponentAnswer.setText(this.opponentAnswer);
-
-            TextView timeLeft = findViewById(R.id.timeLeft);
-            timeLeft.setText(this.timeLeft);
-
             answerButton.setOnClickListener(v -> gameController.answerButtonPushed());
         }
         if (currentLocation == WRITE_ANSWER) {
             setContentView(R.layout.activity_writing_answer);
 
-            TextView questionTextField = findViewById(R.id.questionText);
-            questionTextField.setText(question);
-            questionTextField.setMovementMethod(new ScrollingMovementMethod());
+            setQuestionText(question);
+            makeScrollable(findViewById(R.id.questionText));
 
             EditText answerEditor = findViewById(R.id.answerEditor);
             Button answerWrittenButton = findViewById(R.id.answerWrittenButton);
@@ -71,14 +68,13 @@ abstract public class GameActivity extends AppCompatActivity {
         if (currentLocation == SHOW_ANSWER) {
             setContentView(R.layout.activity_showing_answer);
 
-            TextView rightAnswerTextField = findViewById(R.id.rightAnswerTextField);
-            rightAnswerTextField.setText(answer + "\n" + comment);
+            setAnswer(answer);
+            makeScrollable(findViewById(R.id.rightAnswerTextField));
 
-            TextView myScore = findViewById(R.id.myScore);
-            myScore.setText(this.myScore);
+            setComment(comment);
+            makeScrollable(findViewById(R.id.commentField));
 
-            TextView opponentScore = findViewById(R.id.opponentScore);
-            opponentScore.setText(this.opponentScore);
+            setScore(myScore, opponentScore);
 
             Button complainButton = findViewById(R.id.complainButton);
             complainButton.setOnClickListener(v -> {
@@ -101,56 +97,86 @@ abstract public class GameActivity extends AppCompatActivity {
         if (currentLocation == OPPONENT_IS_ANSWERING) {
             setContentView(R.layout.activity_opponent_answering);
 
-            TextView questionTextField = findViewById(R.id.questionText);
-            questionTextField.setText(question);
-            questionTextField.setMovementMethod(new ScrollingMovementMethod());
+            setQuestionText(question);
+            makeScrollable(findViewById(R.id.questionText));
         }
+    }
+
+    private void makeScrollable(@NonNull TextView view) {
+        view.setMovementMethod(new ScrollingMovementMethod());
     }
 
     public void onNewQuestion() {
         setOpponentAnswer("");
         setTime("");
-        buttonText = "Чтение вопроса";
+        setButtonText("Чтение вопроса");
     }
 
-    public void setButtonText(String text) {
+    public void setButtonText(@NonNull String text) {
         buttonText = text;
-        drawLocation();
+        Button button = findViewById(R.id.answerReadyButton);
+        if (button != null) {
+            button.setText(buttonText);
+        }
     }
 
-    public void setTime(String time) {
+    public void setTime(@NonNull String time) {
         timeLeft = time;
         TextView timeLeftView = findViewById(R.id.timeLeft);
-        timeLeftView.setText(timeLeft);
+        if (timeLeftView != null) {
+            timeLeftView.setText(timeLeft);
+        }
     }
 
-    public void setOpponentAnswer(String answer) {
+    public void setOpponentAnswer(@NonNull String answer) {
         opponentAnswer = answer;
-        drawLocation();
+        TextView opponentAnswer = findViewById(R.id.opponentAnswer);
+        if (opponentAnswer != null) {
+            opponentAnswer.setText(answer);
+        }
     }
 
-    public void setScore(int my, int opponent) {
-        myScore = String.valueOf(my);
-        opponentScore = String.valueOf(opponent);
-        drawLocation();
+    public void setScore(@NonNull String my, @NonNull String opponent) {
+        myScore = my;
+        opponentScore = opponent;
+        TextView myScore = findViewById(R.id.myScore);
+        TextView opponentScore = findViewById(R.id.opponentScore);
+        if (myScore != null && opponentScore != null) {
+            opponentScore.setText(this.opponentScore);
+            myScore.setText(this.myScore);
+        }
     }
 
-    public void setQuestionText(String question) {
+    public void setQuestionText(@NonNull String question) {
         this.question = question;
-        drawLocation();
+        TextView questionTextField = findViewById(R.id.questionText);
+        if (questionTextField != null) {
+            questionTextField.setText(question);
+        }
     }
 
-    public void setAnswer(String answer) {
+    public void setAnswer(@NonNull String answer) {
         this.answer = answer;
-        drawLocation();
+        TextView rightAnswerTextField = findViewById(R.id.rightAnswerTextField);
+        if (rightAnswerTextField != null) {
+            String answerToShow = "Ответ: " + answer;
+            rightAnswerTextField.setText(answerToShow);
+        }
     }
 
-    public void setComment(String comment) {
+    public void setComment(@NonNull String comment) {
         this.comment = comment;
-        drawLocation();
+        TextView commentField = findViewById(R.id.commentField);
+        if (commentField != null) {
+            String commentToShow = comment;
+            if (!comment.equals("")) {
+                commentToShow = "Комментарий: " + commentToShow;
+            }
+            commentField.setText(commentToShow);
+        }
     }
 
-    public void setLocation(GameActivityLocation location) {
+    public void setLocation(@NonNull GameActivityLocation location) {
         currentLocation = location;
         drawLocation();
     }
