@@ -81,7 +81,7 @@ public class TrainingController extends Controller {
         }
 
         public static void setScore(int myScore, int maxScore) {
-            trainingGameActivity.get().setScore(myScore, maxScore);
+            trainingGameActivity.get().setScore(String.valueOf(myScore), String.valueOf(maxScore));
         }
 
         public static void setLocation(GameActivityLocation location) {
