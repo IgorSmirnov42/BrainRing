@@ -8,25 +8,25 @@
 
     <Button
         android:id="@+id/clearListButton"
-        android:layout_width="172dp"
+        android:layout_width="148dp"
         android:layout_height="wrap_content"
         android:text="Очистить список жалоб"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.857"
+        app:layout_constraintHorizontal_bias="0.824"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/questionsList"
-        app:layout_constraintVertical_bias="0.444" />
+        app:layout_constraintVertical_bias="0.388" />
 
     <ListView
         android:id="@+id/questionsList"
-        android:layout_width="395dp"
-        android:layout_height="544dp"
+        android:layout_width="341dp"
+        android:layout_height="472dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.32" />
 
     <TextView
         android:id="@+id/textView2"
@@ -39,17 +39,17 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.532" />
+        app:layout_constraintVertical_bias="0.674" />
 
     <Button
         android:id="@+id/sendAllButton"
-        android:layout_width="172dp"
+        android:layout_width="134dp"
         android:layout_height="wrap_content"
         android:text="Отправить все жалобы"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.066"
+        app:layout_constraintHorizontal_bias="0.126"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/questionsList"
-        app:layout_constraintVertical_bias="0.444" />
+        app:layout_constraintVertical_bias="0.388" />
 </android.support.constraint.ConstraintLayout>

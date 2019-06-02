@@ -1,5 +1,7 @@
 package ru.spbhse.brainring.controllers;
 
+import android.support.annotation.NonNull;
+
 import java.lang.ref.WeakReference;
 
 import ru.spbhse.brainring.files.ComplainedQuestion;
@@ -64,6 +66,10 @@ public class TrainingController extends Controller {
             trainingGameActivity.get().setQuestionText(question);
         }
 
+        public static void setQuestionResult(@NonNull String result) {
+            trainingGameActivity.get().setQuestionResult(result);
+        }
+
         public static void onNewQuestion() {
             trainingGameActivity.get().onNewQuestion();
         }
@@ -81,7 +87,7 @@ public class TrainingController extends Controller {
         }
 
         public static void setScore(int myScore, int maxScore) {
-            trainingGameActivity.get().setScore(myScore, maxScore);
+            trainingGameActivity.get().setScore(String.valueOf(myScore), String.valueOf(maxScore));
         }
 
         public static void setLocation(GameActivityLocation location) {

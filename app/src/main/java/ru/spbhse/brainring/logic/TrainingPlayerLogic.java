@@ -91,8 +91,10 @@ public class TrainingPlayerLogic {
         TrainingController.TrainingUIController.setTime("");
         Log.d("BrainRing", "Checking answer " + answer);
         if (currentQuestion.checkAnswer(answer)) {
+            TrainingController.TrainingUIController.setQuestionResult("Правильный ответ!");
             correctAnswers++;
         } else {
+            TrainingController.TrainingUIController.setQuestionResult("Неверный ответ");
             wrongAnswers++;
         }
         TrainingController.TrainingUIController.setScore(correctAnswers, wrongAnswers);

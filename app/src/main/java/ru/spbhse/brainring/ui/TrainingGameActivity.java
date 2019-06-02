@@ -49,6 +49,8 @@ public class TrainingGameActivity extends GameActivity {
         dataBase.setGameTable(gameTable);
         dataBase.createTable(gameTable);
         gameController = TrainingController.TrainingLogicController.getInstance();
+        setMyNick("Правильных ответов");
+        setOpponentNick("Неправильных ответов");
 
         TrainingController.createTrainingGame();
         TrainingController.TrainingLogicController.setAnswerTime(answerTime);
