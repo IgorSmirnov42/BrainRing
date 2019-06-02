@@ -2,7 +2,7 @@
     <string name="app_name">Брейн-Ринг</string>
     <string name="train">Тренировка</string>
     <string name="net">Игра по сети</string>
-    <string name="local">Игра по локальной сети</string>
+    <string name="local">Локальная игра</string>
     <string name="complain">Пожаловаться на вопрос</string>
     <string name="settings">Рейтинг</string>
     <string name="info">О приложении</string>
