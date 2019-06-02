@@ -1,5 +1,7 @@
 package ru.spbhse.brainring.controllers;
 
+import android.support.annotation.NonNull;
+
 import java.lang.ref.WeakReference;
 
 import ru.spbhse.brainring.files.ComplainedQuestion;
@@ -62,6 +64,10 @@ public class TrainingController extends Controller {
     public static class TrainingUIController extends Controller {
         public static void setQuestionText(String question) {
             trainingGameActivity.get().setQuestionText(question);
+        }
+
+        public static void setQuestionResult(@NonNull String result) {
+            trainingGameActivity.get().setQuestionResult(result);
         }
 
         public static void onNewQuestion() {

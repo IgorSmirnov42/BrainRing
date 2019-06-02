@@ -33,6 +33,9 @@ abstract public class GameActivity extends AppCompatActivity {
     protected String myScore = "0";
     protected String opponentScore = "0";
     protected GameController gameController;
+    protected String opponentNick = "";
+    protected String myNick = "";
+    protected String questionResult = "";
 
     protected void drawLocation() {
         if (currentLocation == GAME_WAITING_START) {
@@ -75,6 +78,9 @@ abstract public class GameActivity extends AppCompatActivity {
             makeScrollable(findViewById(R.id.commentField));
 
             setScore(myScore, opponentScore);
+            setQuestionResult(questionResult);
+            setMyNick(myNick);
+            setOpponentNick(opponentNick);
 
             Button complainButton = findViewById(R.id.complainButton);
             complainButton.setOnClickListener(v -> {
@@ -110,6 +116,30 @@ abstract public class GameActivity extends AppCompatActivity {
         setOpponentAnswer("");
         setTime("");
         setButtonText("Чтение вопроса");
+    }
+
+    public void setOpponentNick(@NonNull String nick) {
+        opponentNick = nick;
+        TextView opponentNickView = findViewById(R.id.opponentNick);
+        if (opponentNickView != null) {
+            opponentNickView.setText(opponentNick);
+        }
+    }
+
+    public void setMyNick(@NonNull String nick) {
+        myNick = nick;
+        TextView myNickView = findViewById(R.id.myNick);
+        if (myNickView != null) {
+            myNickView.setText(myNick);
+        }
+    }
+
+    public void setQuestionResult(@NonNull String result) {
+        questionResult = result;
+        TextView questionResultView = findViewById(R.id.questionResult);
+        if (questionResultView != null) {
+            questionResultView.setText(questionResult);
+        }
     }
 
     public void setButtonText(@NonNull String text) {

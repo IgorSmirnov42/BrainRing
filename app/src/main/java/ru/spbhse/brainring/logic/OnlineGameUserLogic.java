@@ -168,7 +168,8 @@ public class OnlineGameUserLogic {
     public void onReceivingAnswer(int firstUserScore,
                                   int secondUserScore,
                                   @NonNull String correctAnswer,
-                                  @NonNull String comment) {
+                                  @NonNull String comment,
+                                  @NonNull String questionMessage) {
         questionReceived = false;
         timeStarted = false;
         timer = null;
@@ -186,6 +187,7 @@ public class OnlineGameUserLogic {
             OnlineController.OnlineUIController.setScore(secondUserScore, firstUserScore);
         }
 
+        OnlineController.OnlineUIController.setQuestionResult(questionMessage);
         OnlineController.OnlineUIController.setComment(comment);
         OnlineController.OnlineUIController.setAnswer(correctAnswer);
         OnlineController.OnlineUIController.setLocation(GameActivityLocation.SHOW_ANSWER);

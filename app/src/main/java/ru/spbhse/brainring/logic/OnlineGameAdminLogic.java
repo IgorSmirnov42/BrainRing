@@ -2,6 +2,7 @@ package ru.spbhse.brainring.logic;
 
 import android.os.Handler;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -53,20 +54,20 @@ public class OnlineGameAdminLogic {
     }
 
     /** Returns UserScore object connected with given user */
-    private UserScore getThisUser(String userId) {
+    private UserScore getThisUser(@NonNull String userId) {
         return user1.status.participantId.equals(userId) ? user1 : user2;
     }
 
     /** Returns UserScore object connected with opponent of given user */
-    private UserScore getOtherUser(String userId) {
+    private UserScore getOtherUser(@NonNull String userId) {
         return user1.status.participantId.equals(userId) ? user2 : user1;
     }
 
-    public void onFalseStart(String userId) {
+    public void onFalseStart(@NonNull String userId) {
         getThisUser(userId).status.alreadyAnswered = true;
     }
 
-    private void allowAnswer(String userId) {
+    private void allowAnswer(@NonNull String userId) {
         Log.d("BrainRing","Allow to answer " + userId);
         answeringUserId = userId;
         UserScore user = getThisUser(userId);
@@ -76,12 +77,12 @@ public class OnlineGameAdminLogic {
                 getOtherUser(userId).status.participantId, OPPONENT_ANSWERING);
     }
 
-    private void forbidAnswer(String userId) {
+    private void forbidAnswer(@NonNull String userId) {
         Log.d("BrainRing","Allow to answer " + userId);
         OnlineController.NetworkController.sendMessageToConcreteUser(userId, FORBID_ANSWER);
     }
 
-    public void onTimeLimit(int roundNumber, String userId) {
+    public void onTimeLimit(int roundNumber, @NonNull String userId) {
         // If other is answering, then no effect
         if (roundNumber != currentRound) {
             return;
@@ -89,13 +90,13 @@ public class OnlineGameAdminLogic {
         if (getOtherUser(userId).status.alreadyAnswered ||
                 !userId.equals(OnlineController.NetworkController.getMyParticipantId())) {
             getThisUser(userId).status.alreadyAnswered = true;
-            showAnswer();
+            showAnswer(null);
         } else {
             new Handler().postDelayed(() -> {
                 if (roundNumber == currentRound) {
                     getThisUser(userId).status.alreadyAnswered = true;
                     if (bothAnswered()) {
-                        showAnswer();
+                        showAnswer(null);
                     }
                 }
             }, DELIVERING_FAULT_MILLIS);
@@ -151,7 +152,7 @@ public class OnlineGameAdminLogic {
 
     private void restartTime(@NonNull String previousUserId, @NonNull String previousAnswer) {
         if (bothAnswered()) {
-            showAnswer();
+            showAnswer(null);
             return;
         }
         OnlineController.NetworkController.sendMessageToConcreteUser(
@@ -176,17 +177,26 @@ public class OnlineGameAdminLogic {
         if (!currentQuestion.checkAnswer(writtenAnswer)) {
             if (!getOtherUser(userId).status.alreadyAnswered) {
                 restartTime(userId, writtenAnswer);
-                return;
+            } else {
+                showAnswer(null);
             }
         } else {
             ++getThisUser(userId).score;
+            showAnswer(userId);
         }
-
-        showAnswer();
     }
 
     /** Sends answer and shows it for {@code TIME_TO_SHOW_ANSWER} seconds */
-    private void showAnswer() {
+    private void showAnswer(@Nullable String answeredUserId) {
+        Log.d("BrainRing", "show answer " + answeredUserId);
+        String questionMessage;
+        if (answeredUserId == null) {
+            questionMessage = "Никто не ответил на вопрос";
+        } else {
+            questionMessage = OnlineController.NetworkController.getParticipantName(answeredUserId) +
+                    " ответил верно";
+        }
+        Log.d("BrainRing", "Question message:" + questionMessage);
         OnlineController.NetworkController.sendMessageToAll(
                 MessageGenerator.create()
                         .writeInt(Message.SENDING_CORRECT_ANSWER_AND_SCORE)
@@ -194,6 +204,7 @@ public class OnlineGameAdminLogic {
                         .writeString(currentQuestion.getComment())
                         .writeInt(user1.score)
                         .writeInt(user2.score)
+                        .writeString(questionMessage)
                         .toByteArray()
         );
         new Handler().postDelayed(this::newQuestion, TIME_TO_SHOW_ANSWER * SECOND);
@@ -237,7 +248,7 @@ public class OnlineGameAdminLogic {
         if (!bothAnswered()) {
             OnlineController.NetworkController.sendMessageToAll(TIME_START);
         } else {
-            showAnswer();
+            showAnswer(null);
         }
     }
 

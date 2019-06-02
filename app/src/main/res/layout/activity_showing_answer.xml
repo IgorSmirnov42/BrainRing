@@ -8,23 +8,36 @@
     tools:context=".ui.GameActivity">
 
     <TextView
+        android:id="@+id/opponentNick"
+        android:layout_width="160dp"
+        android:layout_height="23dp"
+        android:text="opponentNick"
+        android:textAlignment="center"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toTopOf="@+id/complainButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/myNick"
+        app:layout_constraintTop_toBottomOf="@+id/opponentScore"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <TextView
         android:id="@+id/myScore"
         android:layout_width="116dp"
-        android:layout_height="142dp"
+        android:layout_height="124dp"
+        android:layout_marginStart="48dp"
+        android:layout_marginTop="4dp"
         android:text="0"
         android:textAlignment="center"
         android:textColor="@color/common_google_signin_btn_text_dark_focused"
         android:textSize="100sp"
-        app:layout_constraintBottom_toTopOf="@+id/complainButton"
-        app:layout_constraintEnd_toStartOf="@+id/opponentScore"
-        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/count" />
 
     <TextView
         android:id="@+id/rightAnswerTextField"
         android:layout_width="324dp"
-        android:layout_height="100dp"
+        android:layout_height="61dp"
         android:layout_marginTop="64dp"
         android:text="Поле с ответом"
         android:textAlignment="center"
@@ -36,22 +49,20 @@
 
     <TextView
         android:id="@+id/count"
-        android:layout_width="221dp"
-        android:layout_height="55dp"
+        android:layout_width="113dp"
+        android:layout_height="31dp"
         android:text="Счёт"
         android:textAlignment="center"
         android:textColor="@color/common_google_signin_btn_text_dark_focused"
-        android:textSize="36sp"
-        app:layout_constraintBottom_toTopOf="@+id/opponentScore"
+        android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/commentField" />
 
     <TextView
         android:id="@+id/opponentScore"
         android:layout_width="116dp"
-        android:layout_height="142dp"
+        android:layout_height="126dp"
         android:text="0"
         android:textAlignment="center"
         android:textColor="@color/common_google_signin_btn_text_dark_focused"
@@ -60,31 +71,62 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/myScore"
-        app:layout_constraintTop_toBottomOf="@+id/count" />
+        app:layout_constraintTop_toBottomOf="@+id/count"
+        app:layout_constraintVertical_bias="0.0" />
 
     <Button
         android:id="@+id/complainButton"
         android:layout_width="349dp"
         android:layout_height="84dp"
+        android:layout_marginBottom="68dp"
         android:text="Пожаловаться на вопрос"
         android:textSize="24sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.37"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/opponentScore"
-        app:layout_constraintVertical_bias="0.891" />
+        app:layout_constraintTop_toBottomOf="@+id/questionResult" />
 
     <TextView
         android:id="@+id/commentField"
         android:layout_width="299dp"
-        android:layout_height="124dp"
+        android:layout_height="75dp"
+        android:maxLines="100"
+        android:scrollbars="vertical"
         android:text="Комментарий"
         android:textAlignment="center"
         app:layout_constraintBottom_toTopOf="@+id/count"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/rightAnswerTextField"
-        android:maxLines = "100"
-        android:scrollbars = "vertical" />
+        app:layout_constraintTop_toBottomOf="@+id/rightAnswerTextField" />
+
+    <TextView
+        android:id="@+id/myNick"
+        android:layout_width="160dp"
+        android:layout_height="19dp"
+        android:text="myNick"
+        android:textAlignment="center"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toTopOf="@+id/questionResult"
+        app:layout_constraintEnd_toStartOf="@+id/opponentNick"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/myScore"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <TextView
+        android:id="@+id/questionResult"
+        android:layout_width="299dp"
+        android:layout_height="38dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:text="questionResult"
+        android:textAlignment="center"
+        android:textColor="@color/common_google_signin_btn_text_dark_focused"
+        app:layout_constraintBottom_toTopOf="@+id/complainButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/opponentNick" />
 </android.support.constraint.ConstraintLayout>
