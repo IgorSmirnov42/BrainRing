@@ -8,7 +8,7 @@
     tools:context=".ui.GameActivity">
 
     <TextView
-        android:id="@+id/opponentScore"
+        android:id="@+id/myScore"
         android:layout_width="116dp"
         android:layout_height="142dp"
         android:text="0"
@@ -16,7 +16,7 @@
         android:textColor="@color/common_google_signin_btn_text_dark_focused"
         android:textSize="100sp"
         app:layout_constraintBottom_toTopOf="@+id/complainButton"
-        app:layout_constraintEnd_toStartOf="@+id/myScore"
+        app:layout_constraintEnd_toStartOf="@+id/opponentScore"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/count" />
@@ -49,7 +49,7 @@
         app:layout_constraintTop_toBottomOf="@+id/commentField" />
 
     <TextView
-        android:id="@+id/myScore"
+        android:id="@+id/opponentScore"
         android:layout_width="116dp"
         android:layout_height="142dp"
         android:text="0"
@@ -59,7 +59,7 @@
         app:layout_constraintBottom_toTopOf="@+id/complainButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/opponentScore"
+        app:layout_constraintStart_toEndOf="@+id/myScore"
         app:layout_constraintTop_toBottomOf="@+id/count" />
 
     <Button

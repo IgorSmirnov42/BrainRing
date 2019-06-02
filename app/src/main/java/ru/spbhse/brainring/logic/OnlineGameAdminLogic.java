@@ -44,7 +44,7 @@ public class OnlineGameAdminLogic {
     private static final int SECOND = 1000;
     private static final int TIME_TO_SHOW_ANSWER = 5;
     private static final int TIME_TO_READ_QUESTION = 10;
-    private static final int DELIVERING_FAULT_MILLIS = 500;
+    private static final int DELIVERING_FAULT_MILLIS = 750;
 
     /** Returns UserScore object connected with given user */
     public OnlineGameAdminLogic() {

@@ -46,7 +46,7 @@ public class Network {
     private LeaderboardsClient leaderboardsClient;
     private long scoreSum;
     private boolean firstMessage = true;
-    private static final int HANDSHAKE_TIME = 1000;
+    private static final int HANDSHAKE_TIME = 1500;
     private static final int FIRST_HANDSHAKE_TIME = 5000; // first message may take longer time
     private static final int MAXIMUM_TIME_WITHOUT_MESSAGES = 80 * 1000;
     private static CountDownTimer timer;
