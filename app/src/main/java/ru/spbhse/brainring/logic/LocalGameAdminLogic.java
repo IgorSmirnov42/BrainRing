@@ -9,6 +9,7 @@ import android.widget.Toast;
 import ru.spbhse.brainring.R;
 import ru.spbhse.brainring.controllers.LocalController;
 import ru.spbhse.brainring.network.messages.Message;
+import ru.spbhse.brainring.network.messages.MessageGenerator;
 import ru.spbhse.brainring.ui.LocalGameLocation;
 
 import static java.lang.Math.max;
@@ -24,11 +25,17 @@ public class LocalGameAdminLogic {
     private String answeringUserId;
     private int handshakeAccepted = 0;
 
-    private static final byte[] ALLOW_ANSWER = Message.generateMessage(Message.ALLOWED_TO_ANSWER, "");;
-    private static final byte[] FORBID_ANSWER = Message.generateMessage(Message.FORBIDDEN_TO_ANSWER, "");
-    private static final byte[] FALSE_START = Message.generateMessage(Message.FALSE_START, "");
-    private static final byte[] TIME_START = Message.generateMessage(Message.TIME_START, "");
+    private static final byte[] ALLOW_ANSWER;
+    private static final byte[] FORBID_ANSWER;
+    private static final byte[] FALSE_START;
+    private static final byte[] TIME_START;
 
+    static {
+        ALLOW_ANSWER = MessageGenerator.create().writeInt(Message.ALLOWED_TO_ANSWER).toByteArray();
+        FORBID_ANSWER = MessageGenerator.create().writeInt(Message.FORBIDDEN_TO_ANSWER).toByteArray();
+        FALSE_START = MessageGenerator.create().writeInt(Message.FALSE_START).toByteArray();
+        TIME_START = MessageGenerator.create().writeInt(Message.TIME_START).toByteArray();
+    }
     private final int firstCountdown;
     private final int secondCountdown;
     private static final int SECOND = 1000;

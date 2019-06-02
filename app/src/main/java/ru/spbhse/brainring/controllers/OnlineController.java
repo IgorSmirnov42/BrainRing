@@ -63,7 +63,7 @@ public class OnlineController extends Controller {
             adminLogic.onAnswerIsWritten(writtenAnswer, id);
         }
 
-        public static void onTimeLimit(long roundNumber, String userId) {
+        public static void onTimeLimit(int roundNumber, String userId) {
             adminLogic.onTimeLimit(roundNumber, userId);
         }
 
@@ -99,9 +99,11 @@ public class OnlineController extends Controller {
             userLogic.onIncorrectOpponentAnswer(opponentAnswer);
         }
 
-        public static void onReceivingAnswer(int firstUserScore, int secondUserScore,
-                                             @NonNull String correctAnswer) {
-            userLogic.onReceivingAnswer(firstUserScore, secondUserScore, correctAnswer);
+        public static void onReceivingAnswer(int firstUserScore,
+                                             int secondUserScore,
+                                             @NonNull String correctAnswer,
+                                             @NonNull String comment) {
+            userLogic.onReceivingAnswer(firstUserScore, secondUserScore, correctAnswer, comment);
         }
 
         public static void onOpponentIsAnswering() {
@@ -135,7 +137,7 @@ public class OnlineController extends Controller {
         }
     }
 
-    public static class NetworkUIController {
+    public static class OnlineUIController {
 
         public static String getWhatWritten() {
             return onlineGameActivity.get().getWhatWritten();

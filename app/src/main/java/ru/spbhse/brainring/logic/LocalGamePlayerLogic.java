@@ -6,6 +6,7 @@ import android.widget.Toast;
 import ru.spbhse.brainring.controllers.LocalController;
 import ru.spbhse.brainring.R;
 import ru.spbhse.brainring.network.messages.Message;
+import ru.spbhse.brainring.network.messages.MessageGenerator;
 
 /** Class realizing player's logic in local network mode */
 public class LocalGamePlayerLogic {
@@ -13,7 +14,7 @@ public class LocalGamePlayerLogic {
     private static byte[] PUSHED_BUTTON;
 
     static {
-        PUSHED_BUTTON = Message.generateMessage(Message.ANSWER_IS_READY, "");
+        PUSHED_BUTTON = MessageGenerator.create().writeInt(Message.ANSWER_IS_READY).toByteArray();
     }
 
     public void onForbiddenToAnswer() {

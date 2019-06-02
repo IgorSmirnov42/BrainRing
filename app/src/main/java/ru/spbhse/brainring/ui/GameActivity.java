@@ -169,7 +169,7 @@ abstract public class GameActivity extends AppCompatActivity {
         TextView commentField = findViewById(R.id.commentField);
         if (commentField != null) {
             String commentToShow = comment;
-            if (!comment.equals("")) {
+            if (!comment.equals("") && !comment.startsWith("Комментарий: ")) {
                 commentToShow = "Комментарий: " + commentToShow;
             }
             commentField.setText(commentToShow);

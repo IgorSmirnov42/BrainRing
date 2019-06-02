@@ -28,6 +28,7 @@ import java.util.List;
 import ru.spbhse.brainring.R;
 import ru.spbhse.brainring.controllers.OnlineController;
 import ru.spbhse.brainring.network.messages.Message;
+import ru.spbhse.brainring.network.messages.MessageGenerator;
 
 import static com.google.android.gms.games.leaderboard.LeaderboardVariant.COLLECTION_PUBLIC;
 import static com.google.android.gms.games.leaderboard.LeaderboardVariant.TIME_SPAN_ALL_TIME;
@@ -45,10 +46,16 @@ public class Network {
     private LeaderboardsClient leaderboardsClient;
     private long scoreSum;
     private boolean firstMessage = true;
-    private static final int HANDSHAKE_TIME = 500;
+    private static final int HANDSHAKE_TIME = 1000;
     private static final int FIRST_HANDSHAKE_TIME = 5000; // first message may take longer time
     private static final int MAXIMUM_TIME_WITHOUT_MESSAGES = 80 * 1000;
     private static CountDownTimer timer;
+    private static final byte[] FINISH;
+
+    static {
+        FINISH = MessageGenerator.create().writeInt(Message.FINISH).toByteArray();
+    }
+
     private RoomStatusUpdateCallback mRoomStatusUpdateCallback = new RoomStatusUpdateCallback() {
         @Override
         public void onRoomConnecting(@Nullable Room room) {
@@ -202,7 +209,7 @@ public class Network {
                     OnlineController.OnlineAdminLogicController.onAnswerIsReady(userId, time);
                     break;
                 case Message.ANSWER_IS_WRITTEN:
-                    String answer = Message.readString(is);
+                    String answer = is.readUTF();
                     OnlineController.OnlineAdminLogicController.onAnswerIsWritten(answer, userId);
                     break;
                 case Message.FORBIDDEN_TO_ANSWER:
@@ -213,18 +220,20 @@ public class Network {
                     break;
                 case Message.SENDING_QUESTION:
                     int questionId = is.readInt();
-                    String question = Message.readString(is);
+                    String question = is.readUTF();
                     OnlineController.OnlineUserLogicController.onReceivingQuestion(questionId, question);
                     break;
                 case Message.SENDING_INCORRECT_OPPONENT_ANSWER:
-                    String opponentAnswer = Message.readString(is);
+                    String opponentAnswer = is.readUTF();
                     OnlineController.OnlineUserLogicController.onIncorrectOpponentAnswer(opponentAnswer);
                     break;
                 case Message.SENDING_CORRECT_ANSWER_AND_SCORE:
+                    String correctAnswer = is.readUTF();
+                    String comment = is.readUTF();
                     int firstUserScore = is.readInt();
                     int secondUserScore = is.readInt();
-                    String correctAnswer = Message.readString(is);
-                    OnlineController.OnlineUserLogicController.onReceivingAnswer(firstUserScore, secondUserScore, correctAnswer);
+                    OnlineController.OnlineUserLogicController.onReceivingAnswer(firstUserScore,
+                            secondUserScore, correctAnswer, comment);
                     break;
                 case Message.OPPONENT_IS_ANSWERING:
                     OnlineController.OnlineUserLogicController.onOpponentIsAnswering();
@@ -243,7 +252,7 @@ public class Network {
                     }
                     break;
                 case Message.TIME_LIMIT:
-                    long roundNumber = is.readLong();
+                    int roundNumber = is.readInt();
                     OnlineController.OnlineAdminLogicController.onTimeLimit(roundNumber, userId);
                     break;
                 case Message.FINISH:
@@ -277,7 +286,7 @@ public class Network {
             @Override
             public void onFinish() {
                 if (timer == this) {
-                    sendMessageToAll(Message.generateMessage(Message.FINISH, ""));
+                    sendMessageToAll(FINISH);
                     OnlineController.finishOnlineGame();
                 }
             }
@@ -329,7 +338,7 @@ public class Network {
         mRealTimeMultiplayerClient.create(mRoomConfig);
     }
 
-    /** Sends message to all users in a room (and to itself). Guarantees delivering. May be slow... */
+    /** Sends message to all users in a room (and to itself). Guarantees delivering */
     public void sendMessageToAll(byte[] message) {
         for (String participantId : room.getParticipantIds()) {
             sendMessageToConcreteUser(participantId, message);
