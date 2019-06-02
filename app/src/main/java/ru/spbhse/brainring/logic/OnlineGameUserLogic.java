@@ -229,7 +229,7 @@ public class OnlineGameUserLogic {
         OnlineController.OnlineUIController.setLocation(GameActivityLocation.SHOW_QUESTION);
         OnlineController.NetworkController.sendMessageToServer(
                 MessageGenerator.create()
-                        .writeInt(Message.ANSWER_IS_READY)
+                        .writeInt(Message.ANSWER_IS_WRITTEN)
                         .writeString(answer)
                         .toByteArray()
         );
