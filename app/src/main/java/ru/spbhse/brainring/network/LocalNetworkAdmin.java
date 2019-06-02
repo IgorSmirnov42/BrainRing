@@ -17,6 +17,7 @@ import java.io.IOException;
 
 import ru.spbhse.brainring.controllers.LocalController;
 import ru.spbhse.brainring.network.messages.Message;
+import ru.spbhse.brainring.network.messages.MessageGenerator;
 
 /**
  * Class with methods to interact with network
@@ -25,7 +26,11 @@ import ru.spbhse.brainring.network.messages.Message;
 public class LocalNetworkAdmin extends LocalNetwork {
     private String redId;
     private String greenId;
-    private static final byte[] HANDSHAKE = Message.generateMessage(Message.HANDSHAKE, "");
+    private static final byte[] HANDSHAKE;
+
+    static {
+        HANDSHAKE = MessageGenerator.create().writeInt(Message.HANDSHAKE).toByteArray();
+    }
 
     /**
      * Creates new instance. Fills {@code mRoomUpdateCallback} with an instance that

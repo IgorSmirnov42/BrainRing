@@ -25,9 +25,9 @@ public class Question {
         return answer.getMainAnswer();
     }
 
-    @Nullable
+    @NonNull
     public String getComment() {
-        return comment;
+        return comment == null ? "" : comment;
     }
 
     public int getId() {

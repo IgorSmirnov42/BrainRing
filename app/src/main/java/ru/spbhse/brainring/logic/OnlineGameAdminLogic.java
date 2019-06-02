@@ -4,15 +4,13 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import ru.spbhse.brainring.controllers.DatabaseController;
 import ru.spbhse.brainring.controllers.OnlineController;
 import ru.spbhse.brainring.network.messages.Message;
+import ru.spbhse.brainring.network.messages.MessageGenerator;
 import ru.spbhse.brainring.utils.Question;
 
 /** Realizes admin's logic in online mode */
@@ -22,15 +20,25 @@ public class OnlineGameAdminLogic {
     private Question currentQuestion;
     private String answeringUserId;
     private boolean interrupted;
-    private long currentRound;
+    private int currentRound;
     private int questionNumber;
     private List<AnswerTime> waitingAnswer= new ArrayList<>();
 
-    private static final byte[] ALLOW_ANSWER = Message.generateMessage(Message.ALLOWED_TO_ANSWER, "");
-    private static final byte[] FORBID_ANSWER = Message.generateMessage(Message.FORBIDDEN_TO_ANSWER, "");
-    private static final byte[] OPPONENT_ANSWERING = Message.generateMessage(Message.OPPONENT_IS_ANSWERING, "");
-    private static final byte[] TIME_START = Message.generateMessage(Message.TIME_START, "");
-    private static final byte[] CORRECT_ANSWER = Message.generateMessage(Message.CORRECT_ANSWER, "");
+    private static final byte[] ALLOW_ANSWER;
+    private static final byte[] FORBID_ANSWER;
+    private static final byte[] OPPONENT_ANSWERING;
+    private static final byte[] TIME_START;
+    private static final byte[] CORRECT_ANSWER;
+    private static final byte[] FINISH;
+
+    static {
+        ALLOW_ANSWER = MessageGenerator.create().writeInt(Message.ALLOWED_TO_ANSWER).toByteArray();
+        FORBID_ANSWER = MessageGenerator.create().writeInt(Message.FORBIDDEN_TO_ANSWER).toByteArray();
+        TIME_START = MessageGenerator.create().writeInt(Message.TIME_START).toByteArray();
+        CORRECT_ANSWER = MessageGenerator.create().writeInt(Message.CORRECT_ANSWER).toByteArray();
+        OPPONENT_ANSWERING = MessageGenerator.create().writeInt(Message.OPPONENT_IS_ANSWERING).toByteArray();
+        FINISH = MessageGenerator.create().writeInt(Message.FINISH).toByteArray();
+    }
 
     private static final int QUESTIONS_NUMBER_MIN = 5;
     private static final int SECOND = 1000;
@@ -73,7 +81,7 @@ public class OnlineGameAdminLogic {
         OnlineController.NetworkController.sendMessageToConcreteUser(userId, FORBID_ANSWER);
     }
 
-    public void onTimeLimit(long roundNumber, String userId) {
+    public void onTimeLimit(int roundNumber, String userId) {
         // If other is answering, then no effect
         if (roundNumber != currentRound) {
             return;
@@ -148,7 +156,10 @@ public class OnlineGameAdminLogic {
         }
         OnlineController.NetworkController.sendMessageToConcreteUser(
                 getOtherUser(previousUserId).status.participantId,
-                Message.generateMessage(Message.SENDING_INCORRECT_OPPONENT_ANSWER, previousAnswer));
+                MessageGenerator.create().
+                        writeInt(Message.SENDING_INCORRECT_OPPONENT_ANSWER)
+                        .writeString(previousAnswer)
+                        .toByteArray());
     }
 
     /** Rejects or accepts answer written by user */
@@ -176,15 +187,22 @@ public class OnlineGameAdminLogic {
 
     /** Sends answer and shows it for {@code TIME_TO_SHOW_ANSWER} seconds */
     private void showAnswer() {
-        OnlineController.NetworkController.sendMessageToAll(generateAnswer());
+        OnlineController.NetworkController.sendMessageToAll(
+                MessageGenerator.create()
+                        .writeInt(Message.SENDING_CORRECT_ANSWER_AND_SCORE)
+                        .writeString(currentQuestion.getAllAnswers())
+                        .writeString(currentQuestion.getComment())
+                        .writeInt(user1.score)
+                        .writeInt(user2.score)
+                        .toByteArray()
+        );
         new Handler().postDelayed(this::newQuestion, TIME_TO_SHOW_ANSWER * SECOND);
     }
 
     /** Determines if game is finished. If not, generates new question and sends it */
     public void newQuestion() {
         if (questionNumber >= QUESTIONS_NUMBER_MIN && user1.score != user2.score) {
-            OnlineController.NetworkController.sendMessageToAll(
-                    Message.generateMessage(Message.FINISH, ""));
+            OnlineController.NetworkController.sendMessageToAll(FINISH);
             OnlineController.finishOnlineGame();
             return;
         }
@@ -194,7 +212,11 @@ public class OnlineGameAdminLogic {
         user2.status.onNewQuestion();
 
         currentQuestion = DatabaseController.getRandomQuestion();
-        byte[] message = Message.generateMessageQuestion(Message.SENDING_QUESTION, currentQuestion.getId(), currentQuestion.getQuestion());
+        byte[] message = MessageGenerator.create()
+                .writeInt(Message.SENDING_QUESTION)
+                .writeInt(currentQuestion.getId())
+                .writeString(currentQuestion.getQuestion())
+                .toByteArray();
         OnlineController.NetworkController.sendQuestion(message);
         currentRound = 1;
         ++questionNumber;
@@ -221,23 +243,6 @@ public class OnlineGameAdminLogic {
 
     public void finishGame() {
         interrupted = true;
-    }
-
-    private byte[] generateAnswer() {
-        String answer = currentQuestion.getAllAnswers();
-        byte[] buf;
-        try (ByteArrayOutputStream bout = new ByteArrayOutputStream();
-             DataOutputStream dout = new DataOutputStream(bout)) {
-            dout.writeInt(Message.SENDING_CORRECT_ANSWER_AND_SCORE);
-            dout.writeInt(user1.score);
-            dout.writeInt(user2.score);
-            dout.writeChars(answer);
-            buf = bout.toByteArray();
-        } catch (IOException e) {
-            e.printStackTrace();
-            buf = null;
-        }
-        return buf;
     }
 
     private static class UserScore {
