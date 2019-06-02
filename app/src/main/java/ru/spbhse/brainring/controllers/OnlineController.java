@@ -102,8 +102,10 @@ public class OnlineController extends Controller {
         public static void onReceivingAnswer(int firstUserScore,
                                              int secondUserScore,
                                              @NonNull String correctAnswer,
-                                             @NonNull String comment) {
-            userLogic.onReceivingAnswer(firstUserScore, secondUserScore, correctAnswer, comment);
+                                             @NonNull String comment,
+                                             @NonNull String questionMessage) {
+            userLogic.onReceivingAnswer(firstUserScore, secondUserScore, correctAnswer,
+                    comment, questionMessage);
         }
 
         public static void onOpponentIsAnswering() {
@@ -143,15 +145,27 @@ public class OnlineController extends Controller {
             return onlineGameActivity.get().getWhatWritten();
         }
 
-        public static void setQuestionText(String question) {
+        public static void setQuestionText(@NonNull String question) {
             onlineGameActivity.get().setQuestionText(question);
+        }
+
+        public static void setQuestionResult(@NonNull String result) {
+            onlineGameActivity.get().setQuestionResult(result);
+        }
+
+        public static void setMyNick(@NonNull String nick) {
+            onlineGameActivity.get().setMyNick(nick);
+        }
+
+        public static void setOpponentNick(@NonNull String nick) {
+            onlineGameActivity.get().setOpponentNick(nick);
         }
 
         public static void onNewQuestion() {
             onlineGameActivity.get().onNewQuestion();
         }
 
-        public static void setButtonText(String text) {
+        public static void setButtonText(@NonNull String text) {
             onlineGameActivity.get().setButtonText(text);
         }
 
@@ -183,13 +197,17 @@ public class OnlineController extends Controller {
     public static class NetworkController {
         private static Network network;
 
+        public static String getParticipantName(@NonNull String userId) {
+            return network.getParticipantName(userId);
+        }
+
         public static void createOnlineGame() {
             network = new Network();
             OnlineUserLogicController.userLogic = new OnlineGameUserLogic();
             onlineGameActivity.get().signIn();
         }
 
-        public static void sendQuestion(byte[] message) {
+        public static void sendQuestion(@NonNull byte[] message) {
             if (network != null) {
                 network.sendQuestion(message);
             }

@@ -159,13 +159,13 @@ public class Network {
                     .addOnSuccessListener(myPlayerId -> {
                         myParticipantId = room.getParticipantId(myPlayerId);
                         Log.d("BrainRing", "Received participant id");
+                        walkRoomMembers();
                         if (myParticipantId.equals(serverId)) {
                             isServer = true;
                             Log.d("BrainRing", "I am server");
                             OnlineController.startOnlineGame();
                         }
                     });
-            printRoomMembers();
         }
     };
     private OnRealTimeMessageReceivedListener mOnRealTimeMessageReceivedListener = realTimeMessage -> {
@@ -174,10 +174,15 @@ public class Network {
         onMessageReceived(buf, realTimeMessage.getSenderParticipantId());
     };
 
-    private void printRoomMembers() {
+    private void walkRoomMembers() {
         Log.d("BrainRing", "Start printing room members");
         if (room != null) {
             for (Participant participant : room.getParticipants()) {
+                if (participant.getParticipantId().equals(myParticipantId)) {
+                    OnlineController.OnlineUIController.setMyNick(participant.getDisplayName());
+                } else {
+                    OnlineController.OnlineUIController.setOpponentNick(participant.getDisplayName());
+                }
                 Log.d("BrainRing", participant.getDisplayName());
             }
         }
@@ -193,7 +198,7 @@ public class Network {
     }
 
     /** Reacts on received message */
-    private void onMessageReceived(byte[] buf, @NonNull String userId) {
+    private void onMessageReceived(@NonNull byte[] buf, @NonNull String userId) {
         if (timer != null && !userId.equals(myParticipantId)) {
             timer.cancel();
             startNewTimer();
@@ -232,8 +237,9 @@ public class Network {
                     String comment = is.readUTF();
                     int firstUserScore = is.readInt();
                     int secondUserScore = is.readInt();
+                    String questionMessage = is.readUTF();
                     OnlineController.OnlineUserLogicController.onReceivingAnswer(firstUserScore,
-                            secondUserScore, correctAnswer, comment);
+                            secondUserScore, correctAnswer, comment, questionMessage);
                     break;
                 case Message.OPPONENT_IS_ANSWERING:
                     OnlineController.OnlineUserLogicController.onOpponentIsAnswering();
@@ -380,6 +386,15 @@ public class Network {
             }
         };
         handshakeTimer.start();
+    }
+
+    public String getParticipantName(@NonNull String userId) {
+        for (Participant participant : room.getParticipants()) {
+            if (participant.getParticipantId().equals(userId)) {
+                return participant.getDisplayName();
+            }
+        }
+        return null;
     }
 
     public void sendMessageToServer(byte[] message) {
