@@ -51,6 +51,7 @@ public class Network {
     private static final int MAXIMUM_TIME_WITHOUT_MESSAGES = 80 * 1000;
     private static CountDownTimer timer;
     private static final byte[] FINISH;
+    private boolean gameIsFinished = false;
 
     static {
         FINISH = MessageGenerator.create().writeInt(Message.FINISH).toByteArray();
@@ -136,7 +137,7 @@ public class Network {
         @Override
         public void onLeftRoom(int i, @NonNull String s) {
             Log.d("BrainRing", "Left room");
-            OnlineController.finishOnlineGame();
+            OnlineController.finishOnlineGame(true);
         }
 
         @Override
@@ -189,7 +190,7 @@ public class Network {
         Log.d("BrainRing", "Finish printing room members");
     }
 
-    public void leaveRoom() {
+    private void leaveRoom() {
         if (room != null) {
             Games.getRealTimeMultiplayerClient(OnlineController.getOnlineGameActivity(),
                     googleSignInAccount).leave(mRoomConfig, room.getRoomId());
@@ -197,8 +198,21 @@ public class Network {
         }
     }
 
+    public void finish() {
+        gameIsFinished = true;
+        if (timer != null) {
+            timer.cancel();
+            timer = null;
+        }
+        leaveRoom();
+        updateRating();
+    }
+
     /** Reacts on received message */
     private void onMessageReceived(@NonNull byte[] buf, @NonNull String userId) {
+        if (gameIsFinished) {
+            return;
+        }
         if (timer != null && !userId.equals(myParticipantId)) {
             timer.cancel();
             startNewTimer();
@@ -262,7 +276,7 @@ public class Network {
                     OnlineController.OnlineAdminLogicController.onTimeLimit(roundNumber, userId);
                     break;
                 case Message.FINISH:
-                    OnlineController.finishOnlineGame();
+                    OnlineController.finishOnlineGame(true);
                     break;
                 case Message.CORRECT_ANSWER:
                     ++scoreSum;
@@ -293,7 +307,7 @@ public class Network {
             public void onFinish() {
                 if (timer == this) {
                     sendMessageToAll(FINISH);
-                    OnlineController.finishOnlineGame();
+                    OnlineController.finishOnlineGame(true);
                 }
             }
         };
@@ -308,7 +322,7 @@ public class Network {
         }
     }
 
-    public void onSignedIn(GoogleSignInAccount signInAccount) {
+    public void onSignedIn(@NonNull GoogleSignInAccount signInAccount) {
         googleSignInAccount = signInAccount;
         mRealTimeMultiplayerClient = Games.getRealTimeMultiplayerClient(OnlineController.getOnlineGameActivity(),
                 googleSignInAccount);
@@ -345,15 +359,18 @@ public class Network {
     }
 
     /** Sends message to all users in a room (and to itself). Guarantees delivering */
-    public void sendMessageToAll(byte[] message) {
+    public void sendMessageToAll(@NonNull byte[] message) {
         for (String participantId : room.getParticipantIds()) {
             sendMessageToConcreteUser(participantId, message);
         }
     }
 
     /** Sends message to user with given id. Guarantees delivering. May be slow... */
-    public void sendMessageToConcreteUser(String userId, byte[] message) {
-        if (myParticipantId == null || userId == null || room == null) {
+    public void sendMessageToConcreteUser(@NonNull String userId, @NonNull byte[] message) {
+        if (gameIsFinished) {
+            return;
+        }
+        if (myParticipantId == null || room == null) {
             Log.e("BrainRing", "Cannot send message before initialization");
             return;
         }
@@ -365,7 +382,7 @@ public class Network {
         }
     }
 
-    public void sendQuestion(byte[] message) {
+    public void sendQuestion(@NonNull byte[] message) {
         sendMessageToAll(message);
         int handshakeTime = HANDSHAKE_TIME;
         if (firstMessage) {
@@ -381,7 +398,7 @@ public class Network {
             public void onFinish() {
                 //if (handshakeTimer == this) {
                     Log.wtf("BrainRing", "Unsuccessful handshake");
-                    OnlineController.finishOnlineGame();
+                    OnlineController.finishOnlineGame(true);
                 //}
             }
         };
@@ -397,7 +414,7 @@ public class Network {
         return null;
     }
 
-    public void sendMessageToServer(byte[] message) {
+    public void sendMessageToServer(@NonNull byte[] message) {
         if (isServer) {
             onMessageReceived(message, myParticipantId);
         } else {

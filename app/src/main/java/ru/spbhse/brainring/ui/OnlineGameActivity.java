@@ -46,16 +46,6 @@ public class OnlineGameActivity extends GameActivity {
         OnlineController.NetworkController.createOnlineGame();
     }
 
-    /*public String getWhatWritten() {
-        EditText answerEditor = findViewById(R.id.answerEditor);
-        if (answerEditor != null) {
-            return answerEditor.getText().toString();
-        } else {
-            Log.wtf("BrainRing", "Answer editing wasn't open but should");
-            return "";
-        }
-    }*/
-
     /* I know that this function is out of content here,
        but it is linked with onActivityResult that can be placed only here */
     public void signIn() {
@@ -89,7 +79,9 @@ public class OnlineGameActivity extends GameActivity {
             }
         } else if (requestCode == GamesActivityResultCodes.RESULT_LEFT_ROOM) {
             Log.d("BrainRing", "Left room from activity");
-            OnlineController.NetworkController.leaveRoom();
+            OnlineController.finishOnlineGame(true);
+            // TODO : добавить сообщение
+            finish();
         } else if (requestCode == GamesActivityResultCodes.RESULT_SEND_REQUEST_FAILED) {
             Log.d("BrainRing", "Send request failed");
         } else if (requestCode == GamesActivityResultCodes.RESULT_NETWORK_FAILURE) {
@@ -101,6 +93,6 @@ public class OnlineGameActivity extends GameActivity {
     protected void onStop() {
         Log.d("BrainRing", "Stopping activity. Leaving room");
         super.onStop();
-        OnlineController.NetworkController.leaveRoom();
+        OnlineController.finishOnlineGame(false);
     }
 }

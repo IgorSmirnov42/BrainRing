@@ -214,7 +214,6 @@ public class OnlineGameAdminLogic {
     public void newQuestion() {
         if (questionNumber >= QUESTIONS_NUMBER_MIN && user1.score != user2.score) {
             OnlineController.NetworkController.sendMessageToAll(FINISH);
-            OnlineController.finishOnlineGame();
             return;
         }
 
