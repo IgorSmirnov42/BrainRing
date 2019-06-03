@@ -1,6 +1,7 @@
 package ru.spbhse.brainring.controllers;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -21,7 +22,7 @@ public class OnlineController extends Controller {
         return onlineGameActivity.get();
     }
 
-    public static void setUI(OnlineGameActivity ui) {
+    public static void setUI(@Nullable OnlineGameActivity ui) {
         onlineGameActivity = new WeakReference<>(ui);
     }
 
@@ -30,7 +31,7 @@ public class OnlineController extends Controller {
         OnlineAdminLogicController.adminLogic.newQuestion();
     }
 
-    public static void finishOnlineGame() {
+    public static void finishOnlineGame(boolean clearUI) {
         if (OnlineAdminLogicController.adminLogic != null) {
             OnlineAdminLogicController.adminLogic.finishGame();
             OnlineAdminLogicController.adminLogic = null;
@@ -40,10 +41,10 @@ public class OnlineController extends Controller {
             OnlineUserLogicController.userLogic = null;
         }
         if (NetworkController.network != null) {
-            NetworkController.network.updateRating();
+            NetworkController.network.finish();
             NetworkController.network = null;
         }
-        if (onlineGameActivity != null) {
+        if (clearUI && onlineGameActivity != null) {
             finishActivity(onlineGameActivity.get());
         }
     }
@@ -213,10 +214,10 @@ public class OnlineController extends Controller {
             }
         }
 
-        public static void leaveRoom() {
+        public static void finish() {
             if (network != null) {
-                network.updateRating();
-                network.leaveRoom();
+                network.finish();
+                network = null;
             }
         }
 
