@@ -86,7 +86,9 @@ public class Network {
         @Override
         public void onPeerLeft(@Nullable Room room, @NonNull List<String> list) {
             Log.d("BrainRing", "onPeerLeft");
-            leaveRoom();
+            if (!gameIsFinished) {
+                OnlineController.finishOnlineGame(true);
+            }
         }
 
         @Override
@@ -97,7 +99,9 @@ public class Network {
         @Override
         public void onDisconnectedFromRoom(@Nullable Room room) {
             Log.d("BrainRing", "onDisconnectedFromRoom");
-            leaveRoom();
+            if (!gameIsFinished) {
+                OnlineController.finishOnlineGame(true);
+            }
         }
 
         @Override
@@ -108,7 +112,9 @@ public class Network {
         @Override
         public void onPeersDisconnected(@Nullable Room room, @NonNull List<String> list) {
             Log.d("BrainRing", "onPeersDisconnected");
-            leaveRoom();
+            if (!gameIsFinished) {
+                OnlineController.finishOnlineGame(true);
+            }
         }
 
         @Override
@@ -119,7 +125,6 @@ public class Network {
         @Override
         public void onP2PDisconnected(@NonNull String s) {
             Log.d("BrainRing", "onP2PDisconnected " + s);
-            leaveRoom();
         }
     };
     private RoomUpdateCallback mRoomUpdateCallback = new RoomUpdateCallback() {
@@ -137,7 +142,9 @@ public class Network {
         @Override
         public void onLeftRoom(int i, @NonNull String s) {
             Log.d("BrainRing", "Left room");
-            OnlineController.finishOnlineGame(true);
+            if (!gameIsFinished) {
+                OnlineController.finishOnlineGame(true);
+            }
         }
 
         @Override
@@ -276,7 +283,9 @@ public class Network {
                     OnlineController.OnlineAdminLogicController.onTimeLimit(roundNumber, userId);
                     break;
                 case Message.FINISH:
-                    OnlineController.finishOnlineGame(true);
+                    if (!gameIsFinished) {
+                        OnlineController.finishOnlineGame(true);
+                    }
                     break;
                 case Message.CORRECT_ANSWER:
                     ++scoreSum;
