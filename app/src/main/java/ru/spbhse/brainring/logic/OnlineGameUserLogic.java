@@ -113,15 +113,15 @@ public class OnlineGameUserLogic {
 
     /** Gets question and prints it on the screen */
     public void onReceivingQuestion(int questionId, @NonNull String question) {
+        if (!OnlineController.NetworkController.iAmServer()) {
+            OnlineController.NetworkController.sendMessageToServer(HANDSHAKE);
+        }
         currentQuestionId = questionId;
         currentQuestionText = question;
         currentQuestionAnswer = null;
         OnlineController.OnlineUIController.onNewQuestion();
         OnlineController.OnlineUIController.setQuestionText(question);
         OnlineController.OnlineUIController.setLocation(GameActivityLocation.SHOW_QUESTION);
-        if (!OnlineController.NetworkController.iAmServer()) {
-            OnlineController.NetworkController.sendMessageToServer(HANDSHAKE);
-        }
 
         questionReceived = true;
         timeStarted = false;

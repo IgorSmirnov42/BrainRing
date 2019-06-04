@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.games.GamesCallbackStatusCodes;
 import com.google.android.gms.games.RealTimeMultiplayerClient;
 import com.google.android.gms.games.multiplayer.realtime.OnRealTimeMessageReceivedListener;
 import com.google.android.gms.games.multiplayer.realtime.Room;
@@ -14,13 +15,16 @@ import com.google.android.gms.games.multiplayer.realtime.RoomUpdateCallback;
 
 import java.util.List;
 
+import ru.spbhse.brainring.controllers.OnlineController;
+
 /** Class for interaction with network in local network mode */
 public abstract class LocalNetwork {
-    static final int ROLE_ADMIN = 1;
-    static final int ROLE_GREEN = 1 << 1;
-    static final int ROLE_RED = 1 << 2;
+    protected static final int ROLE_ADMIN = 1;
+    protected static final int ROLE_GREEN = 1 << 1;
+    protected static final int ROLE_RED = 1 << 2;
+    private static final int TIMES_TO_SEND = 100;
     /** Flag to determine if handshake was done */
-    protected volatile boolean handshaked = false;
+    protected boolean handshaked = false;
     protected RoomConfig mRoomConfig;
     protected Room room;
     public GoogleSignInAccount googleSignInAccount;
@@ -103,13 +107,40 @@ public abstract class LocalNetwork {
     /** Reacts on received message */
     protected abstract void onMessageReceived(byte[] buf, String userId);
 
-    //public LocalNetwork() {}
 
     abstract public void startQuickGame();
 
     /** Sends message to user with given id */
-    public void sendMessageToConcreteUser(String userId, byte[] message) {
+    public void sendMessageToConcreteUser(@NonNull String userId, @NonNull byte[] message) {
+        if (myParticipantId == null || room == null) {
+            Log.e("BrainRing", "Cannot send message before initialization");
+            return;
+        }
+        if (userId.equals(myParticipantId)) {
+            Log.d("BrainRing", "Sending message to myself");
+            onMessageReceived(message, myParticipantId);
+        } else {
+            Log.d("BrainRing", "Start sending message to " + userId);
+            sendMessageToConcreteUserNTimes(userId, message, TIMES_TO_SEND);
+        }
+    }
+
+    private void sendMessageToConcreteUserNTimes(@NonNull String userId, @NonNull byte[] message,
+                                                 int timesToSend) {
+        if (timesToSend < 0) {
+            Log.wtf("BrainRing", "Failed to send message too many times. Finish game");
+            OnlineController.finishOnlineGame(true);
+            return;
+        }
         mRealTimeMultiplayerClient.sendReliableMessage(message, room.getRoomId(), userId, (i, i1, s) -> {
+            if (i != GamesCallbackStatusCodes.OK) {
+
+                Log.e("BrainRing", "Failed to send message. Left " + timesToSend + " tries\n" +
+                        "Error is " + GamesCallbackStatusCodes.getStatusCodeString(i));
+                sendMessageToConcreteUserNTimes(userId, message, timesToSend - 1);
+            } else {
+                Log.d("BrainRing", "Message to " + userId + " is delivered");
+            }
         });
     }
 
