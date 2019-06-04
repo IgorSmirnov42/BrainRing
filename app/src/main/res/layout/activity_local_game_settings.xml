@@ -11,15 +11,18 @@
         android:id="@+id/secondCounterValue"
         android:layout_width="42dp"
         android:layout_height="39dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
         android:text="20"
         android:textAlignment="center"
+        android:textAppearance="@style/GrayText"
         android:textSize="24sp"
-        app:layout_constraintBottom_toTopOf="@+id/redPlayerButton"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.583"
+        app:layout_constraintHorizontal_bias="0.555"
         app:layout_constraintStart_toEndOf="@+id/firstCounterBar"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.337" />
+        app:layout_constraintVertical_bias="0.218" />
 
     <SeekBar
         android:id="@+id/secondCounterBar"
@@ -39,6 +42,7 @@
         android:id="@+id/juryModeButton"
         android:layout_width="265dp"
         android:layout_height="107dp"
+        android:background="@drawable/simple_button"
         android:text="Режим ведущего"
         android:textSize="24sp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -48,30 +52,40 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.416" />
 
-    <Button
-        android:id="@+id/greenPlayerButton"
-        android:layout_width="176dp"
-        android:layout_height="138dp"
-        android:text="Зелёный стол"
-        android:textSize="24sp"
+    <LinearLayout
+        android:id="@+id/linearLayout1"
+        android:layout_width="335dp"
+        android:layout_height="161dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.068"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/juryModeButton"
-        app:layout_constraintVertical_bias="0.494" />
+        app:layout_constraintVertical_bias="0.7">
 
-    <Button
-        android:id="@+id/redPlayerButton"
-        android:layout_width="164dp"
-        android:layout_height="133dp"
-        android:text="Красный стол"
-        android:textSize="24sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/greenPlayerButton"
-        app:layout_constraintTop_toBottomOf="@+id/juryModeButton" />
+        <Button
+            android:id="@+id/greenPlayerButton"
+            android:layout_width="0dp"
+            android:layout_height="140dp"
+            android:layout_weight="1"
+            android:background="@drawable/simple_button"
+            android:layout_marginEnd="5dp"
+            android:text="Зелёный стол"
+            android:textSize="24sp" />
+
+        <Button
+            android:id="@+id/redPlayerButton"
+            android:layout_width="0dp"
+            android:layout_height="140dp"
+            android:layout_weight="1"
+            android:background="@drawable/simple_button"
+            android:text="Красный стол"
+            android:layout_marginStart="5dp"
+            android:textSize="24sp" />
+    </LinearLayout>
 
     <SeekBar
         android:id="@+id/firstCounterBar"
@@ -92,19 +106,21 @@
         android:layout_height="39dp"
         android:text="20"
         android:textAlignment="center"
+        android:textAppearance="@style/GrayText"
         android:textSize="24sp"
-        app:layout_constraintBottom_toTopOf="@+id/redPlayerButton"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.555"
         app:layout_constraintStart_toEndOf="@+id/firstCounterBar"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.164" />
+        app:layout_constraintVertical_bias="0.138" />
 
     <TextView
         android:id="@+id/textView7"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Первый таймер"
+        android:textAppearance="@style/GrayText"
         android:textSize="24sp"
         app:layout_constraintBottom_toTopOf="@+id/firstCounterBar"
         app:layout_constraintEnd_toEndOf="parent"
@@ -118,6 +134,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Второй таймер"
+        android:textAppearance="@style/GrayText"
         android:textSize="24sp"
         app:layout_constraintBottom_toTopOf="@+id/secondCounterBar"
         app:layout_constraintEnd_toEndOf="parent"

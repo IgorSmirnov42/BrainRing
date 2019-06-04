@@ -9,22 +9,25 @@
 
     <TextView
         android:id="@+id/tableColor"
-        android:layout_width="204dp"
-        android:layout_height="97dp"
+        android:layout_width="246dp"
+        android:layout_height="137dp"
         android:text="Зелёный стол"
+        android:textAlignment="center"
+        android:textAppearance="@style/GrayText"
         android:textSize="30sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintHorizontal_bias="0.509"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.025" />
+        app:layout_constraintVertical_bias="0.085" />
 
     <Button
         android:id="@+id/buttonPush"
         android:layout_width="242dp"
         android:layout_height="191dp"
         android:text="ЖМЯК"
+        android:background="@drawable/simple_button"
         android:textSize="50sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

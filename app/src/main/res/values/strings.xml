@@ -7,5 +7,6 @@
     <string name="settings">Рейтинг</string>
     <string name="info">О приложении</string>
     <string name="packages">Мои пакеты вопросов</string>
+    <string name="handInAnswer">Сдать ответ</string>
 
 </resources>

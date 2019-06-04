@@ -1,51 +1,99 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.MainActivity">
+    android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
-
-        <Button
-            android:id="@+id/trainButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/train" />
+        android:layout_height="0dip"
+        android:layout_weight="1"
+        android:orientation="horizontal">
 
         <Button
             android:id="@+id/netButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/net" />
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/simple_button"
+            android:text="@string/net"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:layout_editor_absoluteY="0dp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dip"
+        android:layout_weight="1"
+        android:orientation="horizontal">
 
         <Button
             android:id="@+id/localButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/local" />
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/simple_button"
+            android:text="@string/local"
+            tools:layout_editor_absoluteX="0dp"
+            tools:layout_editor_absoluteY="208dp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/trainButton"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/simple_button"
+            android:text="@string/train" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dip"
+        android:layout_weight="1"
+        android:orientation="horizontal">
 
         <Button
             android:id="@+id/complainButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/complain" />
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/simple_button"
+            android:text="@string/complain"
+            tools:layout_editor_absoluteX="0dp"
+            tools:layout_editor_absoluteY="278dp" />
 
         <Button
             android:id="@+id/ratingButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/settings" />
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/simple_button"
+            android:text="@string/settings"
+            tools:layout_editor_absoluteX="0dp"
+            tools:layout_editor_absoluteY="382dp" />
 
         <Button
             android:id="@+id/infoButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/info" />
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/simple_button"
+            android:text="@string/info"
+            tools:layout_editor_absoluteX="0dp"
+            tools:layout_editor_absoluteY="557dp" />
 
     </LinearLayout>
-</ScrollView>
+
+</LinearLayout>

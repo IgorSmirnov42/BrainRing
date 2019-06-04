@@ -9,160 +9,192 @@
 
     <TextView
         android:id="@+id/redStatus"
-        android:layout_width="202dp"
+        android:layout_width="198dp"
+        android:layout_height="36dp"
+        android:textAlignment="center"
+        android:textSize="24sp"
+        app:layout_constraintBottom_toTopOf="@+id/greenTeamStatus"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/gameStatusInfo"
+        app:layout_constraintVertical_bias="0.905" />
+
+    <TextView
+        android:id="@+id/greenStatus"
+        android:layout_width="198dp"
         android:layout_height="35dp"
         android:textAlignment="center"
         android:textSize="24sp"
         app:layout_constraintBottom_toTopOf="@+id/greenTeamStatus"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.923"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/gameStatusInfo"
-        app:layout_constraintVertical_bias="0.913" />
-
-    <TextView
-        android:id="@+id/greenTeamScore"
-        android:layout_width="51dp"
-        android:layout_height="59dp"
-        android:text="0"
-        android:textAlignment="center"
-        android:textSize="36sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.222"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/greenTeamStatus"
-        app:layout_constraintVertical_bias="0.448" />
+        app:layout_constraintVertical_bias="0.907" />
 
     <ImageView
         android:id="@+id/greenTeamStatus"
-        android:layout_width="137dp"
-        android:layout_height="163dp"
+        android:layout_width="130dp"
+        android:layout_height="130dp"
+        android:background="@color/colorJungleGreen"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.148"
+        app:layout_constraintHorizontal_bias="0.096"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.854"
-        app:srcCompat="@android:color/holo_green_dark"
-        tools:srcCompat="@color/colorPrimary" />
+        app:layout_constraintVertical_bias="0.831" />
 
     <ImageView
         android:id="@+id/redTeamStatus"
-        android:layout_width="126dp"
-        android:layout_height="163dp"
+        android:layout_width="130dp"
+        android:layout_height="130dp"
+        android:background="@color/colorCardinal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.46"
+        app:layout_constraintHorizontal_bias="0.782"
         app:layout_constraintStart_toEndOf="@+id/greenTeamStatus"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.854"
-        app:srcCompat="@color/colorAccent"
-        tools:srcCompat="@color/colorAccent" />
+        app:layout_constraintVertical_bias="0.831" />
+
 
     <Button
         android:id="@+id/mainButton"
         android:layout_width="275dp"
-        android:layout_height="86dp"
+        android:layout_height="94dp"
+        android:background="@drawable/simple_button"
         android:text="Начать чтение вопроса"
+        android:textSize="18sp"
         app:layout_constraintBottom_toTopOf="@+id/greenTeamStatus"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.067" />
+        app:layout_constraintVertical_bias="0.219" />
 
-    <TextView
-        android:id="@+id/redTeamScore"
-        android:layout_width="51dp"
-        android:layout_height="45dp"
-        android:text="0"
-        android:textAlignment="center"
-        android:textSize="30sp"
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="0dp"
+        android:layout_height="59dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.752"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/view2"
         app:layout_constraintTop_toBottomOf="@+id/redTeamStatus"
-        app:layout_constraintVertical_bias="0.162" />
+        app:layout_constraintVertical_bias="0.42000002">
 
-    <Button
-        android:id="@+id/plusRedTeamButton"
-        android:layout_width="50dp"
-        android:layout_height="61dp"
-        android:text="+"
-        android:textAlignment="center"
-        android:textSize="30sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toEndOf="@+id/redTeamScore"
-        app:layout_constraintTop_toBottomOf="@+id/redTeamStatus"
-        app:layout_constraintVertical_bias="0.074" />
+        <Button
+            android:id="@+id/plusRedTeamButton"
+            android:layout_width="0dp"
+            android:layout_height="57dp"
+            android:layout_weight="1"
+            android:background="@drawable/simple_button"
+            android:text="+"
+            android:textAlignment="center"
+            android:textSize="36sp" />
 
-    <Button
-        android:id="@+id/minusRedTeamButton"
-        android:layout_width="50dp"
-        android:layout_height="62dp"
-        android:text="-"
-        android:textSize="30sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/redTeamScore"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/redTeamStatus"
-        app:layout_constraintVertical_bias="0.0" />
+        <TextView
+            android:id="@+id/redTeamScore"
+            android:layout_width="0dp"
+            android:layout_height="57dp"
+            android:layout_weight="1"
+            android:text="0"
+            android:textAlignment="center"
+            android:textSize="36sp" />
+
+        <Button
+            android:id="@+id/minusRedTeamButton"
+            android:layout_width="0dp"
+            android:layout_height="57dp"
+            android:layout_marginEnd="5dp"
+            android:layout_weight="1"
+            android:background="@drawable/simple_button"
+            android:text="-"
+            android:textSize="36sp" />
+    </LinearLayout>
 
     <TextView
         android:id="@+id/gameStatusInfo"
         android:layout_width="357dp"
-        android:layout_height="155dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="60dp"
+        android:layout_marginEnd="8dp"
         android:text="Ожидаем подключения игроков"
         android:textAlignment="center"
+        android:textAppearance="@style/GrayText"
         android:textSize="24sp"
-        app:layout_constraintBottom_toTopOf="@+id/greenTeamStatus"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/mainButton"
-        app:layout_constraintVertical_bias="0.142" />
+        app:layout_constraintTop_toBottomOf="@+id/mainButton" />
 
-    <Button
-        android:id="@+id/plusGreenTeamButton"
-        android:layout_width="62dp"
-        android:layout_height="65dp"
-        android:text="+"
-        android:textAlignment="center"
-        android:textSize="36sp"
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="56dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/minusRedTeamButton"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toEndOf="@+id/greenTeamScore"
-        app:layout_constraintTop_toBottomOf="@+id/greenTeamStatus"
-        app:layout_constraintVertical_bias="0.086" />
-
-    <Button
-        android:id="@+id/minusGreenTeamButton"
-        android:layout_width="61dp"
-        android:layout_height="63dp"
-        android:text="-"
-        android:textSize="36sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/greenTeamScore"
-        app:layout_constraintHorizontal_bias="0.842"
+        app:layout_constraintEnd_toStartOf="@+id/view2"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/greenTeamStatus"
-        app:layout_constraintVertical_bias="0.125" />
+        app:layout_constraintVertical_bias="0.428">
 
-    <TextView
-        android:id="@+id/greenStatus"
-        android:layout_width="178dp"
-        android:layout_height="35dp"
-        android:textAlignment="center"
-        android:textSize="24sp"
-        app:layout_constraintBottom_toTopOf="@+id/greenTeamStatus"
+        <Button
+            android:id="@+id/plusGreenTeamButton"
+            android:layout_width="0dp"
+            android:layout_height="57dp"
+            android:layout_marginStart="5dp"
+            android:layout_weight="1"
+            android:background="@drawable/simple_button"
+            android:text="+"
+            android:textAlignment="center"
+            android:textSize="36sp" />
+
+        <TextView
+            android:id="@+id/greenTeamScore"
+            android:layout_width="0dp"
+            android:layout_height="57dp"
+            android:layout_weight="1"
+            android:text="0"
+            android:textAlignment="center"
+            android:textSize="36sp" />
+
+        <Button
+            android:id="@+id/minusGreenTeamButton"
+            android:layout_width="0dp"
+            android:layout_height="57dp"
+            android:layout_weight="1"
+            android:background="@drawable/simple_button"
+            android:text="-"
+            android:textSize="36sp" />
+
+    </LinearLayout>
+
+    <View
+        android:id="@+id/view2"
+        android:layout_width="1dp"
+        android:layout_height="304dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:background="@color/colorDarkGray"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.062"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/gameStatusInfo"
-        app:layout_constraintVertical_bias="0.913" />
+        app:layout_constraintTop_toTopOf="@+id/redStatus" />
+
+    <View
+        android:id="@+id/view3"
+        android:layout_width="wrap_content"
+        android:layout_height="1dp"
+        android:layout_marginEnd="8dp"
+        android:background="@color/colorDarkGray"
+        app:layout_constraintBottom_toTopOf="@+id/view2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </android.support.constraint.ConstraintLayout>

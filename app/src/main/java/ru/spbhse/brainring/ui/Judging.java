@@ -8,6 +8,7 @@ import android.widget.TextView;
 
 import ru.spbhse.brainring.controllers.LocalController;
 import ru.spbhse.brainring.R;
+import ru.spbhse.brainring.logic.LocalGameAdminLogic;
 
 public class Judging extends AppCompatActivity {
 
@@ -19,6 +20,7 @@ public class Judging extends AppCompatActivity {
         String color = getIntent().getStringExtra("color");
         TextView answering = findViewById(R.id.answeringId);
         answering.setText(color);
+        //TODO: цвет текста показывает игрока (чтобы вызывать getColor(), нужен API 23)
 
         Button acceptButton = findViewById(R.id.acceptButton);
         acceptButton.setOnClickListener(new View.OnClickListener() {

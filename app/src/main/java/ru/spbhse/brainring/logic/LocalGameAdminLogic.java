@@ -19,6 +19,8 @@ import static java.lang.Math.max;
  *      in local mode
  */
 public class LocalGameAdminLogic {
+    public static final String GREEN = "green";
+    public static final String RED = "red";
     private LocalGameLocation location = LocalGameLocation.GAME_WAITING_START;
     private UserScore green;
     private UserScore red;
@@ -250,9 +252,9 @@ public class LocalGameAdminLogic {
 
     private String getColor(@NonNull String userId) {
         if (green.status.participantId.equals(userId)) {
-            return "green";
+            return GREEN;
         } else {
-            return "red";
+            return RED;
         }
     }
 

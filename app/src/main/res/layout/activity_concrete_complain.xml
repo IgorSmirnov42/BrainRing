@@ -10,23 +10,26 @@
         android:id="@+id/sendButton"
         android:layout_width="126dp"
         android:layout_height="100dp"
+        android:background="@drawable/simple_button"
         android:text="Отправить"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.824"
+        app:layout_constraintHorizontal_bias="0.221"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/complainText"
-        app:layout_constraintVertical_bias="0.389" />
+        app:layout_constraintVertical_bias="0.548" />
 
     <TextView
         android:id="@+id/textView3"
         android:layout_width="78dp"
         android:layout_height="29dp"
+        android:layout_marginTop="8dp"
         android:text="Вопрос"
+        android:textAppearance="@style/GrayText"
         android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.093"
+        app:layout_constraintHorizontal_bias="0.09"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.047" />
@@ -52,6 +55,7 @@
         android:maxLines="100"
         android:scrollbars="vertical"
         android:text="Ответ"
+        android:textAppearance="@style/GrayText"
         android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -63,8 +67,8 @@
     <TextView
         android:id="@+id/answer"
         android:layout_width="334dp"
-        android:layout_height="51dp"
-        android:textColor="@color/common_google_signin_btn_text_dark_focused"
+        android:layout_height="78dp"
+        android:textAppearance="@style/GrayText"
         android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -77,14 +81,16 @@
         android:id="@+id/textView9"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
         android:text="Жалоба"
+        android:textAppearance="@style/GrayText"
         android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.09"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/answer"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintVertical_bias="0.026" />
 
     <EditText
         android:id="@+id/complainText"
@@ -94,23 +100,24 @@
         android:hint="Введите жалобу"
         android:inputType="textMultiLine"
         android:lines="5"
-        android:textColor="@color/common_google_signin_btn_text_dark_focused"
+        android:textColor="@color/colorLightGray"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.492"
+        app:layout_constraintHorizontal_bias="0.496"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView9"
-        app:layout_constraintVertical_bias="0.068" />
+        app:layout_constraintVertical_bias="0.096" />
 
     <Button
         android:id="@+id/deleteButton"
         android:layout_width="126dp"
         android:layout_height="100dp"
+        android:background="@drawable/simple_button"
         android:text="Удалить жалобу"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.147"
+        app:layout_constraintHorizontal_bias="0.775"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/complainText"
-        app:layout_constraintVertical_bias="0.39" />
+        app:layout_constraintVertical_bias="0.548" />
 </android.support.constraint.ConstraintLayout>
