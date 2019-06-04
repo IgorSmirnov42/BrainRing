@@ -22,7 +22,7 @@ public abstract class LocalNetwork {
     protected static final int ROLE_ADMIN = 1;
     protected static final int ROLE_GREEN = 1 << 1;
     protected static final int ROLE_RED = 1 << 2;
-    private static final int TIMES_TO_SEND = 100;
+    private static final int TIMES_TO_SEND = 10000;
     /** Flag to determine if handshake was done */
     protected boolean handshaked = false;
     protected RoomConfig mRoomConfig;

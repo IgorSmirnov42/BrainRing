@@ -52,7 +52,10 @@ public class Network {
     private static CountDownTimer timer;
     private static final byte[] FINISH;
     private boolean gameIsFinished = false;
-    private static final int TIMES_TO_SEND = 100;
+    private boolean gameIsStarted = false;
+    private int counterOfConnections = 0;
+    private static final int TIMES_TO_SEND = 10000;
+    private long handshakeStartTime;
 
     static {
         FINISH = MessageGenerator.create().writeInt(Message.FINISH).toByteArray();
@@ -121,11 +124,18 @@ public class Network {
         @Override
         public void onP2PConnected(@NonNull String s) {
             Log.d("BrainRing", "onP2PConnected " + s);
+            ++counterOfConnections;
+            if (counterOfConnections == 2 && isServer) {
+                OnlineController.startOnlineGame();
+            }
         }
 
         @Override
         public void onP2PDisconnected(@NonNull String s) {
             Log.d("BrainRing", "onP2PDisconnected " + s);
+            if (!gameIsFinished) {
+                OnlineController.finishOnlineGame(true);
+            }
         }
     };
     private RoomUpdateCallback mRoomUpdateCallback = new RoomUpdateCallback() {
@@ -172,7 +182,10 @@ public class Network {
                         if (myParticipantId.equals(serverId)) {
                             isServer = true;
                             Log.d("BrainRing", "I am server");
-                            OnlineController.startOnlineGame();
+                            ++counterOfConnections;
+                            if (counterOfConnections == 2) {
+                                OnlineController.startOnlineGame();
+                            }
                         }
                     });
         }
@@ -332,6 +345,8 @@ public class Network {
         if (handshakeTimer != null) {
             handshakeTimer.cancel();
             handshakeTimer = null;
+            Log.d("BrainRing", "Successful handshake. Took "
+                    + (System.currentTimeMillis() - handshakeStartTime) + "ms");
             OnlineController.OnlineAdminLogicController.publishing();
         }
     }
@@ -409,7 +424,8 @@ public class Network {
                                 "Error is " + GamesCallbackStatusCodes.getStatusCodeString(i));
                 sendMessageToConcreteUserNTimes(userId, message, timesToSend - 1);
             } else {
-                Log.d("BrainRing", "Message to " + userId + " is delivered");
+                Log.d("BrainRing", "Message to " + userId + " is delivered. Took " +
+                        (TIMES_TO_SEND - timesToSend + 1) + " tries");
             }
         });
     }
@@ -434,6 +450,7 @@ public class Network {
                 }
             }
         };
+        handshakeStartTime = System.currentTimeMillis();
         handshakeTimer.start();
     }
 
