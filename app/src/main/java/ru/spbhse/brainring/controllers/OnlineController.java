@@ -33,14 +33,17 @@ public class OnlineController extends Controller {
 
     public static void finishOnlineGame(boolean clearUI) {
         if (OnlineAdminLogicController.adminLogic != null) {
+            Log.d("BrainRing","Clearing admin logic");
             OnlineAdminLogicController.adminLogic.finishGame();
             OnlineAdminLogicController.adminLogic = null;
         }
         if (OnlineUserLogicController.userLogic != null) {
+            Log.d("BrainRing","Clearing user logic");
             OnlineUserLogicController.userLogic.finishGame();
             OnlineUserLogicController.userLogic = null;
         }
         if (NetworkController.network != null) {
+            Log.d("BrainRing","Clearing network");
             NetworkController.network.finish();
             NetworkController.network = null;
         }
@@ -204,6 +207,7 @@ public class OnlineController extends Controller {
 
         public static void createOnlineGame() {
             network = new Network();
+            Log.d("BrainRing", "Network: " + network);
             OnlineUserLogicController.userLogic = new OnlineGameUserLogic();
             onlineGameActivity.get().signIn();
         }
@@ -217,7 +221,6 @@ public class OnlineController extends Controller {
         public static void finish() {
             if (network != null) {
                 network.finish();
-                network = null;
             }
         }
 
@@ -235,6 +238,7 @@ public class OnlineController extends Controller {
         }
 
         public static void startGame() {
+            Log.d("BrainRing", "StartQuick network: " + network);
             network.startQuickGame();
         }
 

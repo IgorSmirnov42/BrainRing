@@ -45,7 +45,7 @@ public class OnlineGameAdminLogic {
     private static final int SECOND = 1000;
     private static final int TIME_TO_SHOW_ANSWER = 5;
     private static final int TIME_TO_READ_QUESTION = 10;
-    private static final int DELIVERING_FAULT_MILLIS = 750;
+    private static final int DELIVERING_FAULT_MILLIS = 1000;
 
     /** Returns UserScore object connected with given user */
     public OnlineGameAdminLogic() {
@@ -95,9 +95,6 @@ public class OnlineGameAdminLogic {
             new Handler().postDelayed(() -> {
                 if (roundNumber == currentRound) {
                     getThisUser(userId).status.alreadyAnswered = true;
-                    if (bothAnswered()) {
-                        showAnswer(null);
-                    }
                 }
             }, DELIVERING_FAULT_MILLIS);
         }
@@ -213,6 +210,7 @@ public class OnlineGameAdminLogic {
     /** Determines if game is finished. If not, generates new question and sends it */
     public void newQuestion() {
         if (questionNumber >= QUESTIONS_NUMBER_MIN && user1.score != user2.score) {
+            Log.d("BrainRing", "Game finished");
             OnlineController.NetworkController.sendMessageToAll(FINISH);
             return;
         }

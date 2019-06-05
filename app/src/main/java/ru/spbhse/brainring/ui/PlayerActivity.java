@@ -24,8 +24,6 @@ public class PlayerActivity extends AppCompatActivity {
 
     private final static int RC_SIGN_IN = 42;
 
-    // TODO: возможно добавить счет
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,5 +76,11 @@ public class PlayerActivity extends AppCompatActivity {
                         .setNeutralButton(android.R.string.ok, null).show();
             }
         }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        LocalController.finishLocalGame(false);
     }
 }

@@ -46,12 +46,16 @@ public class Network {
     private LeaderboardsClient leaderboardsClient;
     private long scoreSum;
     private boolean firstMessage = true;
-    private static final int HANDSHAKE_TIME = 1500;
+    private static final int HANDSHAKE_TIME = 2000;
     private static final int FIRST_HANDSHAKE_TIME = 5000; // first message may take longer time
     private static final int MAXIMUM_TIME_WITHOUT_MESSAGES = 80 * 1000;
     private static CountDownTimer timer;
     private static final byte[] FINISH;
     private boolean gameIsFinished = false;
+    private boolean gameIsStarted = false;
+    private int counterOfConnections = 0;
+    private static final int TIMES_TO_SEND = 10000;
+    private long handshakeStartTime;
 
     static {
         FINISH = MessageGenerator.create().writeInt(Message.FINISH).toByteArray();
@@ -86,7 +90,9 @@ public class Network {
         @Override
         public void onPeerLeft(@Nullable Room room, @NonNull List<String> list) {
             Log.d("BrainRing", "onPeerLeft");
-            leaveRoom();
+            if (!gameIsFinished) {
+                OnlineController.finishOnlineGame(true);
+            }
         }
 
         @Override
@@ -97,7 +103,9 @@ public class Network {
         @Override
         public void onDisconnectedFromRoom(@Nullable Room room) {
             Log.d("BrainRing", "onDisconnectedFromRoom");
-            leaveRoom();
+            if (!gameIsFinished) {
+                OnlineController.finishOnlineGame(true);
+            }
         }
 
         @Override
@@ -108,18 +116,26 @@ public class Network {
         @Override
         public void onPeersDisconnected(@Nullable Room room, @NonNull List<String> list) {
             Log.d("BrainRing", "onPeersDisconnected");
-            leaveRoom();
+            if (!gameIsFinished) {
+                OnlineController.finishOnlineGame(true);
+            }
         }
 
         @Override
         public void onP2PConnected(@NonNull String s) {
-            Log.d("BrainRing", "onP2PConnected");
+            Log.d("BrainRing", "onP2PConnected " + s);
+            ++counterOfConnections;
+            if (counterOfConnections == 2 && isServer) {
+                OnlineController.startOnlineGame();
+            }
         }
 
         @Override
         public void onP2PDisconnected(@NonNull String s) {
             Log.d("BrainRing", "onP2PDisconnected " + s);
-            leaveRoom();
+            if (!gameIsFinished) {
+                OnlineController.finishOnlineGame(true);
+            }
         }
     };
     private RoomUpdateCallback mRoomUpdateCallback = new RoomUpdateCallback() {
@@ -137,7 +153,9 @@ public class Network {
         @Override
         public void onLeftRoom(int i, @NonNull String s) {
             Log.d("BrainRing", "Left room");
-            OnlineController.finishOnlineGame(true);
+            if (!gameIsFinished) {
+                OnlineController.finishOnlineGame(true);
+            }
         }
 
         @Override
@@ -164,7 +182,10 @@ public class Network {
                         if (myParticipantId.equals(serverId)) {
                             isServer = true;
                             Log.d("BrainRing", "I am server");
-                            OnlineController.startOnlineGame();
+                            ++counterOfConnections;
+                            if (counterOfConnections == 2) {
+                                OnlineController.startOnlineGame();
+                            }
                         }
                     });
         }
@@ -204,6 +225,10 @@ public class Network {
             timer.cancel();
             timer = null;
         }
+        if (handshakeTimer != null) {
+            handshakeTimer.cancel();
+            handshakeTimer = null;
+        }
         leaveRoom();
         updateRating();
     }
@@ -211,6 +236,7 @@ public class Network {
     /** Reacts on received message */
     private void onMessageReceived(@NonNull byte[] buf, @NonNull String userId) {
         if (gameIsFinished) {
+            Log.e("BrainRing", "received message but game is over");
             return;
         }
         if (timer != null && !userId.equals(myParticipantId)) {
@@ -276,7 +302,9 @@ public class Network {
                     OnlineController.OnlineAdminLogicController.onTimeLimit(roundNumber, userId);
                     break;
                 case Message.FINISH:
-                    OnlineController.finishOnlineGame(true);
+                    if (!gameIsFinished) {
+                        OnlineController.finishOnlineGame(true);
+                    }
                     break;
                 case Message.CORRECT_ANSWER:
                     ++scoreSum;
@@ -307,7 +335,6 @@ public class Network {
             public void onFinish() {
                 if (timer == this) {
                     sendMessageToAll(FINISH);
-                    OnlineController.finishOnlineGame(true);
                 }
             }
         };
@@ -318,6 +345,8 @@ public class Network {
         if (handshakeTimer != null) {
             handshakeTimer.cancel();
             handshakeTimer = null;
+            Log.d("BrainRing", "Successful handshake. Took "
+                    + (System.currentTimeMillis() - handshakeStartTime) + "ms");
             OnlineController.OnlineAdminLogicController.publishing();
         }
     }
@@ -360,26 +389,45 @@ public class Network {
 
     /** Sends message to all users in a room (and to itself). Guarantees delivering */
     public void sendMessageToAll(@NonNull byte[] message) {
-        for (String participantId : room.getParticipantIds()) {
-            sendMessageToConcreteUser(participantId, message);
-        }
+        sendMessageToConcreteUser(getOpponentParticipantId(), message);
+        onMessageReceived(message, getMyParticipantId());
     }
 
-    /** Sends message to user with given id. Guarantees delivering. May be slow... */
     public void sendMessageToConcreteUser(@NonNull String userId, @NonNull byte[] message) {
-        if (gameIsFinished) {
-            return;
-        }
         if (myParticipantId == null || room == null) {
             Log.e("BrainRing", "Cannot send message before initialization");
             return;
         }
         if (userId.equals(myParticipantId)) {
+            Log.d("BrainRing", "Sending message to myself");
             onMessageReceived(message, myParticipantId);
         } else {
-            mRealTimeMultiplayerClient.sendReliableMessage(message, room.getRoomId(), userId, (i, i1, s) -> {
-            });
+            Log.d("BrainRing", "Start sending message to " + userId);
+            sendMessageToConcreteUserNTimes(userId, message, TIMES_TO_SEND);
         }
+    }
+
+    private void sendMessageToConcreteUserNTimes(@NonNull String userId, @NonNull byte[] message,
+                                          int timesToSend) {
+        if (gameIsFinished) {
+            return;
+        }
+        if (timesToSend < 0) {
+            Log.wtf("BrainRing", "Failed to send message too many times. Finish game");
+            OnlineController.finishOnlineGame(true);
+            return;
+        }
+        mRealTimeMultiplayerClient.sendReliableMessage(message, room.getRoomId(), userId, (i, i1, s) -> {
+            if (i != GamesCallbackStatusCodes.OK) {
+
+                Log.e("BrainRing", "Failed to send message. Left " + timesToSend + " tries\n" +
+                                "Error is " + GamesCallbackStatusCodes.getStatusCodeString(i));
+                sendMessageToConcreteUserNTimes(userId, message, timesToSend - 1);
+            } else {
+                Log.d("BrainRing", "Message to " + userId + " is delivered. Took " +
+                        (TIMES_TO_SEND - timesToSend + 1) + " tries");
+            }
+        });
     }
 
     public void sendQuestion(@NonNull byte[] message) {
@@ -396,12 +444,13 @@ public class Network {
 
             @Override
             public void onFinish() {
-                //if (handshakeTimer == this) {
+                if (handshakeTimer == this) { // check in case message was delivered right before finish
                     Log.wtf("BrainRing", "Unsuccessful handshake");
                     OnlineController.finishOnlineGame(true);
-                //}
+                }
             }
         };
+        handshakeStartTime = System.currentTimeMillis();
         handshakeTimer.start();
     }
 

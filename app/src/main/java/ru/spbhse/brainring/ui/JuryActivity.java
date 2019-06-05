@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
@@ -122,7 +121,6 @@ public class JuryActivity extends AppCompatActivity {
             mainButton.setVisibility(View.VISIBLE);
         }
         if (currentLocation == LocalGameLocation.COUNTDOWN) {
-            statusText.setText("Идёт обратный отсчёт (сюда надо запилить таймер)");
             mainButton.setText("Остановить таймер");
             mainButton.setVisibility(View.VISIBLE);
         }
@@ -182,12 +180,5 @@ public class JuryActivity extends AppCompatActivity {
                         .setNeutralButton(android.R.string.ok, null).show();
             }
         }
-    }
-
-    @Override
-    protected void onDestroy() {
-        Log.d("BrainRing", "Destroying activity. Leaving room");
-        super.onDestroy();
-        LocalController.LocalNetworkController.leaveRoom();
     }
 }

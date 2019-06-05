@@ -27,7 +27,7 @@ public class ConcreteComplain extends AppCompatActivity {
         //getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
         setContentView(R.layout.activity_concrete_complain);
         try {
-            list = ComplainsFileHandler.getAllQuestionsFromFile();
+            list = ComplainsFileHandler.getAllQuestionsFromFile(this);
         } catch (Exception e) {
             e.printStackTrace();
             Log.wtf("BrainRing", "Cannot load list of questions");
@@ -78,7 +78,7 @@ public class ConcreteComplain extends AppCompatActivity {
         super.onPause();
         saveWrittenText();
         try {
-            ComplainsFileHandler.saveComplainsToFile(list);
+            ComplainsFileHandler.saveComplainsToFile(list, this);
         } catch (Exception e) {
             e.printStackTrace();
             Log.wtf("BrainRing", "Error while writing to file");

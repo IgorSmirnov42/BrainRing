@@ -1,5 +1,8 @@
 package ru.spbhse.brainring.controllers;
 
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 
 import java.lang.ref.WeakReference;
@@ -25,11 +28,11 @@ public class LocalController extends Controller {
         return playerActivity.get();
     }
 
-    public static void setUI(JuryActivity ui) {
+    public static void setUI(@Nullable JuryActivity ui) {
         juryActivity = new WeakReference<>(ui);
     }
 
-    public static void setUI(PlayerActivity ui) {
+    public static void setUI(@Nullable PlayerActivity ui) {
         playerActivity = new WeakReference<>(ui);
     }
 
@@ -37,15 +40,25 @@ public class LocalController extends Controller {
         LocalAdminLogicController.adminLogic = new LocalGameAdminLogic(firstTimer, secondTimer);
     }
 
-    public static void finishLocalGameAsAdmin() {
+    public static void finishLocalGame(boolean clearUI) {
         if (LocalAdminLogicController.adminLogic != null) {
             LocalAdminLogicController.adminLogic.finishGame();
             LocalAdminLogicController.adminLogic = null;
         }
+        LocalPlayerLogicController.playerLogic = null;
+        if (LocalNetworkController.network != null) {
+            LocalNetworkController.network.finish();
+            LocalNetworkController.network = null;
+        }
+        LocalNetworkPlayerController.network = null;
         LocalNetworkAdminController.network = null;
-        LocalNetworkController.network = null;
-        if (juryActivity != null) {
-            finishActivity(juryActivity.get());
+        if (clearUI) {
+            if (juryActivity != null) {
+                finishActivity(juryActivity.get());
+            }
+            if (playerActivity != null) {
+                finishActivity(playerActivity.get());
+            }
         }
     }
 
@@ -53,19 +66,10 @@ public class LocalController extends Controller {
         LocalPlayerLogicController.playerLogic = new LocalGamePlayerLogic();
     }
 
-    public static void finishLocalGameAsPlayer() {
-        LocalPlayerLogicController.playerLogic = null;
-        LocalNetworkController.network = null;
-        LocalNetworkPlayerController.network = null;
-        if (playerActivity != null) {
-            finishActivity(playerActivity.get());
-        }
-    }
-
     public static class LocalAdminLogicController {
         private static LocalGameAdminLogic adminLogic;
 
-        public static void onHandshakeAccept(String userId) {
+        public static void onHandshakeAccept(@NonNull String userId) {
             adminLogic.onHandshakeAccept(userId);
         }
 
@@ -89,7 +93,7 @@ public class LocalController extends Controller {
             return adminLogic.toNextState();
         }
 
-        public static void onAnswerIsReady(String userId) {
+        public static void onAnswerIsReady(@NonNull String userId) {
             adminLogic.onAnswerIsReady(userId);
         }
 
@@ -133,7 +137,7 @@ public class LocalController extends Controller {
             juryActivity.get().redrawLocation();
         }
 
-        public static void setLocation(LocalGameLocation location) {
+        public static void setLocation(@NonNull LocalGameLocation location) {
             juryActivity.get().setLocation(location);
         }
 
@@ -141,15 +145,15 @@ public class LocalController extends Controller {
             juryActivity.get().showTime(time);
         }
 
-        public static void onReceivingAnswer(String color) {
+        public static void onReceivingAnswer(@NonNull String color) {
             juryActivity.get().onReceivingAnswer(color);
         }
 
-        public static void setGreenStatus(String status) {
+        public static void setGreenStatus(@NonNull String status) {
             juryActivity.get().setGreenStatus(status);
         }
 
-        public static void setRedStatus(String status) {
+        public static void setRedStatus(@NonNull String status) {
             juryActivity.get().setRedStatus(status);
         }
     }
@@ -176,13 +180,13 @@ public class LocalController extends Controller {
     public static class LocalNetworkPlayerController {
         private static LocalNetworkPlayer network;
 
-        public static void createLocalGame(String color) {
+        public static void createLocalGame(@NonNull String color) {
             network = new LocalNetworkPlayer(color);
             LocalNetworkController.network = network;
             playerActivity.get().signIn();
         }
 
-        public static void sendMessageToServer(byte[] message) {
+        public static void sendMessageToServer(@NonNull byte[] message) {
             network.sendMessageToServer(message);
         }
     }
@@ -190,22 +194,16 @@ public class LocalController extends Controller {
     public static class LocalNetworkController {
         private static LocalNetwork network;
 
-        public static void leaveRoom() {
-            if (network != null) {
-                network.leaveRoom();
-            }
-        }
-
         public static void loggedIn(GoogleSignInAccount signedInAccount) {
             network.googleSignInAccount = signedInAccount;
             network.startQuickGame();
         }
 
-        public static void sendMessageToConcreteUser(String userId, byte[] message) {
+        public static void sendMessageToConcreteUser(@NonNull String userId, @NonNull byte[] message) {
             network.sendMessageToConcreteUser(userId, message);
         }
 
-        public static void sendMessageToOthers(byte[] message) {
+        public static void sendMessageToOthers(@NonNull byte[] message) {
             network.sendMessageToOthers(message);
         }
     }
