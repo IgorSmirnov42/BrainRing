@@ -64,7 +64,7 @@
         android:layout_height="94dp"
         android:background="@drawable/simple_button"
         android:text="Начать чтение вопроса"
-        android:textSize="18sp"
+        android:textSize="24sp"
         app:layout_constraintBottom_toTopOf="@+id/greenTeamStatus"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -80,18 +80,18 @@
         android:layout_marginBottom="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toEndOf="@+id/view2"
         app:layout_constraintTop_toBottomOf="@+id/redTeamStatus"
-        app:layout_constraintVertical_bias="0.42000002">
+        app:layout_constraintVertical_bias="0.423">
 
         <Button
-            android:id="@+id/plusRedTeamButton"
+            android:id="@+id/minusRedTeamButton"
             android:layout_width="0dp"
             android:layout_height="57dp"
             android:layout_weight="1"
             android:background="@drawable/simple_button"
-            android:text="+"
-            android:textAlignment="center"
+            android:text="-"
             android:textSize="36sp" />
 
         <TextView
@@ -104,20 +104,22 @@
             android:textSize="36sp" />
 
         <Button
-            android:id="@+id/minusRedTeamButton"
+            android:id="@+id/plusRedTeamButton"
             android:layout_width="0dp"
             android:layout_height="57dp"
             android:layout_marginEnd="5dp"
             android:layout_weight="1"
             android:background="@drawable/simple_button"
-            android:text="-"
+            android:text="+"
+            android:textAlignment="center"
             android:textSize="36sp" />
+
     </LinearLayout>
 
     <TextView
         android:id="@+id/gameStatusInfo"
-        android:layout_width="357dp"
-        android:layout_height="0dp"
+        android:layout_width="353dp"
+        android:layout_height="82dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="60dp"
         android:layout_marginEnd="8dp"
@@ -138,19 +140,19 @@
         android:layout_marginBottom="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/view2"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/greenTeamStatus"
-        app:layout_constraintVertical_bias="0.428">
+        app:layout_constraintVertical_bias="0.379">
 
         <Button
-            android:id="@+id/plusGreenTeamButton"
+            android:id="@+id/minusGreenTeamButton"
             android:layout_width="0dp"
             android:layout_height="57dp"
             android:layout_marginStart="5dp"
             android:layout_weight="1"
             android:background="@drawable/simple_button"
-            android:text="+"
-            android:textAlignment="center"
+            android:text="-"
             android:textSize="36sp" />
 
         <TextView
@@ -163,12 +165,13 @@
             android:textSize="36sp" />
 
         <Button
-            android:id="@+id/minusGreenTeamButton"
+            android:id="@+id/plusGreenTeamButton"
             android:layout_width="0dp"
             android:layout_height="57dp"
             android:layout_weight="1"
             android:background="@drawable/simple_button"
-            android:text="-"
+            android:text="+"
+            android:textAlignment="center"
             android:textSize="36sp" />
 
     </LinearLayout>

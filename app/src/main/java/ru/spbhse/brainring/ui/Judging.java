@@ -1,5 +1,6 @@
 package ru.spbhse.brainring.ui;
 
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -17,10 +18,16 @@ public class Judging extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_judging);
 
-        String color = getIntent().getStringExtra("color");
+        String colorName = getIntent().getStringExtra("color");
         TextView answering = findViewById(R.id.answeringId);
-        answering.setText(color);
-        //TODO: цвет текста показывает игрока (чтобы вызывать getColor(), нужен API 23)
+        int color;
+        if (colorName.equals(LocalGameAdminLogic.RED)) {
+            color = ContextCompat.getColor(this, R.color.colorCardinal);
+        } else {
+            color = ContextCompat.getColor(this, R.color.colorJungleGreen);
+        }
+        answering.setText(colorName);
+        answering.setTextColor(color);
 
         Button acceptButton = findViewById(R.id.acceptButton);
         acceptButton.setOnClickListener(new View.OnClickListener() {

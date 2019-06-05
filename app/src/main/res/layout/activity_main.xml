@@ -3,97 +3,89 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="500dp"
     android:orientation="vertical">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dip"
-        android:layout_weight="1"
-        android:orientation="horizontal">
-
-        <Button
-            android:id="@+id/netButton"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="@drawable/simple_button"
-            android:text="@string/net"
-            app:layout_constraintEnd_toEndOf="parent"
-            tools:layout_editor_absoluteY="0dp" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dip"
-        android:layout_weight="1"
-        android:orientation="horizontal">
-
-        <Button
-            android:id="@+id/localButton"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="@drawable/simple_button"
-            android:text="@string/local"
-            tools:layout_editor_absoluteX="0dp"
-            tools:layout_editor_absoluteY="208dp" />
-
-    </LinearLayout>
-
-    <LinearLayout
+    <Button
+        android:id="@+id/netButton"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginBottom="10dp"
         android:layout_weight="1"
-        android:orientation="horizontal">
+        android:background="@drawable/simple_button"
+        android:text="@string/net_title"
+        android:textSize="24sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:layout_editor_absoluteY="0dp" />
 
-        <Button
-            android:id="@+id/trainButton"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="@drawable/simple_button"
-            android:text="@string/train" />
-
-    </LinearLayout>
-
-    <LinearLayout
+    <Button
+        android:id="@+id/localButton"
         android:layout_width="match_parent"
-        android:layout_height="0dip"
+        android:layout_height="0dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginBottom="10dp"
         android:layout_weight="1"
-        android:orientation="horizontal">
+        android:background="@drawable/simple_button"
+        android:text="@string/local_title"
+        android:textSize="24sp"
+        tools:layout_editor_absoluteX="0dp" />
 
-        <Button
-            android:id="@+id/complainButton"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="@drawable/simple_button"
-            android:text="@string/complain"
-            tools:layout_editor_absoluteX="0dp"
-            tools:layout_editor_absoluteY="278dp" />
+    <Button
+        android:id="@+id/trainButton"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginBottom="10dp"
+        android:layout_weight="1"
+        android:background="@drawable/simple_button"
+        android:text="@string/training_title"
+        android:textSize="24sp" />
 
-        <Button
-            android:id="@+id/ratingButton"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="@drawable/simple_button"
-            android:text="@string/settings"
-            tools:layout_editor_absoluteX="0dp"
-            tools:layout_editor_absoluteY="382dp" />
+    <Button
+        android:id="@+id/complainButton"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginBottom="10dp"
+        android:layout_weight="1"
+        android:background="@drawable/simple_button"
+        android:text="@string/make_complain"
+        android:textSize="24sp"
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="278dp" />
 
-        <Button
-            android:id="@+id/infoButton"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="@drawable/simple_button"
-            android:text="@string/info"
-            tools:layout_editor_absoluteX="0dp"
-            tools:layout_editor_absoluteY="557dp" />
+    <Button
+        android:id="@+id/ratingButton"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginBottom="10dp"
+        android:layout_weight="1"
+        android:background="@drawable/simple_button"
+        android:text="@string/settings"
+        android:textSize="24sp"
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="382dp" />
 
-    </LinearLayout>
+    <Button
+        android:id="@+id/infoButton"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginBottom="10dp"
+        android:layout_weight="1"
+        android:background="@drawable/simple_button"
+        android:text="@string/info"
+        android:textSize="24sp"
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="557dp" />
 
 </LinearLayout>

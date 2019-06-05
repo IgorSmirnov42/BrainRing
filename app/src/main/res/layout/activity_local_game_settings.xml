@@ -19,38 +19,38 @@
         android:textSize="24sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.555"
+        app:layout_constraintHorizontal_bias="0.567"
         app:layout_constraintStart_toEndOf="@+id/firstCounterBar"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.218" />
+        app:layout_constraintVertical_bias="0.294" />
 
     <SeekBar
         android:id="@+id/secondCounterBar"
         style="@style/Widget.AppCompat.SeekBar.Discrete"
-        android:layout_width="252dp"
-        android:layout_height="45dp"
+        android:layout_width="255dp"
+        android:layout_height="32dp"
         android:max="5"
         android:progress="1"
         app:layout_constraintBottom_toTopOf="@+id/juryModeButton"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.496"
+        app:layout_constraintHorizontal_bias="0.506"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.697" />
+        app:layout_constraintVertical_bias="0.547" />
 
     <Button
         android:id="@+id/juryModeButton"
         android:layout_width="265dp"
         android:layout_height="107dp"
         android:background="@drawable/simple_button"
-        android:text="Режим ведущего"
-        android:textSize="24sp"
+        android:text="ведущий"
+        android:textSize="30sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.465"
+        app:layout_constraintHorizontal_bias="0.541"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.416" />
+        app:layout_constraintVertical_bias="0.657" />
 
     <LinearLayout
         android:id="@+id/linearLayout1"
@@ -70,21 +70,21 @@
             android:id="@+id/greenPlayerButton"
             android:layout_width="0dp"
             android:layout_height="140dp"
+            android:layout_marginEnd="5dp"
             android:layout_weight="1"
             android:background="@drawable/simple_button"
-            android:layout_marginEnd="5dp"
             android:text="Зелёный стол"
-            android:textSize="24sp" />
+            android:textSize="30sp" />
 
         <Button
             android:id="@+id/redPlayerButton"
             android:layout_width="0dp"
             android:layout_height="140dp"
+            android:layout_marginStart="5dp"
             android:layout_weight="1"
             android:background="@drawable/simple_button"
             android:text="Красный стол"
-            android:layout_marginStart="5dp"
-            android:textSize="24sp" />
+            android:textSize="30sp" />
     </LinearLayout>
 
     <SeekBar
@@ -96,9 +96,10 @@
         android:progress="1"
         app:layout_constraintBottom_toTopOf="@+id/juryModeButton"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.506"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.303" />
+        app:layout_constraintVertical_bias="0.241" />
 
     <TextView
         android:id="@+id/firstCounterValue"
@@ -110,10 +111,10 @@
         android:textSize="24sp"
         app:layout_constraintBottom_toTopOf="@+id/linearLayout1"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.555"
+        app:layout_constraintHorizontal_bias="0.542"
         app:layout_constraintStart_toEndOf="@+id/firstCounterBar"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.138" />
+        app:layout_constraintVertical_bias="0.177" />
 
     <TextView
         android:id="@+id/textView7"
@@ -124,10 +125,10 @@
         android:textSize="24sp"
         app:layout_constraintBottom_toTopOf="@+id/firstCounterBar"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.555"
+        app:layout_constraintHorizontal_bias="0.557"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.88" />
+        app:layout_constraintVertical_bias="0.711" />
 
     <TextView
         android:id="@+id/textView8"
@@ -138,9 +139,37 @@
         android:textSize="24sp"
         app:layout_constraintBottom_toTopOf="@+id/secondCounterBar"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.57"
+        app:layout_constraintHorizontal_bias="0.549"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/firstCounterBar"
-        app:layout_constraintVertical_bias="0.625" />
+        app:layout_constraintVertical_bias="0.666" />
+
+    <TextView
+        android:id="@+id/textView6"
+        android:layout_width="253dp"
+        android:layout_height="81dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:text="Выберите свою роль"
+        android:textAlignment="center"
+        android:textAppearance="@style/GrayText"
+        android:textSize="24sp"
+        app:layout_constraintBottom_toTopOf="@+id/juryModeButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/secondCounterBar"
+        app:layout_constraintVertical_bias="1.0" />
+
+    <View
+        android:id="@+id/view5"
+        android:layout_width="wrap_content"
+        android:layout_height="1dp"
+        android:layout_marginTop="8dp"
+        android:background="@color/colorDarkGray"
+        app:layout_constraintBottom_toTopOf="@+id/textView6"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/secondCounterBar" />
 
 </android.support.constraint.ConstraintLayout>

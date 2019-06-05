@@ -1,12 +1,17 @@
 <resources>
     <string name="app_name">Брейн-Ринг</string>
-    <string name="train">Тренировка</string>
-    <string name="net">Игра по сети</string>
-    <string name="local">Локальная игра</string>
-    <string name="complain">Пожаловаться на вопрос</string>
+    <string name="training_title">Тренировка</string>
+    <string name="net_title">Игра по сети</string>
+    <string name="local_title">Локальная игра</string>
+    <string name="make_complain">Пожаловаться на вопрос</string>
     <string name="settings">Рейтинг</string>
     <string name="info">О приложении</string>
     <string name="packages">Мои пакеты вопросов</string>
     <string name="handInAnswer">Сдать ответ</string>
+    <string name="license">Лицензия</string>
+    <string name="send">Отправить</string>
+    <string name="question">Вопрос</string>
+    <string name="answer">Ответ</string>
+    <string name="complain">Жалоба</string>
 
 </resources>

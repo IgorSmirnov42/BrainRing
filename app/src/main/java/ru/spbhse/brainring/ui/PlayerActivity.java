@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Button;
 import android.widget.TextView;
@@ -17,6 +18,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 
 import ru.spbhse.brainring.R;
 import ru.spbhse.brainring.controllers.LocalController;
+import ru.spbhse.brainring.logic.LocalGameAdminLogic;
 
 public class PlayerActivity extends AppCompatActivity {
 
@@ -29,17 +31,20 @@ public class PlayerActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_player);
         LocalController.initializeLocalPlayer();
-        String color = getIntent().getStringExtra("color");
-
-        TextView textView = findViewById(R.id.tableColor);
-        textView.setText(color);
 
         LocalController.setUI(this);
 
+
         Button button = findViewById(R.id.buttonPush);
         button.setOnClickListener(v -> LocalController.LocalPlayerLogicController.answerButtonPushed());
+        String colorName = getIntent().getStringExtra("color");
+        if (colorName.equals(LocalGameAdminLogic.RED)) {
+            button.setBackgroundColor(ContextCompat.getColor(this, R.color.colorCardinal));
+        } else {
+            button.setBackgroundColor(ContextCompat.getColor(this, R.color.colorJungleGreen));
+        }
 
-        LocalController.LocalNetworkPlayerController.createLocalGame(color);
+        LocalController.LocalNetworkPlayerController.createLocalGame(colorName);
     }
 
     /* I know that this function is out of content here,

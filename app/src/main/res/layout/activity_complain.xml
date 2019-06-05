@@ -8,10 +8,11 @@
 
     <Button
         android:id="@+id/clearListButton"
-        android:layout_width="148dp"
-        android:layout_height="wrap_content"
-        android:text="Очистить список жалоб"
+        android:layout_width="150dp"
+        android:layout_height="100dp"
         android:background="@drawable/simple_button"
+        android:text="Очистить список жалоб"
+        android:textSize="20sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.824"
@@ -45,10 +46,11 @@
 
     <Button
         android:id="@+id/sendAllButton"
-        android:layout_width="134dp"
-        android:layout_height="wrap_content"
-        android:text="Отправить все жалобы"
+        android:layout_width="150dp"
+        android:layout_height="100dp"
         android:background="@drawable/simple_button"
+        android:text="Отправить все жалобы"
+        android:textSize="20sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.126"
