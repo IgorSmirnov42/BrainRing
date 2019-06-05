@@ -52,7 +52,9 @@ public class LocalNetworkAdmin extends LocalNetwork {
             @Override
             public void onLeftRoom(int i, @NonNull String s) {
                 Log.d("BrainRing", "Left room");
-                LocalController.finishLocalGameAsAdmin();
+                if (!gameIsFinished) {
+                    LocalController.finishLocalGame(true);
+                }
             }
 
             @Override
@@ -70,9 +72,13 @@ public class LocalNetworkAdmin extends LocalNetwork {
                 }
                 Games.getPlayersClient(LocalController.getJuryActivity(), googleSignInAccount)
                         .getCurrentPlayerId()
-                        .addOnSuccessListener(myPlayerId -> myParticipantId = room.getParticipantId(myPlayerId));
-                Log.d("BrainRing", "Start handshake");
-                handshake();
+                        .addOnSuccessListener(myPlayerId -> {
+                            myParticipantId = room.getParticipantId(myPlayerId);
+                            serverRoomConnected = true;
+                            if (p2pConnected == 2) {
+                                handshake();
+                            }
+                        });
             }
         };
     }
@@ -83,7 +89,10 @@ public class LocalNetworkAdmin extends LocalNetwork {
      * If it is a first message to server fills player's ids
      */
     @Override
-    protected void onMessageReceived(byte[] buf, String userId) {
+    protected void onMessageReceived(@NonNull byte[] buf, @NonNull String userId) {
+        if (gameIsFinished) {
+            return;
+        }
         Log.d("BrainRing", "Received message as admin!");
         if (!handshaked) {
             greenId = userId;
@@ -114,7 +123,6 @@ public class LocalNetworkAdmin extends LocalNetwork {
             }
         } catch (IOException e) {
             e.printStackTrace();
-            // TODO: нормальная обработка
         }
     }
 
@@ -142,7 +150,9 @@ public class LocalNetworkAdmin extends LocalNetwork {
      * Waits while the answer isn't received
      * After execution starts game cycle
      */
-    private void handshake() {
+    @Override
+    protected void handshake() {
+        Log.d("BrainRing", "Start handshake");
         byte[] message = new byte[0];
         Log.d("BrainRing", "Writing message");
         sendMessageToOthers(message);
@@ -154,8 +164,9 @@ public class LocalNetworkAdmin extends LocalNetwork {
     }
 
     @Override
-    public void leaveRoom() {
+    protected void leaveRoom() {
         if (room != null) {
+            Log.d("BrainRing","Leaving room");
             Games.getRealTimeMultiplayerClient(LocalController.getJuryActivity(),
                     googleSignInAccount).leave(mRoomConfig, room.getRoomId());
             room = null;

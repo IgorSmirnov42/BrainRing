@@ -31,7 +31,7 @@ public class LocalNetworkPlayer extends LocalNetwork {
      * Creates new instance of LocalNetworkPlayer.
      * @param myColor string "red" or "green"
      */
-    public LocalNetworkPlayer(String myColor) {
+    public LocalNetworkPlayer(@NonNull String myColor) {
         super();
 
         if (myColor.equals("green")) {
@@ -54,7 +54,9 @@ public class LocalNetworkPlayer extends LocalNetwork {
             @Override
             public void onLeftRoom(int i, @NonNull String s) {
                 Log.d("BrainRing", "Left room");
-                LocalController.finishLocalGameAsPlayer();
+                if (!gameIsFinished) {
+                    LocalController.finishLocalGame(true);
+                }
             }
 
             @Override
@@ -82,7 +84,10 @@ public class LocalNetworkPlayer extends LocalNetwork {
      * If it is a first message to player, sends response if green
      */
     @Override
-    protected void onMessageReceived(byte[] buf, String userId) {
+    protected void onMessageReceived(@NonNull byte[] buf, @NonNull String userId) {
+        if (gameIsFinished) {
+            return;
+        }
         Log.d("BrainRing","RECEIVED MESSAGE AS PLAYER!");
         if (!handshaked) {
             new Thread(() -> {
@@ -158,7 +163,7 @@ public class LocalNetworkPlayer extends LocalNetwork {
      * Sends message to server
      * If server is not known, does nothing
      */
-    public void sendMessageToServer(byte[] message) {
+    public void sendMessageToServer(@NonNull byte[] message) {
         if (serverId == null) {
             Log.d("BrainRing", "Sending message before handshake");
         } else {
@@ -167,11 +172,17 @@ public class LocalNetworkPlayer extends LocalNetwork {
     }
 
     @Override
-    public void leaveRoom() {
+    protected void leaveRoom() {
         if (room != null) {
+            Log.d("RainRing","Leaving room");
             Games.getRealTimeMultiplayerClient(LocalController.getPlayerActivity(),
                     googleSignInAccount).leave(mRoomConfig, room.getRoomId());
             room = null;
         }
+    }
+
+    @Override
+    protected void handshake() {
+        Log.wtf("BrainRing", "Handshake was called for player");
     }
 }
