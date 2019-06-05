@@ -39,7 +39,8 @@ public class ComplainActivity extends AppCompatActivity {
         sendAllButton.setOnClickListener(v -> {
             try {
                 MailSender.sendMail(this, "[Complain] Жалоба на несколько вопросов",
-                        ComplainsFileHandler.allReadable(ComplainsFileHandler.getAllQuestionsFromFile()));
+                        ComplainsFileHandler.allReadable(
+                                ComplainsFileHandler.getAllQuestionsFromFile(this)));
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (JSONException e) {
@@ -51,7 +52,7 @@ public class ComplainActivity extends AppCompatActivity {
         clearListButton.setOnClickListener(v -> {
             questions = new ArrayList<>();
             try {
-                ComplainsFileHandler.saveComplainsToFile(questions);
+                ComplainsFileHandler.saveComplainsToFile(questions, this);
             } catch (Exception e) {
                 e.printStackTrace();
                 finish();
@@ -69,7 +70,7 @@ public class ComplainActivity extends AppCompatActivity {
 
     private void showListOfQuestions() {
         try {
-            questions = ComplainsFileHandler.getAllQuestionsFromFile();
+            questions = ComplainsFileHandler.getAllQuestionsFromFile(this);
         } catch (Exception e) {
             Log.wtf("BrainRing", "Error while opening file");
             e.printStackTrace();
@@ -77,7 +78,8 @@ public class ComplainActivity extends AppCompatActivity {
             return;
         }
         ListView view = findViewById(R.id.questionsList);
-        ArrayAdapter<ComplainedQuestion> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, questions);
+        ArrayAdapter<ComplainedQuestion> adapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_list_item_1, questions);
         view.setAdapter(adapter);
     }
 }

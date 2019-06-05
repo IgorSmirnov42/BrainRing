@@ -16,21 +16,16 @@ import java.util.List;
 
 public class ComplainsFileHandler {
     private static final String filename = "complains.json";
-    private static Context context;
-
-    public static void setContext(@NonNull Context mainContext) {
-        context = mainContext;
-    }
 
     @NonNull
-    public static List<ComplainedQuestion> getAllQuestionsFromFile() throws IOException, JSONException {
+    public static List<ComplainedQuestion> getAllQuestionsFromFile(@NonNull Context context) throws IOException, JSONException {
         List<ComplainedQuestion> questions = new ArrayList<>();
         StringBuilder builder = new StringBuilder();
         // If file doesn't exist then create
         try {
             context.openFileInput(filename);
         } catch (IOException e) {
-            saveComplainsToFile(new ArrayList<>());
+            saveComplainsToFile(new ArrayList<>(), context);
         }
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(
                 context.openFileInput(filename)))) {
@@ -55,10 +50,11 @@ public class ComplainsFileHandler {
         return questions;
     }
 
-    public static void appendComplain(@NonNull ComplainedQuestion question) throws IOException, JSONException {
-        List<ComplainedQuestion> questions = getAllQuestionsFromFile();
+    public static void appendComplain(@NonNull ComplainedQuestion question,
+                                      @NonNull Context context) throws IOException, JSONException {
+        List<ComplainedQuestion> questions = getAllQuestionsFromFile(context);
         questions.add(question);
-        saveComplainsToFile(questions);
+        saveComplainsToFile(questions, context);
     }
 
     public static String allReadable(@NonNull List<ComplainedQuestion> questions) {
@@ -69,13 +65,14 @@ public class ComplainsFileHandler {
         return result.toString();
     }
 
-    private static void rewriteFile(@NonNull String text) throws IOException {
+    private static void rewriteFile(@NonNull String text, @NonNull Context context) throws IOException {
         try (FileOutputStream outputStream = context.openFileOutput(filename, Context.MODE_PRIVATE)) {
             outputStream.write(text.getBytes());
         }
     }
 
-    public static void saveComplainsToFile(@NonNull List<ComplainedQuestion> questions) throws IOException, JSONException {
+    public static void saveComplainsToFile(@NonNull List<ComplainedQuestion> questions,
+                                           @NonNull Context context) throws IOException, JSONException {
         List<JSONObject> complains = new ArrayList<>();
         for (ComplainedQuestion question : questions) {
             JSONObject jsonQuestion = new JSONObject();
@@ -88,6 +85,6 @@ public class ComplainsFileHandler {
 
         JSONArray array = new JSONArray(complains);
 
-        rewriteFile(array.toString());
+        rewriteFile(array.toString(), context);
     }
 }

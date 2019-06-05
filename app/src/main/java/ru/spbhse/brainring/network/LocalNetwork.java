@@ -15,7 +15,7 @@ import com.google.android.gms.games.multiplayer.realtime.RoomUpdateCallback;
 
 import java.util.List;
 
-import ru.spbhse.brainring.controllers.OnlineController;
+import ru.spbhse.brainring.controllers.LocalController;
 
 /** Class for interaction with network in local network mode */
 public abstract class LocalNetwork {
@@ -24,7 +24,10 @@ public abstract class LocalNetwork {
     protected static final int ROLE_RED = 1 << 2;
     private static final int TIMES_TO_SEND = 10000;
     /** Flag to determine if handshake was done */
-    protected boolean handshaked = false;
+    protected volatile boolean handshaked = false;
+    protected boolean gameIsFinished = false;
+    protected int p2pConnected = 0;
+    protected boolean serverRoomConnected = false;
     protected RoomConfig mRoomConfig;
     protected Room room;
     public GoogleSignInAccount googleSignInAccount;
@@ -59,7 +62,9 @@ public abstract class LocalNetwork {
         @Override
         public void onPeerLeft(@Nullable Room room, @NonNull List<String> list) {
             Log.d("BrainRing", "onPeerLeft");
-            leaveRoom();
+            if (!gameIsFinished) {
+                LocalController.finishLocalGame(true);
+            }
         }
 
         @Override
@@ -70,7 +75,9 @@ public abstract class LocalNetwork {
         @Override
         public void onDisconnectedFromRoom(@Nullable Room room) {
             Log.d("BrainRing", "onDisconnectedFromRoom");
-            leaveRoom();
+            if (!gameIsFinished) {
+                LocalController.finishLocalGame(true);
+            }
         }
 
         @Override
@@ -81,18 +88,25 @@ public abstract class LocalNetwork {
         @Override
         public void onPeersDisconnected(@Nullable Room room, @NonNull List<String> list) {
             Log.d("BrainRing", "onPeersDisconnected");
-            leaveRoom();
+            if (!gameIsFinished) {
+                LocalController.finishLocalGame(true);
+            }
         }
 
         @Override
         public void onP2PConnected(@NonNull String s) {
-            Log.d("BrainRing", "onP2PConnected");
+            Log.d("BrainRing", "onP2PConnected " + s);
+            ++p2pConnected;
+            if (serverRoomConnected && p2pConnected == 2) {
+                handshake();
+            }
         }
 
         @Override
         public void onP2PDisconnected(@NonNull String s) {
             Log.d("BrainRing", "onP2PDisconnected");
-            leaveRoom();
+            --p2pConnected;
+            LocalController.finishLocalGame(true);
         }
     };
 
@@ -105,31 +119,25 @@ public abstract class LocalNetwork {
     };
 
     /** Reacts on received message */
-    protected abstract void onMessageReceived(byte[] buf, String userId);
+    protected abstract void onMessageReceived(@NonNull byte[] buf, @NonNull String userId);
 
 
     abstract public void startQuickGame();
 
     /** Sends message to user with given id */
     public void sendMessageToConcreteUser(@NonNull String userId, @NonNull byte[] message) {
-        if (myParticipantId == null || room == null) {
-            Log.e("BrainRing", "Cannot send message before initialization");
-            return;
-        }
-        if (userId.equals(myParticipantId)) {
-            Log.d("BrainRing", "Sending message to myself");
-            onMessageReceived(message, myParticipantId);
-        } else {
-            Log.d("BrainRing", "Start sending message to " + userId);
-            sendMessageToConcreteUserNTimes(userId, message, TIMES_TO_SEND);
-        }
+        Log.d("BrainRing", "Start sending message to " + userId);
+        sendMessageToConcreteUserNTimes(userId, message, TIMES_TO_SEND);
     }
 
     private void sendMessageToConcreteUserNTimes(@NonNull String userId, @NonNull byte[] message,
                                                  int timesToSend) {
+        if (gameIsFinished) {
+            return;
+        }
         if (timesToSend < 0) {
             Log.wtf("BrainRing", "Failed to send message too many times. Finish game");
-            OnlineController.finishOnlineGame(true);
+            LocalController.finishLocalGame(true);
             return;
         }
         mRealTimeMultiplayerClient.sendReliableMessage(message, room.getRoomId(), userId, (i, i1, s) -> {
@@ -139,15 +147,25 @@ public abstract class LocalNetwork {
                         "Error is " + GamesCallbackStatusCodes.getStatusCodeString(i));
                 sendMessageToConcreteUserNTimes(userId, message, timesToSend - 1);
             } else {
-                Log.d("BrainRing", "Message to " + userId + " is delivered");
+                Log.d("BrainRing", "Message to " + userId + " is delivered. Took " +
+                        (TIMES_TO_SEND - timesToSend + 1) + " tries");
             }
         });
     }
 
-    abstract public void leaveRoom();
+    abstract protected void leaveRoom();
+
+    abstract protected void handshake();
+
+    public void finish() {
+        if (!gameIsFinished) {
+            gameIsFinished = true;
+            leaveRoom();
+        }
+    }
 
     /** Sends message to all users in a room except itself */
-    public void sendMessageToOthers(byte[] message) {
+    public void sendMessageToOthers(@NonNull byte[] message) {
         for (String participantId : room.getParticipantIds()) {
             if (!participantId.equals(myParticipantId)) {
                 sendMessageToConcreteUser(participantId, message);
