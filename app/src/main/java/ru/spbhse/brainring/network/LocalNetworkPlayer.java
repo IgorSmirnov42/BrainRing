@@ -45,11 +45,13 @@ public class LocalNetworkPlayer extends LocalNetwork {
             @Override
             public void onRoomCreated(int i, @Nullable Room room) {
                 Log.d("BrainRing", "Room was created");
+                LocalNetworkPlayer.this.room = room;
             }
 
             @Override
             public void onJoinedRoom(int i, @Nullable Room room) {
                 Log.d("BrainRing", "Joined room");
+                LocalNetworkPlayer.this.room = room;
             }
 
             @Override

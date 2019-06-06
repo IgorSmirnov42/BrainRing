@@ -37,31 +37,37 @@ public abstract class LocalNetwork {
         @Override
         public void onRoomConnecting(@Nullable Room room) {
             Log.d("BrainRing", "onRoomConnecting");
+            LocalNetwork.this.room = room;
         }
 
         @Override
         public void onRoomAutoMatching(@Nullable Room room) {
             Log.d("BrainRing", "onRoomAutoMatching");
+            LocalNetwork.this.room = room;
         }
 
         @Override
         public void onPeerInvitedToRoom(@Nullable Room room, @NonNull List<String> list) {
             Log.d("BrainRing", "onPeerInvitedToRoom");
+            LocalNetwork.this.room = room;
         }
 
         @Override
         public void onPeerDeclined(@Nullable Room room, @NonNull List<String> list) {
             Log.d("BrainRing", "onPeerDeclined");
+            LocalNetwork.this.room = room;
         }
 
         @Override
         public void onPeerJoined(@Nullable Room room, @NonNull List<String> list) {
             Log.d("BrainRing", "onPeerJoined");
+            LocalNetwork.this.room = room;
         }
 
         @Override
         public void onPeerLeft(@Nullable Room room, @NonNull List<String> list) {
             Log.d("BrainRing", "onPeerLeft");
+            LocalNetwork.this.room = room;
             if (!gameIsFinished) {
                 LocalController.finishLocalGame(true);
             }
@@ -70,11 +76,13 @@ public abstract class LocalNetwork {
         @Override
         public void onConnectedToRoom(@Nullable Room room) {
             Log.d("BrainRing", "onConnectedToRoom");
+            LocalNetwork.this.room = room;
         }
 
         @Override
         public void onDisconnectedFromRoom(@Nullable Room room) {
             Log.d("BrainRing", "onDisconnectedFromRoom");
+            LocalNetwork.this.room = room;
             if (!gameIsFinished) {
                 LocalController.finishLocalGame(true);
             }
@@ -83,11 +91,13 @@ public abstract class LocalNetwork {
         @Override
         public void onPeersConnected(@Nullable Room room, @NonNull List<String> list) {
             Log.d("BrainRing", "onPeersConnected");
+            LocalNetwork.this.room = room;
         }
 
         @Override
         public void onPeersDisconnected(@Nullable Room room, @NonNull List<String> list) {
             Log.d("BrainRing", "onPeersDisconnected");
+            LocalNetwork.this.room = room;
             if (!gameIsFinished) {
                 LocalController.finishLocalGame(true);
             }
