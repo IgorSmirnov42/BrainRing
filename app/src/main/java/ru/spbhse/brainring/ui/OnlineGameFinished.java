@@ -22,7 +22,6 @@ public class OnlineGameFinished extends AppCompatActivity {
         Button toSelectOnlineOpponentButton = findViewById(R.id.toSelectOnlineOpponent);
         toSelectOnlineOpponentButton.setOnClickListener(v -> {
             // Back to select opponent activity
-            super.onBackPressed();
             finish();
         });
     }
