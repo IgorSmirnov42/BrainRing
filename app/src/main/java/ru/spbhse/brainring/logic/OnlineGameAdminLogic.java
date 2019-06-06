@@ -25,6 +25,7 @@ public class OnlineGameAdminLogic {
     private int currentRound;
     private int questionNumber;
     private boolean published;
+    private int readyUsers;
     private List<AnswerTime> waitingAnswer= new ArrayList<>();
 
     private static final byte[] ALLOW_ANSWER;
@@ -34,16 +35,25 @@ public class OnlineGameAdminLogic {
     private static final byte[] CORRECT_ANSWER;
 
     static {
-        ALLOW_ANSWER = MessageGenerator.create().writeInt(Message.ALLOWED_TO_ANSWER).toByteArray();
-        FORBID_ANSWER = MessageGenerator.create().writeInt(Message.FORBIDDEN_TO_ANSWER).toByteArray();
-        TIME_START = MessageGenerator.create().writeInt(Message.TIME_START).toByteArray();
-        CORRECT_ANSWER = MessageGenerator.create().writeInt(Message.CORRECT_ANSWER).toByteArray();
-        OPPONENT_ANSWERING = MessageGenerator.create().writeInt(Message.OPPONENT_IS_ANSWERING).toByteArray();
+        ALLOW_ANSWER = MessageGenerator.create()
+                .writeInt(Message.ALLOWED_TO_ANSWER)
+                .toByteArray();
+        FORBID_ANSWER = MessageGenerator.create()
+                .writeInt(Message.FORBIDDEN_TO_ANSWER)
+                .toByteArray();
+        TIME_START = MessageGenerator.create()
+                .writeInt(Message.TIME_START)
+                .toByteArray();
+        CORRECT_ANSWER = MessageGenerator.create()
+                .writeInt(Message.CORRECT_ANSWER)
+                .toByteArray();
+        OPPONENT_ANSWERING = MessageGenerator.create()
+                .writeInt(Message.OPPONENT_IS_ANSWERING)
+                .toByteArray();
     }
 
     private static final int QUESTIONS_NUMBER_MIN = 5;
     private static final int SECOND = 1000;
-    private static final int TIME_TO_SHOW_ANSWER = 5;
     private static final int TIME_TO_READ_QUESTION = 10;
     private static final int DELIVERING_FAULT_MILLIS = 1000;
 
@@ -206,6 +216,7 @@ public class OnlineGameAdminLogic {
                     " ответил верно";
         }
         Log.d("BrainRing", "Question message:" + questionMessage);
+        readyUsers = 0;
         OnlineController.NetworkController.sendMessageToAll(
                 MessageGenerator.create()
                         .writeInt(Message.SENDING_CORRECT_ANSWER_AND_SCORE)
@@ -216,7 +227,6 @@ public class OnlineGameAdminLogic {
                         .writeString(questionMessage)
                         .toByteArray()
         );
-        new Handler().postDelayed(this::newQuestion, TIME_TO_SHOW_ANSWER * SECOND);
     }
 
     /** Determines if game is finished. If not, generates new question and sends it */
@@ -281,6 +291,13 @@ public class OnlineGameAdminLogic {
             showAnswer(null);
         }
         published = true;
+    }
+
+    public void onReadyForQuestion(@NonNull String userId) {
+        ++readyUsers;
+        if (readyUsers == 2) {
+            newQuestion();
+        }
     }
 
     public void finishGame() {

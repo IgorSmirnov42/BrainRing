@@ -60,24 +60,28 @@ public class OnlineController extends Controller {
     public static class OnlineAdminLogicController {
         private static OnlineGameAdminLogic adminLogic;
 
-        public static void onFalseStart(String userId) {
+        public static void onFalseStart(@NonNull String userId) {
             adminLogic.onFalseStart(userId);
         }
 
-        public static void onAnswerIsReady(String userId, long time) {
+        public static void onAnswerIsReady(@NonNull String userId, long time) {
             adminLogic.onAnswerIsReady(userId, time);
         }
 
-        public static void onAnswerIsWritten(String writtenAnswer, String id) {
+        public static void onAnswerIsWritten(@NonNull String writtenAnswer, String id) {
             adminLogic.onAnswerIsWritten(writtenAnswer, id);
         }
 
-        public static void onTimeLimit(int roundNumber, String userId) {
+        public static void onTimeLimit(int roundNumber, @NonNull String userId) {
             adminLogic.onTimeLimit(roundNumber, userId);
         }
 
         public static void publishing() {
             adminLogic.publishing();
+        }
+
+        public static void onReadyForQuestion(@NonNull String userId) {
+            adminLogic.onReadyForQuestion(userId);
         }
     }
 
@@ -87,6 +91,10 @@ public class OnlineController extends Controller {
 
         public static ComplainedQuestion getQuestionData() {
             return userLogic.getQuestionData();
+        }
+
+        public static void readyForQuestion() {
+            userLogic.readyForQuestion();
         }
 
         public static void onForbiddenToAnswer() {
