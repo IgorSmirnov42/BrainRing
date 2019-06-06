@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.StrictMode;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
@@ -79,8 +80,8 @@ public class OnlineGameActivity extends GameActivity {
             }
         } else if (requestCode == GamesActivityResultCodes.RESULT_LEFT_ROOM) {
             Log.d("BrainRing", "Left room from activity");
-            OnlineController.finishOnlineGame(true);
-            // TODO : добавить сообщение
+            OnlineController.finishOnlineGame();
+            OnlineController.NetworkController.finishImmediately("Игра прервана. Разорвано соединение с соперником.");
             finish();
         } else if (requestCode == GamesActivityResultCodes.RESULT_SEND_REQUEST_FAILED) {
             Log.d("BrainRing", "Send request failed");
@@ -89,10 +90,32 @@ public class OnlineGameActivity extends GameActivity {
         }
     }
 
+    public void onBackPressed() {
+        new AlertDialog.Builder(this).setTitle("Выход из игры по сети")
+                .setMessage("Вы хотите выйти?")
+                .setPositiveButton("Да", (dialog, which) -> {
+                    Intent intent = new Intent(OnlineGameActivity.this,
+                            SelectOnlineOpponentActivity.class);
+                    startActivity(intent);
+
+                    finish();
+                })
+                .setNegativeButton("Нет", (dialog, which) -> {
+                })
+                .show();
+    }
+
+    public void showGameFinishedActivity(@NonNull String message) {
+        Intent intent = new Intent(this, OnlineGameFinished.class);
+        intent.putExtra("message", message);
+        startActivity(intent);
+        finish();
+    }
+
     @Override
     protected void onStop() {
         Log.d("BrainRing", "Stopping activity. Leaving room");
         super.onStop();
-        OnlineController.finishOnlineGame(false);
+        OnlineController.finishOnlineGame();
     }
 }

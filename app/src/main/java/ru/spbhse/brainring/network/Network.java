@@ -2,6 +2,7 @@ package ru.spbhse.brainring.network;
 
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -29,6 +30,7 @@ import ru.spbhse.brainring.R;
 import ru.spbhse.brainring.controllers.OnlineController;
 import ru.spbhse.brainring.network.messages.Message;
 import ru.spbhse.brainring.network.messages.MessageGenerator;
+import ru.spbhse.brainring.network.messages.OnlineFinishCodes;
 
 import static com.google.android.gms.games.leaderboard.LeaderboardVariant.COLLECTION_PUBLIC;
 import static com.google.android.gms.games.leaderboard.LeaderboardVariant.TIME_SPAN_ALL_TIME;
@@ -50,16 +52,12 @@ public class Network {
     private static final int FIRST_HANDSHAKE_TIME = 5000; // first message may take longer time
     private static final int MAXIMUM_TIME_WITHOUT_MESSAGES = 80 * 1000;
     private static CountDownTimer timer;
-    private static final byte[] FINISH;
     private boolean gameIsFinished = false;
-    private boolean gameIsStarted = false;
     private int counterOfConnections = 0;
-    private static final int TIMES_TO_SEND = 10000;
+    private static final int TIMES_TO_SEND = 100;
+    private static final int WAIT_FOR_MESSAGE = 2000;
     private long handshakeStartTime;
 
-    static {
-        FINISH = MessageGenerator.create().writeInt(Message.FINISH).toByteArray();
-    }
 
     private RoomStatusUpdateCallback mRoomStatusUpdateCallback = new RoomStatusUpdateCallback() {
         @Override
@@ -90,9 +88,7 @@ public class Network {
         @Override
         public void onPeerLeft(@Nullable Room room, @NonNull List<String> list) {
             Log.d("BrainRing", "onPeerLeft");
-            if (!gameIsFinished) {
-                OnlineController.finishOnlineGame(true);
-            }
+            waitOrFinish();
         }
 
         @Override
@@ -103,9 +99,7 @@ public class Network {
         @Override
         public void onDisconnectedFromRoom(@Nullable Room room) {
             Log.d("BrainRing", "onDisconnectedFromRoom");
-            if (!gameIsFinished) {
-                OnlineController.finishOnlineGame(true);
-            }
+            waitOrFinish();
         }
 
         @Override
@@ -116,9 +110,7 @@ public class Network {
         @Override
         public void onPeersDisconnected(@Nullable Room room, @NonNull List<String> list) {
             Log.d("BrainRing", "onPeersDisconnected");
-            if (!gameIsFinished) {
-                OnlineController.finishOnlineGame(true);
-            }
+            waitOrFinish();
         }
 
         @Override
@@ -133,9 +125,7 @@ public class Network {
         @Override
         public void onP2PDisconnected(@NonNull String s) {
             Log.d("BrainRing", "onP2PDisconnected " + s);
-            if (!gameIsFinished) {
-                OnlineController.finishOnlineGame(true);
-            }
+            waitOrFinish();
         }
     };
     private RoomUpdateCallback mRoomUpdateCallback = new RoomUpdateCallback() {
@@ -153,9 +143,7 @@ public class Network {
         @Override
         public void onLeftRoom(int i, @NonNull String s) {
             Log.d("BrainRing", "Left room");
-            if (!gameIsFinished) {
-                OnlineController.finishOnlineGame(true);
-            }
+            waitOrFinish();
         }
 
         @Override
@@ -220,6 +208,9 @@ public class Network {
     }
 
     public void finish() {
+        if (gameIsFinished) {
+            return;
+        }
         gameIsFinished = true;
         if (timer != null) {
             timer.cancel();
@@ -302,9 +293,26 @@ public class Network {
                     OnlineController.OnlineAdminLogicController.onTimeLimit(roundNumber, userId);
                     break;
                 case Message.FINISH:
-                    if (!gameIsFinished) {
-                        OnlineController.finishOnlineGame(true);
+                    int finishCode = is.readInt();
+                    String message;
+                    switch (finishCode) {
+                        case OnlineFinishCodes.UNSUCCESSFUL_HANDSHAKE:
+                            message = "Игра прервана. Соединение с соперником слишком медленное.";
+                            break;
+                        case OnlineFinishCodes.SERVER_TIMER_TIMEOUT:
+                            message = "Игра прервана. Потеряно соединение или произошла непоправимая" +
+                                    " ошибка.";
+                            break;
+                        case OnlineFinishCodes.GAME_FINISHED_CORRECTLY_LOOSE:
+                            message = "Игра завершена. К сожалению, Вы проиграли.";
+                            break;
+                        case OnlineFinishCodes.GAME_FINISHED_CORRECTLY_WON:
+                            message = "Игра завершена. Вы победили!";
+                            break;
+                        default:
+                            message = "Игра прервана. Неизвестная ошибка.";
                     }
+                    finishImmediately(message);
                     break;
                 case Message.CORRECT_ANSWER:
                     ++scoreSum;
@@ -334,7 +342,15 @@ public class Network {
             @Override
             public void onFinish() {
                 if (timer == this) {
-                    sendMessageToAll(FINISH);
+                    if (counterOfConnections == 0) {
+                        finishImmediately("Соперник не найден");
+                    } else {
+                        sendMessageToAll(MessageGenerator.create()
+                                .writeInt(Message.FINISH)
+                                .writeInt(OnlineFinishCodes.SERVER_TIMER_TIMEOUT)
+                                .toByteArray()
+                        );
+                    }
                 }
             }
         };
@@ -387,10 +403,30 @@ public class Network {
         mRealTimeMultiplayerClient.create(mRoomConfig);
     }
 
+    private void waitOrFinish() {
+        if (gameIsFinished) {
+            return;
+        }
+        new Handler().postDelayed(() ->
+                finishImmediately("Игра прервана. Потеряно соединение с соперником."),
+                WAIT_FOR_MESSAGE);
+    }
+
+    public void finishImmediately(@NonNull String message) {
+        if (gameIsFinished) {
+            return;
+        }
+        OnlineController.finishOnlineGame();
+        OnlineController.showGameFinishedActivity(message);
+    }
+
     /** Sends message to all users in a room (and to itself). Guarantees delivering */
     public void sendMessageToAll(@NonNull byte[] message) {
-        sendMessageToConcreteUser(getOpponentParticipantId(), message);
-        onMessageReceived(message, getMyParticipantId());
+        // The order of sending is critical!
+        if (getOpponentParticipantId() != null) {
+            sendMessageToConcreteUser(getOpponentParticipantId(), message);
+        }
+        onMessageReceived(message, myParticipantId);
     }
 
     public void sendMessageToConcreteUser(@NonNull String userId, @NonNull byte[] message) {
@@ -414,7 +450,7 @@ public class Network {
         }
         if (timesToSend < 0) {
             Log.wtf("BrainRing", "Failed to send message too many times. Finish game");
-            OnlineController.finishOnlineGame(true);
+            finishImmediately("Игра прервана. Потеряна связь с соперником.");
             return;
         }
         mRealTimeMultiplayerClient.sendReliableMessage(message, room.getRoomId(), userId, (i, i1, s) -> {
@@ -446,7 +482,11 @@ public class Network {
             public void onFinish() {
                 if (handshakeTimer == this) { // check in case message was delivered right before finish
                     Log.wtf("BrainRing", "Unsuccessful handshake");
-                    OnlineController.finishOnlineGame(true);
+                    sendMessageToAll(MessageGenerator.create()
+                            .writeInt(Message.FINISH)
+                            .writeInt(OnlineFinishCodes.UNSUCCESSFUL_HANDSHAKE)
+                            .toByteArray()
+                    );
                 }
             }
         };
@@ -480,6 +520,9 @@ public class Network {
     }
 
     public String getOpponentParticipantId() {
+        if (room == null) {
+            return null;
+        }
         for (String participantId : room.getParticipantIds()) {
             if (!participantId.equals(myParticipantId)) {
                 return participantId;
