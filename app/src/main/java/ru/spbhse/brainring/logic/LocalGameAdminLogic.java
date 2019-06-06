@@ -38,6 +38,7 @@ public class LocalGameAdminLogic {
         FALSE_START = MessageGenerator.create().writeInt(Message.FALSE_START).toByteArray();
         TIME_START = MessageGenerator.create().writeInt(Message.TIME_START).toByteArray();
     }
+
     private final int firstCountdown;
     private final int secondCountdown;
     private static final int SECOND = 1000;

@@ -68,6 +68,9 @@
         <activity
             android:name=".ui.TrainingGamePreparationActivity"
             android:screenOrientation="portrait" />
+        <activity
+            android:name=".ui.OnlineGameFinished"
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>

@@ -282,11 +282,7 @@ public class Network {
                     OnlineController.OnlineAdminLogicController.onFalseStart(userId);
                     break;
                 case Message.HANDSHAKE:
-                    if (isServer) {
-                        continueGame();
-                    } else {
-                        Log.wtf("BrainRing", "Unexpected message");
-                    }
+                    continueGame();
                     break;
                 case Message.TIME_LIMIT:
                     int roundNumber = is.readInt();
@@ -316,6 +312,9 @@ public class Network {
                     break;
                 case Message.CORRECT_ANSWER:
                     ++scoreSum;
+                    break;
+                case Message.READY_FOR_QUESTION:
+                    OnlineController.OnlineAdminLogicController.onReadyForQuestion(userId);
                     break;
             }
 

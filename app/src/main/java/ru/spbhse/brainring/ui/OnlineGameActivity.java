@@ -7,6 +7,7 @@ import android.os.StrictMode;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
+import android.widget.Button;
 
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -16,6 +17,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.games.GamesActivityResultCodes;
 
+import ru.spbhse.brainring.R;
 import ru.spbhse.brainring.controllers.DatabaseController;
 import ru.spbhse.brainring.controllers.OnlineController;
 import ru.spbhse.brainring.database.QuestionDatabase;
@@ -110,6 +112,16 @@ public class OnlineGameActivity extends GameActivity {
         intent.putExtra("message", message);
         startActivity(intent);
         finish();
+    }
+
+    @Override
+    protected void drawLocation() {
+        super.drawLocation();
+        if (currentLocation == GameActivityLocation.SHOW_ANSWER) {
+            Button continueGameButton = findViewById(R.id.continueGameButton);
+            continueGameButton.setOnClickListener(v ->
+                    OnlineController.OnlineUserLogicController.readyForQuestion());
+        }
     }
 
     @Override
