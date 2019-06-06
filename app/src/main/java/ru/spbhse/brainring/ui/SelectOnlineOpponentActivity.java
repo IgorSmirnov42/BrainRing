@@ -21,5 +21,11 @@ public class SelectOnlineOpponentActivity extends AppCompatActivity {
         });
     }
 
-
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent(SelectOnlineOpponentActivity.this,
+                MainActivity.class);
+        startActivity(intent);
+        finish();
+    }
 }

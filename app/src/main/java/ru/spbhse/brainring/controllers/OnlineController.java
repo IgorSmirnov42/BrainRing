@@ -31,7 +31,7 @@ public class OnlineController extends Controller {
         OnlineAdminLogicController.adminLogic.newQuestion();
     }
 
-    public static void finishOnlineGame(boolean clearUI) {
+    public static void finishOnlineGame() {
         if (OnlineAdminLogicController.adminLogic != null) {
             Log.d("BrainRing","Clearing admin logic");
             OnlineAdminLogicController.adminLogic.finishGame();
@@ -47,9 +47,14 @@ public class OnlineController extends Controller {
             NetworkController.network.finish();
             NetworkController.network = null;
         }
-        if (clearUI && onlineGameActivity != null) {
-            finishActivity(onlineGameActivity.get());
+    }
+
+    public static void showGameFinishedActivity(@NonNull String message) {
+        if (onlineGameActivity == null) {
+            Log.wtf("BrainRing", "Online activity is null but shouldn't");
+            return;
         }
+        onlineGameActivity.get().showGameFinishedActivity(message);
     }
 
     public static class OnlineAdminLogicController {
@@ -203,6 +208,10 @@ public class OnlineController extends Controller {
 
         public static String getParticipantName(@NonNull String userId) {
             return network.getParticipantName(userId);
+        }
+
+        public static void finishImmediately(@NonNull String message) {
+            network.finishImmediately(message);
         }
 
         public static void createOnlineGame() {
