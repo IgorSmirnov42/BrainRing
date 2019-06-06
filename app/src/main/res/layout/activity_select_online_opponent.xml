@@ -9,9 +9,11 @@
 
     <Button
         android:id="@+id/searchOpponentButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Поиск оппонента"
+        android:layout_width="238dp"
+        android:layout_height="189dp"
+        android:background="@drawable/simple_button"
+        android:text="начать поиск оппонента"
+        android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"

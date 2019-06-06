@@ -3,7 +3,6 @@ package ru.spbhse.brainring.ui;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.view.View;
 import android.widget.Button;
 
 import ru.spbhse.brainring.R;
@@ -16,14 +15,17 @@ public class SelectOnlineOpponentActivity extends AppCompatActivity {
         setContentView(R.layout.activity_select_online_opponent);
 
         Button searchOpponentButton = findViewById(R.id.searchOpponentButton);
-        searchOpponentButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(SelectOnlineOpponentActivity.this, OnlineGameActivity.class);
-                startActivity(intent);
-            }
+        searchOpponentButton.setOnClickListener(v -> {
+            Intent intent = new Intent(SelectOnlineOpponentActivity.this, OnlineGameActivity.class);
+            startActivity(intent);
         });
     }
 
-
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent(SelectOnlineOpponentActivity.this,
+                MainActivity.class);
+        startActivity(intent);
+        finish();
+    }
 }

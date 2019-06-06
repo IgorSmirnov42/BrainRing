@@ -4,8 +4,10 @@ import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.StrictMode;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
+import android.widget.Button;
 
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -15,6 +17,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.games.GamesActivityResultCodes;
 
+import ru.spbhse.brainring.R;
 import ru.spbhse.brainring.controllers.DatabaseController;
 import ru.spbhse.brainring.controllers.OnlineController;
 import ru.spbhse.brainring.database.QuestionDatabase;
@@ -45,16 +48,6 @@ public class OnlineGameActivity extends GameActivity {
 
         OnlineController.NetworkController.createOnlineGame();
     }
-
-    /*public String getWhatWritten() {
-        EditText answerEditor = findViewById(R.id.answerEditor);
-        if (answerEditor != null) {
-            return answerEditor.getText().toString();
-        } else {
-            Log.wtf("BrainRing", "Answer editing wasn't open but should");
-            return "";
-        }
-    }*/
 
     /* I know that this function is out of content here,
        but it is linked with onActivityResult that can be placed only here */
@@ -89,7 +82,9 @@ public class OnlineGameActivity extends GameActivity {
             }
         } else if (requestCode == GamesActivityResultCodes.RESULT_LEFT_ROOM) {
             Log.d("BrainRing", "Left room from activity");
-            OnlineController.NetworkController.leaveRoom();
+            OnlineController.finishOnlineGame();
+            OnlineController.NetworkController.finishImmediately("Игра прервана. Разорвано соединение с соперником.");
+            finish();
         } else if (requestCode == GamesActivityResultCodes.RESULT_SEND_REQUEST_FAILED) {
             Log.d("BrainRing", "Send request failed");
         } else if (requestCode == GamesActivityResultCodes.RESULT_NETWORK_FAILURE) {
@@ -97,10 +92,42 @@ public class OnlineGameActivity extends GameActivity {
         }
     }
 
+    public void onBackPressed() {
+        new AlertDialog.Builder(this).setTitle("Выход из игры по сети")
+                .setMessage("Вы хотите выйти?")
+                .setPositiveButton("Да", (dialog, which) -> {
+                    Intent intent = new Intent(OnlineGameActivity.this,
+                            SelectOnlineOpponentActivity.class);
+                    startActivity(intent);
+
+                    finish();
+                })
+                .setNegativeButton("Нет", (dialog, which) -> {
+                })
+                .show();
+    }
+
+    public void showGameFinishedActivity(@NonNull String message) {
+        Intent intent = new Intent(this, OnlineGameFinished.class);
+        intent.putExtra("message", message);
+        startActivity(intent);
+        finish();
+    }
+
+    @Override
+    protected void drawLocation() {
+        super.drawLocation();
+        if (currentLocation == GameActivityLocation.SHOW_ANSWER) {
+            Button continueGameButton = findViewById(R.id.continueGameButton);
+            continueGameButton.setOnClickListener(v ->
+                    OnlineController.OnlineUserLogicController.readyForQuestion());
+        }
+    }
+
     @Override
     protected void onStop() {
         Log.d("BrainRing", "Stopping activity. Leaving room");
         super.onStop();
-        OnlineController.NetworkController.leaveRoom();
+        OnlineController.finishOnlineGame();
     }
 }

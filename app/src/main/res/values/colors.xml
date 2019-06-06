@@ -3,4 +3,14 @@
     <color name="colorPrimary">#008577</color>
     <color name="colorPrimaryDark">#00574B</color>
     <color name="colorAccent">#D81B60</color>
+    <color name="colorDarkGray">#5B5B5B</color>
+    <color name="colorLightGray">#7D7C7A</color>
+    <color name="colorVanilla">#C9C19F</color>
+    <color name="colorPastelRed">#FF6663</color>
+    <color name="colorDesire">#E84855</color>
+    <color name="colorJungleGreen">#1B998B</color>
+    <color name="colorChampagne">#F6F1D1</color>
+    <color name="colorBlackOlive">#393E41</color>
+    <color name="colorSoftWhite">#F8F4E3</color>
+    <color name="colorCardinal">#C52233</color>
 </resources>

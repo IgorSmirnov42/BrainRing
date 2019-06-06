@@ -7,41 +7,54 @@
     android:keepScreenOn="true"
     tools:context=".ui.Judging">
 
-    <Button
-        android:id="@+id/acceptButton"
-        android:layout_width="203dp"
-        android:layout_height="121dp"
-        android:text="Принять ответ"
-        android:textSize="24sp"
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="160dp"
+        android:layout_marginTop="424dp"
+        android:layout_weight="1"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.116" />
+        app:layout_constraintVertical_bias="1.0">
 
-    <Button
-        android:id="@+id/rejectButton"
-        android:layout_width="258dp"
-        android:layout_height="122dp"
-        android:layout_marginStart="76dp"
-        android:text="Отклонить ответ"
-        android:textSize="24sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/acceptButton"
-        app:layout_constraintVertical_bias="0.223" />
+        <Button
+            android:id="@+id/acceptButton"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="15dp"
+            android:layout_marginEnd="15dp"
+            android:layout_marginBottom="15dp"
+            android:layout_weight="1"
+            android:background="@drawable/simple_button"
+            android:text="Принять\nответ"
+            android:textSize="18sp" />
+
+        <Button
+            android:id="@+id/rejectButton"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="15dp"
+            android:layout_marginEnd="15dp"
+            android:layout_marginBottom="15dp"
+            android:layout_weight="1"
+            android:background="@drawable/simple_button"
+            android:text="Отклонить\nответ"
+            android:textSize="18sp" />
+    </LinearLayout>
 
     <TextView
         android:id="@+id/answeringId"
-        android:layout_width="250dp"
-        android:layout_height="108dp"
+        android:layout_width="267dp"
+        android:layout_height="155dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="460dp"
         android:textAlignment="center"
-        android:textSize="70sp"
+        android:textSize="40sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintHorizontal_bias="0.496"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/rejectButton" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.98" />
 </android.support.constraint.ConstraintLayout>

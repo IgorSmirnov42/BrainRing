@@ -15,4 +15,5 @@ public class Message {
     public static final int FINISH = 11;
     public static final int HANDSHAKE = 12;
     public static final int CORRECT_ANSWER = 13;
+    public static final int READY_FOR_QUESTION = 14;
 }

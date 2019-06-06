@@ -13,25 +13,39 @@ import ru.spbhse.brainring.network.messages.Message;
 import ru.spbhse.brainring.network.messages.MessageGenerator;
 import ru.spbhse.brainring.ui.GameActivityLocation;
 
-/** Realizing user logic in online mode */
+/**
+ * Realizing user logic in online mode.
+ * Most of timers are placed here
+ */
 public class OnlineGameUserLogic {
     private String currentQuestionText;
     private int currentQuestionId;
     private String currentQuestionAnswer;
     private long startQuestionTime;
     private boolean questionReceived;
+    private boolean readyForQuestion;
     private boolean timeStarted;
-    private static final byte[] HANDSHAKE;
+    private static final int TIME_TO_SHOW_ANSWER = 10;
     private static final int TIME_TO_WRITE_ANSWER = 20;
     private static final int FIRST_COUNTDOWN = 20;
     private static final int SECOND_COUNTDOWN = 20;
     private static final int SENDING_COUNTDOWN = 5;
     private static final int SECOND = 1000;
     private static final byte[] FALSE_START;
+    private static final byte[] HANDSHAKE;
+    private static final byte[] READY_FOR_QUESTION;
+
 
     static {
-        HANDSHAKE = MessageGenerator.create().writeInt(Message.HANDSHAKE).toByteArray();
-        FALSE_START = MessageGenerator.create().writeInt(Message.FALSE_START).toByteArray();
+        HANDSHAKE = MessageGenerator.create()
+                .writeInt(Message.HANDSHAKE)
+                .toByteArray();
+        FALSE_START = MessageGenerator.create()
+                .writeInt(Message.FALSE_START)
+                .toByteArray();
+        READY_FOR_QUESTION = MessageGenerator.create()
+                .writeInt(Message.READY_FOR_QUESTION)
+                .toByteArray();
     }
 
     private CountDownTimer timer;
@@ -48,14 +62,28 @@ public class OnlineGameUserLogic {
     }
 
     private void onFalseStart() {
-        Toast.makeText(OnlineController.getOnlineGameActivity(), "Фальстарт!", Toast.LENGTH_LONG).show();
+        Toast.makeText(OnlineController.getOnlineGameActivity(), "Фальстарт!",
+                Toast.LENGTH_LONG).show();
         OnlineController.NetworkController.sendMessageToServer(FALSE_START);
+    }
+
+    public void readyForQuestion() {
+        if (readyForQuestion) {
+            return;
+        }
+        if (timer != null) {
+            timer.cancel();
+            timer = null;
+        }
+        readyForQuestion = true;
+        OnlineController.NetworkController.sendMessageToServer(READY_FOR_QUESTION);
     }
 
     public void onTimeStart() {
         timeStarted = true;
         new Thread(() -> {
-            MediaPlayer player = MediaPlayer.create(OnlineController.getOnlineGameActivity(), R.raw.start);
+            MediaPlayer player = MediaPlayer.create(OnlineController.getOnlineGameActivity(),
+                    R.raw.start);
             player.setOnCompletionListener(MediaPlayer::release);
             player.start();
         }).start();
@@ -65,19 +93,19 @@ public class OnlineGameUserLogic {
                 SECOND) {
             @Override
             public void onTick(long millisUntilFinished) {
-                //if (timer == this) {
+                if (timer == this) {
                     if (millisUntilFinished <= SENDING_COUNTDOWN * SECOND) {
                         onReceivingTick(millisUntilFinished / SECOND);
                     }
-                //}
+                }
             }
 
             @Override
             public void onFinish() {
-                //if (timer == this) {
+                if (timer == this) {
                     Log.d("BrainRing", "Finish first timer");
                     sendTimeLimitedAnswer(1);
-                //}
+                }
             }
         };
         timer.start();
@@ -85,7 +113,8 @@ public class OnlineGameUserLogic {
 
     private void onReceivingTick(long secondsLeft) {
         new Thread(() -> {
-            MediaPlayer player = MediaPlayer.create(OnlineController.getOnlineGameActivity(), R.raw.countdown);
+            MediaPlayer player = MediaPlayer.create(OnlineController.getOnlineGameActivity(),
+                    R.raw.countdown);
             player.setOnCompletionListener(MediaPlayer::release);
             player.start();
         }).start();
@@ -103,9 +132,9 @@ public class OnlineGameUserLogic {
 
             @Override
             public void onFinish() {
-                //if (timer == this) {
+                if (timer == this) {
                     answerIsWritten(OnlineController.OnlineUIController.getWhatWritten());
-                //}
+                }
             }
         };
         timer.start();
@@ -113,15 +142,15 @@ public class OnlineGameUserLogic {
 
     /** Gets question and prints it on the screen */
     public void onReceivingQuestion(int questionId, @NonNull String question) {
+        if (!OnlineController.NetworkController.iAmServer()) {
+            OnlineController.NetworkController.sendMessageToServer(HANDSHAKE);
+        }
         currentQuestionId = questionId;
         currentQuestionText = question;
         currentQuestionAnswer = null;
         OnlineController.OnlineUIController.onNewQuestion();
         OnlineController.OnlineUIController.setQuestionText(question);
         OnlineController.OnlineUIController.setLocation(GameActivityLocation.SHOW_QUESTION);
-        if (!OnlineController.NetworkController.iAmServer()) {
-            OnlineController.NetworkController.sendMessageToServer(HANDSHAKE);
-        }
 
         questionReceived = true;
         timeStarted = false;
@@ -137,19 +166,19 @@ public class OnlineGameUserLogic {
                 SECOND) {
             @Override
             public void onTick(long millisUntilFinished) {
-                //if (timer == this) {
+                if (timer == this) {
                     if (millisUntilFinished <= SENDING_COUNTDOWN * SECOND) {
                         onReceivingTick(millisUntilFinished / SECOND);
                     }
-                //}
+                }
             }
 
             @Override
             public void onFinish() {
-                //if (timer == this) {
+                if (timer == this) {
                     Log.d("BrainRing", "Finish second timer");
                     sendTimeLimitedAnswer(2);
-                //}
+                }
             }
         };
         timer.start();
@@ -170,13 +199,18 @@ public class OnlineGameUserLogic {
                                   @NonNull String correctAnswer,
                                   @NonNull String comment,
                                   @NonNull String questionMessage) {
+        readyForQuestion = false;
         questionReceived = false;
         timeStarted = false;
-        timer = null;
+        if (timer != null) {
+            timer.cancel();
+            timer = null;
+        }
         currentQuestionAnswer = correctAnswer;
 
         new Thread(() -> {
-            MediaPlayer player = MediaPlayer.create(OnlineController.getOnlineGameActivity(), R.raw.beep);
+            MediaPlayer player = MediaPlayer.create(OnlineController.getOnlineGameActivity(),
+                    R.raw.beep);
             player.setOnCompletionListener(MediaPlayer::release);
             player.start();
         }).start();
@@ -186,6 +220,21 @@ public class OnlineGameUserLogic {
         } else {
             OnlineController.OnlineUIController.setScore(secondUserScore, firstUserScore);
         }
+
+        timer = new CountDownTimer(TIME_TO_SHOW_ANSWER * SECOND,
+                TIME_TO_SHOW_ANSWER * SECOND) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+            }
+
+            @Override
+            public void onFinish() {
+                if (timer == this) {
+                    readyForQuestion();
+                }
+            }
+        };
+        timer.start();
 
         OnlineController.OnlineUIController.setQuestionResult(questionMessage);
         OnlineController.OnlineUIController.setComment(comment);

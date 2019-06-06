@@ -6,6 +6,13 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <!--<item name="android:background">@color/colorChampagne</item>-->
+    </style>
+
+    <style name="GrayText" parent="TextAppearance.AppCompat">
+        <item name="android:color">@color/colorBlackOlive</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textStyle">bold</item>
     </style>
 
 </resources>

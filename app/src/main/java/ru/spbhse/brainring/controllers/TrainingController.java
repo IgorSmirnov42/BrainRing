@@ -23,7 +23,6 @@ public class TrainingController extends Controller {
 
     public static void createTrainingGame() {
         TrainingLogicController.trainingPlayerLogic = new TrainingPlayerLogic();
-        TrainingLogicController.trainingPlayerLogic.newQuestion();
     }
 
     public static class TrainingLogicController implements GameController {
@@ -37,8 +36,12 @@ public class TrainingController extends Controller {
             return gameController;
         }
 
-        public static void setAnswerTime(int answerTime) {
-            trainingPlayerLogic.setAnswerTime(answerTime);
+        public static void setReadingTime(int readingTime) {
+            trainingPlayerLogic.setReadingTime(readingTime);
+        }
+
+        public static void newQuestion() {
+            trainingPlayerLogic.newQuestion();
         }
 
         @Override

@@ -14,6 +14,8 @@
         android:maxLines="100"
         android:scrollbars="vertical"
         android:text="Тут должен быть вопрос"
+        android:textColor="@color/colorDarkGray"
+        android:textSize="14sp"
         android:textAlignment="center"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -23,13 +25,18 @@
 
     <Button
         android:id="@+id/answerWrittenButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="204dp"
-        android:text="Кнопка готовности ответа"
+        android:layout_width="134dp"
+        android:layout_height="62dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/simple_button"
+        android:text="@string/handInAnswer"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintHorizontal_bias="0.505"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/answerEditor"
+        app:layout_constraintVertical_bias="0.13999999" />
 
     <EditText
         android:id="@+id/answerEditor"

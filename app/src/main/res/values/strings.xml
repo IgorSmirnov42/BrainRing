@@ -1,11 +1,19 @@
 <resources>
     <string name="app_name">Брейн-Ринг</string>
-    <string name="train">Тренировка</string>
-    <string name="net">Игра по сети</string>
-    <string name="local">Игра по локальной сети</string>
-    <string name="complain">Пожаловаться на вопрос</string>
+    <string name="training_title">Тренировка</string>
+    <string name="net_title">Игра по сети</string>
+    <string name="local_title">Локальная игра</string>
+    <string name="make_complain">Пожаловаться на вопрос</string>
     <string name="settings">Рейтинг</string>
     <string name="info">О приложении</string>
     <string name="packages">Мои пакеты вопросов</string>
+    <string name="handInAnswer">Сдать ответ</string>
+    <string name="license">Лицензия</string>
+    <string name="send">Отправить</string>
+    <string name="question">Вопрос</string>
+    <string name="answer">Ответ</string>
+    <string name="complain">Жалоба</string>
+    <string name="select_packages_info">Введите ссылку на пакет из базы вопросов <a href="https://db.chgk.info/tour"> db.chgk.info</a> (требует наличия интернета) \n\nПример:\n<a href = "https://db.chgk.info/tour/znat09br"> https://db.chgk.info/tour/znat09br </a></string>
+    <string name="base_package">Стандартный пакет</string>
 
 </resources>

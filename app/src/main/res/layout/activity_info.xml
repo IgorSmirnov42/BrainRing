@@ -1,21 +1,133 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.InfoActivity">
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:orientation="horizontal">
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/cardViewLocal"
+            android:layout_width="0dp"
+            android:layout_height="60dp"
+            android:layout_weight="1"
+            app:cardCornerRadius="1dp"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:layout_editor_absoluteY="-55dp" >
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text = "@string/local_title"
+                android:textSize="12sp"
+                android:gravity="center"
+                android:textAppearance="@style/GrayText" />
+        </android.support.v7.widget.CardView>
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/cardViewTraining"
+            android:layout_width="0dp"
+            android:layout_height="60dp"
+            android:layout_weight="1"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:layout_editor_absoluteY="-55dp" >
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text = "@string/training_title"
+                android:textSize="12sp"
+                android:gravity="center"
+                android:textAppearance="@style/GrayText"
+                android:textAlignment="center"/>
+
+        </android.support.v7.widget.CardView>
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/cardViewNet"
+            android:layout_width="0dp"
+            android:layout_height="60dp"
+            android:layout_weight="1"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:layout_editor_absoluteY="-55dp" >
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text = "@string/net_title"
+                android:textSize="12sp"
+                android:gravity="center"
+                android:textAppearance="@style/GrayText"
+                android:textAlignment="center"/>
+
+        </android.support.v7.widget.CardView>
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/cardViewLicense"
+            android:layout_width="0dp"
+            android:layout_height="60dp"
+            android:layout_weight="1"   
+            app:layout_constraintStart_toStartOf="parent"
+            tools:layout_editor_absoluteY="-55dp" >
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text = "@string/license"
+                android:textSize="12sp"
+                android:gravity="center"
+                android:textAppearance="@style/GrayText"
+                android:textAlignment="center"/>
+
+        </android.support.v7.widget.CardView>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="10dp"
+        android:gravity="bottom">
+
+        <View
+            android:id="@+id/viewLocalInfo"
+            android:layout_width="0dp"
+            android:layout_height="3dp"
+            android:layout_weight="1"
+            android:background="@color/colorVanilla" />
+
+        <View
+            android:id="@+id/viewTrainingInfo"
+            android:layout_width="0dp"
+            android:layout_height="3dp"
+            android:layout_weight="1"
+            android:background="@color/colorVanilla" />
+
+        <View
+            android:id="@+id/viewNetInfo"
+            android:layout_width="0dp"
+            android:layout_height="3dp"
+            android:layout_weight="1"
+            android:background="@color/colorVanilla" />
+
+        <View
+            android:id="@+id/viewLicenseInfo"
+            android:layout_width="0dp"
+            android:layout_height="3dp"
+            android:layout_weight="1"
+            android:background="@color/colorVanilla" />
+    </LinearLayout>
 
     <TextView
-        android:id="@+id/infoView"
-        android:layout_width="361dp"
-        android:layout_height="661dp"
-        android:maxLines="100"
+        android:id="@+id/textInfo"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
         android:scrollbars="vertical"
-        android:textSize="18sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-</android.support.constraint.ConstraintLayout>
+        android:textColor="@color/colorBlackOlive"
+        android:textSize="16sp" />
+</LinearLayout>

@@ -1,6 +1,7 @@
 package ru.spbhse.brainring.controllers;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -21,7 +22,7 @@ public class OnlineController extends Controller {
         return onlineGameActivity.get();
     }
 
-    public static void setUI(OnlineGameActivity ui) {
+    public static void setUI(@Nullable OnlineGameActivity ui) {
         onlineGameActivity = new WeakReference<>(ui);
     }
 
@@ -32,43 +33,55 @@ public class OnlineController extends Controller {
 
     public static void finishOnlineGame() {
         if (OnlineAdminLogicController.adminLogic != null) {
+            Log.d("BrainRing","Clearing admin logic");
             OnlineAdminLogicController.adminLogic.finishGame();
             OnlineAdminLogicController.adminLogic = null;
         }
         if (OnlineUserLogicController.userLogic != null) {
+            Log.d("BrainRing","Clearing user logic");
             OnlineUserLogicController.userLogic.finishGame();
             OnlineUserLogicController.userLogic = null;
         }
         if (NetworkController.network != null) {
-            NetworkController.network.updateRating();
+            Log.d("BrainRing","Clearing network");
+            NetworkController.network.finish();
             NetworkController.network = null;
         }
-        if (onlineGameActivity != null) {
-            finishActivity(onlineGameActivity.get());
+    }
+
+    public static void showGameFinishedActivity(@NonNull String message) {
+        if (onlineGameActivity == null) {
+            Log.wtf("BrainRing", "Online activity is null but shouldn't");
+            return;
         }
+        onlineGameActivity.get().showGameFinishedActivity(message);
     }
 
     public static class OnlineAdminLogicController {
         private static OnlineGameAdminLogic adminLogic;
 
-        public static void onFalseStart(String userId) {
+        public static void onFalseStart(@NonNull String userId) {
             adminLogic.onFalseStart(userId);
         }
 
-        public static void onAnswerIsReady(String userId, long time) {
+        public static void onAnswerIsReady(@NonNull String userId, long time) {
             adminLogic.onAnswerIsReady(userId, time);
         }
 
-        public static void onAnswerIsWritten(String writtenAnswer, String id) {
+        public static void onAnswerIsWritten(@NonNull String writtenAnswer, String id) {
             adminLogic.onAnswerIsWritten(writtenAnswer, id);
         }
 
-        public static void onTimeLimit(int roundNumber, String userId) {
+        public static void onTimeLimit(int roundNumber, @NonNull String userId) {
             adminLogic.onTimeLimit(roundNumber, userId);
         }
 
         public static void publishing() {
             adminLogic.publishing();
+        }
+
+        public static void onReadyForQuestion(@NonNull String userId) {
+            adminLogic.onReadyForQuestion(userId);
         }
     }
 
@@ -78,6 +91,10 @@ public class OnlineController extends Controller {
 
         public static ComplainedQuestion getQuestionData() {
             return userLogic.getQuestionData();
+        }
+
+        public static void readyForQuestion() {
+            userLogic.readyForQuestion();
         }
 
         public static void onForbiddenToAnswer() {
@@ -201,8 +218,13 @@ public class OnlineController extends Controller {
             return network.getParticipantName(userId);
         }
 
+        public static void finishImmediately(@NonNull String message) {
+            network.finishImmediately(message);
+        }
+
         public static void createOnlineGame() {
             network = new Network();
+            Log.d("BrainRing", "Network: " + network);
             OnlineUserLogicController.userLogic = new OnlineGameUserLogic();
             onlineGameActivity.get().signIn();
         }
@@ -213,10 +235,9 @@ public class OnlineController extends Controller {
             }
         }
 
-        public static void leaveRoom() {
+        public static void finish() {
             if (network != null) {
-                network.updateRating();
-                network.leaveRoom();
+                network.finish();
             }
         }
 
@@ -234,6 +255,7 @@ public class OnlineController extends Controller {
         }
 
         public static void startGame() {
+            Log.d("BrainRing", "StartQuick network: " + network);
             network.startQuickGame();
         }
 

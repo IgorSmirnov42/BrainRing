@@ -1,51 +1,91 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".ui.MainActivity">
+    android:layout_height="500dp"
+    android:orientation="vertical">
 
-    <LinearLayout
+    <Button
+        android:id="@+id/netButton"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_height="0dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginBottom="10dp"
+        android:layout_weight="1"
+        android:background="@drawable/simple_button"
+        android:text="@string/net_title"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:layout_editor_absoluteY="0dp" />
 
-        <Button
-            android:id="@+id/trainButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/train" />
+    <Button
+        android:id="@+id/localButton"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginBottom="10dp"
+        android:layout_weight="1"
+        android:background="@drawable/simple_button"
+        android:text="@string/local_title"
+        android:textSize="18sp"
+        tools:layout_editor_absoluteX="0dp" />
 
-        <Button
-            android:id="@+id/netButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/net" />
+    <Button
+        android:id="@+id/trainButton"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginBottom="10dp"
+        android:layout_weight="1"
+        android:background="@drawable/simple_button"
+        android:text="@string/training_title"
+        android:textSize="18sp" />
 
-        <Button
-            android:id="@+id/localButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/local" />
+    <Button
+        android:id="@+id/complainButton"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginBottom="10dp"
+        android:layout_weight="1"
+        android:background="@drawable/simple_button"
+        android:text="@string/make_complain"
+        android:textSize="18sp"
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="278dp" />
 
-        <Button
-            android:id="@+id/complainButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/complain" />
+    <Button
+        android:id="@+id/ratingButton"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginBottom="10dp"
+        android:layout_weight="1"
+        android:background="@drawable/simple_button"
+        android:text="@string/settings"
+        android:textSize="18sp"
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="382dp" />
 
-        <Button
-            android:id="@+id/ratingButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/settings" />
+    <Button
+        android:id="@+id/infoButton"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginBottom="10dp"
+        android:layout_weight="1"
+        android:background="@drawable/simple_button"
+        android:text="@string/info"
+        android:textSize="18sp"
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="557dp" />
 
-        <Button
-            android:id="@+id/infoButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/info" />
-
-    </LinearLayout>
-</ScrollView>
+</LinearLayout>

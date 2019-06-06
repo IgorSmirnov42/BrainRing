@@ -86,7 +86,7 @@ abstract public class GameActivity extends AppCompatActivity {
             complainButton.setOnClickListener(v -> {
                 ComplainedQuestion question = gameController.getCurrentQuestionData();
                 try {
-                    ComplainsFileHandler.appendComplain(question);
+                    ComplainsFileHandler.appendComplain(question, this);
                 } catch (Exception e) {
                     e.printStackTrace();
                     finish();

@@ -8,20 +8,22 @@
 
     <Button
         android:id="@+id/clearListButton"
-        android:layout_width="148dp"
-        android:layout_height="wrap_content"
+        android:layout_width="150dp"
+        android:layout_height="100dp"
+        android:background="@drawable/simple_button"
         android:text="Очистить список жалоб"
+        android:textSize="14sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.824"
+        app:layout_constraintHorizontal_bias="0.88"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/questionsList"
-        app:layout_constraintVertical_bias="0.388" />
+        app:layout_constraintVertical_bias="0.394" />
 
     <ListView
         android:id="@+id/questionsList"
         android:layout_width="341dp"
-        android:layout_height="472dp"
+        android:layout_height="429dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -34,18 +36,21 @@
         android:layout_height="41dp"
         android:text="Список вопросов"
         android:textAlignment="center"
-        android:textSize="24sp"
+        android:textAppearance="@style/GrayText"
+        android:textSize="18sp"
         app:layout_constraintBottom_toTopOf="@+id/questionsList"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.674" />
+        app:layout_constraintVertical_bias="1.0" />
 
     <Button
         android:id="@+id/sendAllButton"
-        android:layout_width="134dp"
-        android:layout_height="wrap_content"
+        android:layout_width="150dp"
+        android:layout_height="100dp"
+        android:background="@drawable/simple_button"
         android:text="Отправить все жалобы"
+        android:textSize="14sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.126"

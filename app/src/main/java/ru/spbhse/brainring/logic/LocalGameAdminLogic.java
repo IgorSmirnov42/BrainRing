@@ -19,6 +19,8 @@ import static java.lang.Math.max;
  *      in local mode
  */
 public class LocalGameAdminLogic {
+    public static final String GREEN = "green";
+    public static final String RED = "red";
     private LocalGameLocation location = LocalGameLocation.GAME_WAITING_START;
     private UserScore green;
     private UserScore red;
@@ -36,6 +38,7 @@ public class LocalGameAdminLogic {
         FALSE_START = MessageGenerator.create().writeInt(Message.FALSE_START).toByteArray();
         TIME_START = MessageGenerator.create().writeInt(Message.TIME_START).toByteArray();
     }
+
     private final int firstCountdown;
     private final int secondCountdown;
     private static final int SECOND = 1000;
@@ -54,7 +57,7 @@ public class LocalGameAdminLogic {
                 SECOND) {
             @Override
             public void onTick(long millisUntilFinished) {
-                //if (timer == this) {
+                if (timer == this) {
                     LocalController.LocalAdminUIController.showTime(
                             max((millisUntilFinished - FAULT) / SECOND, 0));
 
@@ -65,20 +68,20 @@ public class LocalGameAdminLogic {
                             player.start();
                         }).start();
                     }
-                //}
+                }
             }
 
             @Override
             public void onFinish() {
                 Log.d("BrainRing", "Finish first timer");
-                //if (timer == this) {
+                if (timer == this) {
                     new Thread(() -> {
                         MediaPlayer player = MediaPlayer.create(LocalController.getJuryActivity(), R.raw.beep);
                         player.setOnCompletionListener(MediaPlayer::release);
                         player.start();
                     }).start();
                     newQuestion();
-                //}
+                }
             }
         };
 
@@ -86,7 +89,7 @@ public class LocalGameAdminLogic {
                 SECOND) {
             @Override
             public void onTick(long millisUntilFinished) {
-                //if (timer == this) {
+                if (timer == this) {
                     LocalController.LocalAdminUIController.showTime(
                             max((millisUntilFinished - FAULT) / SECOND, 0));
 
@@ -97,20 +100,20 @@ public class LocalGameAdminLogic {
                             player.start();
                         }).start();
                     }
-                //}
+                }
             }
 
             @Override
             public void onFinish() {
                 Log.d("BrainRing", "Finish second timer");
-                //if (timer == this) {
+                if (timer == this) {
                     new Thread(() -> {
                         MediaPlayer player = MediaPlayer.create(LocalController.getJuryActivity(), R.raw.beep);
                         player.setOnCompletionListener(MediaPlayer::release);
                         player.start();
                     }).start();
                     newQuestion();
-                //}
+                }
             }
         };
     }
@@ -236,7 +239,8 @@ public class LocalGameAdminLogic {
             user.status.alreadyAnswered = true;
             answeringUserId = userId;
             new Thread(() -> {
-                MediaPlayer player = MediaPlayer.create(LocalController.getJuryActivity(), R.raw.answering);
+                MediaPlayer player = MediaPlayer.create(LocalController.getJuryActivity(),
+                        R.raw.answering);
                 player.setOnCompletionListener(MediaPlayer::release);
                 player.start();
             }).start();
@@ -250,9 +254,9 @@ public class LocalGameAdminLogic {
 
     private String getColor(@NonNull String userId) {
         if (green.status.participantId.equals(userId)) {
-            return "green";
+            return GREEN;
         } else {
-            return "red";
+            return RED;
         }
     }
 
@@ -316,7 +320,8 @@ public class LocalGameAdminLogic {
         if (location == LocalGameLocation.NOT_STARTED && red != null && green != null) {
             return true;
         } else {
-            Toast.makeText(LocalController.getJuryActivity(), "Изменение счёта невозможно во время вопроса.",
+            Toast.makeText(LocalController.getJuryActivity(),
+                    "Изменение счёта невозможно во время вопроса.",
                     Toast.LENGTH_LONG).show();
             return false;
         }

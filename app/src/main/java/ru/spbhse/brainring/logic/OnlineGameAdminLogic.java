@@ -12,6 +12,7 @@ import ru.spbhse.brainring.controllers.DatabaseController;
 import ru.spbhse.brainring.controllers.OnlineController;
 import ru.spbhse.brainring.network.messages.Message;
 import ru.spbhse.brainring.network.messages.MessageGenerator;
+import ru.spbhse.brainring.network.messages.OnlineFinishCodes;
 import ru.spbhse.brainring.utils.Question;
 
 /** Realizes admin's logic in online mode */
@@ -23,6 +24,8 @@ public class OnlineGameAdminLogic {
     private boolean interrupted;
     private int currentRound;
     private int questionNumber;
+    private boolean published;
+    private int readyUsers;
     private List<AnswerTime> waitingAnswer= new ArrayList<>();
 
     private static final byte[] ALLOW_ANSWER;
@@ -30,22 +33,29 @@ public class OnlineGameAdminLogic {
     private static final byte[] OPPONENT_ANSWERING;
     private static final byte[] TIME_START;
     private static final byte[] CORRECT_ANSWER;
-    private static final byte[] FINISH;
 
     static {
-        ALLOW_ANSWER = MessageGenerator.create().writeInt(Message.ALLOWED_TO_ANSWER).toByteArray();
-        FORBID_ANSWER = MessageGenerator.create().writeInt(Message.FORBIDDEN_TO_ANSWER).toByteArray();
-        TIME_START = MessageGenerator.create().writeInt(Message.TIME_START).toByteArray();
-        CORRECT_ANSWER = MessageGenerator.create().writeInt(Message.CORRECT_ANSWER).toByteArray();
-        OPPONENT_ANSWERING = MessageGenerator.create().writeInt(Message.OPPONENT_IS_ANSWERING).toByteArray();
-        FINISH = MessageGenerator.create().writeInt(Message.FINISH).toByteArray();
+        ALLOW_ANSWER = MessageGenerator.create()
+                .writeInt(Message.ALLOWED_TO_ANSWER)
+                .toByteArray();
+        FORBID_ANSWER = MessageGenerator.create()
+                .writeInt(Message.FORBIDDEN_TO_ANSWER)
+                .toByteArray();
+        TIME_START = MessageGenerator.create()
+                .writeInt(Message.TIME_START)
+                .toByteArray();
+        CORRECT_ANSWER = MessageGenerator.create()
+                .writeInt(Message.CORRECT_ANSWER)
+                .toByteArray();
+        OPPONENT_ANSWERING = MessageGenerator.create()
+                .writeInt(Message.OPPONENT_IS_ANSWERING)
+                .toByteArray();
     }
 
     private static final int QUESTIONS_NUMBER_MIN = 5;
     private static final int SECOND = 1000;
-    private static final int TIME_TO_SHOW_ANSWER = 5;
     private static final int TIME_TO_READ_QUESTION = 10;
-    private static final int DELIVERING_FAULT_MILLIS = 750;
+    private static final int DELIVERING_FAULT_MILLIS = 1000;
 
     /** Returns UserScore object connected with given user */
     public OnlineGameAdminLogic() {
@@ -64,7 +74,17 @@ public class OnlineGameAdminLogic {
     }
 
     public void onFalseStart(@NonNull String userId) {
-        getThisUser(userId).status.alreadyAnswered = true;
+        if (!published) {
+            getThisUser(userId).status.alreadyAnswered = true;
+        } else {
+            if (answeringUserId != null) { // somebody is answering
+                getThisUser(userId).status.alreadyAnswered = true;
+            } else {
+                if (getOtherUser(userId).status.alreadyAnswered) {
+                    showAnswer(null);
+                }
+            }
+        }
     }
 
     private void allowAnswer(@NonNull String userId) {
@@ -95,9 +115,6 @@ public class OnlineGameAdminLogic {
             new Handler().postDelayed(() -> {
                 if (roundNumber == currentRound) {
                     getThisUser(userId).status.alreadyAnswered = true;
-                    if (bothAnswered()) {
-                        showAnswer(null);
-                    }
                 }
             }, DELIVERING_FAULT_MILLIS);
         }
@@ -107,14 +124,15 @@ public class OnlineGameAdminLogic {
      * Allows or forbids to answer team that pushed answer button
      * Determines false starts
      */
-    public void onAnswerIsReady(String userId, long time) {
+    public void onAnswerIsReady(@NonNull String userId, long time) {
         UserScore user = getThisUser(userId);
         if (user.status.alreadyAnswered || answeringUserId != null) {
             forbidAnswer(userId);
         } else {
             Log.d("BrainRing", "Received answer from user " + userId + " at " + time);
             currentRound = 2;
-            // If other user has already answered or not admin wants and current don't then allow immediately
+            // If other user has already answered or not admin wants and current don't
+            // then allow immediately
             if (getOtherUser(userId).status.alreadyAnswered ||
                     (!userId.equals(OnlineController.NetworkController.getMyParticipantId())
                             && waitingAnswer.isEmpty())) {
@@ -157,10 +175,11 @@ public class OnlineGameAdminLogic {
         }
         OnlineController.NetworkController.sendMessageToConcreteUser(
                 getOtherUser(previousUserId).status.participantId,
-                MessageGenerator.create().
-                        writeInt(Message.SENDING_INCORRECT_OPPONENT_ANSWER)
+                MessageGenerator.create()
+                        .writeInt(Message.SENDING_INCORRECT_OPPONENT_ANSWER)
                         .writeString(previousAnswer)
-                        .toByteArray());
+                        .toByteArray()
+        );
     }
 
     /** Rejects or accepts answer written by user */
@@ -197,6 +216,7 @@ public class OnlineGameAdminLogic {
                     " ответил верно";
         }
         Log.d("BrainRing", "Question message:" + questionMessage);
+        readyUsers = 0;
         OnlineController.NetworkController.sendMessageToAll(
                 MessageGenerator.create()
                         .writeInt(Message.SENDING_CORRECT_ANSWER_AND_SCORE)
@@ -207,14 +227,33 @@ public class OnlineGameAdminLogic {
                         .writeString(questionMessage)
                         .toByteArray()
         );
-        new Handler().postDelayed(this::newQuestion, TIME_TO_SHOW_ANSWER * SECOND);
     }
 
     /** Determines if game is finished. If not, generates new question and sends it */
     public void newQuestion() {
         if (questionNumber >= QUESTIONS_NUMBER_MIN && user1.score != user2.score) {
-            OnlineController.NetworkController.sendMessageToAll(FINISH);
-            OnlineController.finishOnlineGame();
+            Log.d("BrainRing", "Game finished");
+            int user1Code, user2Code;
+            if (user1.score > user2.score) {
+                user1Code = OnlineFinishCodes.GAME_FINISHED_CORRECTLY_WON;
+                user2Code = OnlineFinishCodes.GAME_FINISHED_CORRECTLY_LOOSE;
+            } else {
+                user2Code = OnlineFinishCodes.GAME_FINISHED_CORRECTLY_WON;
+                user1Code = OnlineFinishCodes.GAME_FINISHED_CORRECTLY_LOOSE;
+            }
+            // The order of sending here is critical!
+            OnlineController.NetworkController.sendMessageToConcreteUser(user2.status.participantId,
+                    MessageGenerator.create()
+                            .writeInt(Message.FINISH)
+                            .writeInt(user2Code)
+                            .toByteArray()
+            );
+            OnlineController.NetworkController.sendMessageToConcreteUser(user1.status.participantId,
+                    MessageGenerator.create()
+                            .writeInt(Message.FINISH)
+                            .writeInt(user1Code)
+                            .toByteArray()
+            );
             return;
         }
 
@@ -234,6 +273,7 @@ public class OnlineGameAdminLogic {
     }
 
     public void publishing() {
+        published = false;
         new Handler().postDelayed(this::publishQuestion, TIME_TO_READ_QUESTION * SECOND);
     }
 
@@ -249,6 +289,14 @@ public class OnlineGameAdminLogic {
             OnlineController.NetworkController.sendMessageToAll(TIME_START);
         } else {
             showAnswer(null);
+        }
+        published = true;
+    }
+
+    public void onReadyForQuestion(@NonNull String userId) {
+        ++readyUsers;
+        if (readyUsers == 2) {
+            newQuestion();
         }
     }
 
