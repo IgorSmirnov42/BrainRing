@@ -30,7 +30,9 @@ public class LocalNetworkAdmin extends LocalNetwork {
     private static final byte[] HANDSHAKE;
 
     static {
-        HANDSHAKE = MessageGenerator.create().writeInt(Message.HANDSHAKE).toByteArray();
+        HANDSHAKE = MessageGenerator.create()
+                .writeInt(Message.HANDSHAKE)
+                .toByteArray();
     }
 
     /**
@@ -43,11 +45,13 @@ public class LocalNetworkAdmin extends LocalNetwork {
             @Override
             public void onRoomCreated(int i, @Nullable Room room) {
                 Log.d("BrainRing", "Room was created");
+                LocalNetworkAdmin.this.room = room;
             }
 
             @Override
             public void onJoinedRoom(int i, @Nullable Room room) {
                 Log.d("BrainRing", "Joined room");
+                LocalNetworkAdmin.this.room = room;
             }
 
             @Override
