@@ -71,7 +71,7 @@
             android:id="@+id/cardViewLicense"
             android:layout_width="0dp"
             android:layout_height="60dp"
-            android:layout_weight="1"
+            android:layout_weight="1"   
             app:layout_constraintStart_toStartOf="parent"
             tools:layout_editor_absoluteY="-55dp" >
 

@@ -29,33 +29,34 @@
         style="@style/Widget.AppCompat.SeekBar.Discrete"
         android:layout_width="255dp"
         android:layout_height="32dp"
+        android:layout_marginBottom="8dp"
         android:max="5"
         android:progress="1"
-        app:layout_constraintBottom_toTopOf="@+id/juryModeButton"
+        app:layout_constraintBottom_toTopOf="@+id/view5"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.506"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.547" />
+        app:layout_constraintVertical_bias="0.869" />
 
     <Button
         android:id="@+id/juryModeButton"
         android:layout_width="265dp"
         android:layout_height="107dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
         android:background="@drawable/simple_button"
         android:text="ведущий"
         android:textSize="20sp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout1"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.541"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.657" />
+        app:layout_constraintTop_toBottomOf="@+id/view5"
+        app:layout_constraintVertical_bias="0.684" />
 
     <LinearLayout
         android:id="@+id/linearLayout1"
-        android:layout_width="341dp"
-        android:layout_height="161dp"
+        android:layout_width="match_parent"
+        android:layout_height="136dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
@@ -63,14 +64,15 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/juryModeButton"
-        app:layout_constraintVertical_bias="0.7">
+        app:layout_constraintTop_toBottomOf="@+id/view5"
+        app:layout_constraintVertical_bias="0.86">
 
         <Button
             android:id="@+id/greenPlayerButton"
             android:layout_width="0dp"
-            android:layout_height="140dp"
-            android:layout_marginEnd="5dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="15dp"
+            android:layout_marginEnd="15dp"
             android:layout_weight="1"
             android:background="@drawable/simple_button"
             android:text="Зелёный стол"
@@ -79,8 +81,9 @@
         <Button
             android:id="@+id/redPlayerButton"
             android:layout_width="0dp"
-            android:layout_height="140dp"
-            android:layout_marginStart="5dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="15dp"
+            android:layout_marginEnd="15dp"
             android:layout_weight="1"
             android:background="@drawable/simple_button"
             android:text="Красный стол"
@@ -92,14 +95,15 @@
         style="@style/Widget.AppCompat.SeekBar.Discrete"
         android:layout_width="255dp"
         android:layout_height="33dp"
+        android:layout_marginBottom="8dp"
         android:max="5"
         android:progress="1"
-        app:layout_constraintBottom_toTopOf="@+id/juryModeButton"
+        app:layout_constraintBottom_toTopOf="@+id/view5"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.506"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.241" />
+        app:layout_constraintVertical_bias="0.383" />
 
     <TextView
         android:id="@+id/firstCounterValue"
@@ -146,8 +150,8 @@
 
     <TextView
         android:id="@+id/textView6"
-        android:layout_width="253dp"
-        android:layout_height="81dp"
+        android:layout_width="252dp"
+        android:layout_height="61dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
@@ -159,19 +163,23 @@
         android:textSize="18sp"
         app:layout_constraintBottom_toTopOf="@+id/juryModeButton"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.514"
+        app:layout_constraintHorizontal_bias="0.496"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/secondCounterBar"
-        app:layout_constraintVertical_bias="1.0" />
+        app:layout_constraintTop_toBottomOf="@+id/view5"
+        app:layout_constraintVertical_bias="0.367" />
 
     <View
         android:id="@+id/view5"
-        android:layout_width="wrap_content"
+        android:layout_width="440dp"
         android:layout_height="1dp"
         android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
         android:background="@color/colorDarkGray"
-        app:layout_constraintBottom_toTopOf="@+id/textView6"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/secondCounterBar" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.378" />
 
 </android.support.constraint.ConstraintLayout>

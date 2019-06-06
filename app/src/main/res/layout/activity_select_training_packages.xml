@@ -34,13 +34,32 @@
         android:background="@drawable/simple_button"
         android:text="Добавить пакет"
         android:textAppearance="@style/GrayText"
-        android:textSize="18sp"
+        android:textSize="16sp"
         app:layout_constraintBottom_toTopOf="@+id/view4"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/view"
-        app:layout_constraintVertical_bias="0.71" />
+        app:layout_constraintVertical_bias="0.627" />
+
+    <Button
+        android:id="@+id/resetCurrentPackage"
+        android:layout_width="145dp"
+        android:layout_height="49dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/simple_button"
+        android:text="Сброс"
+        android:textAppearance="@style/GrayText"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toTopOf="@+id/view4"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/view"
+        app:layout_constraintVertical_bias="0.949" />
 
     <EditText
         android:id="@+id/urlEditor"
@@ -56,10 +75,10 @@
         android:textColor="@color/colorLightGray"
         app:layout_constraintBottom_toBottomOf="@+id/view4"
         app:layout_constraintEnd_toStartOf="@+id/urlWrittenButton"
-        app:layout_constraintHorizontal_bias="0.041"
+        app:layout_constraintHorizontal_bias="0.177"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/view"
-        app:layout_constraintVertical_bias="0.7" />
+        app:layout_constraintVertical_bias="0.629" />
 
     <TextView
         android:id="@+id/trainingCounterValue"
@@ -69,31 +88,34 @@
         android:layout_marginTop="100dp"
         android:layout_marginEnd="44dp"
         android:layout_marginBottom="8dp"
-        android:text="15"
+        android:text="10"
         android:textAlignment="center"
         android:textAppearance="@style/GrayText"
         android:textSize="18sp"
         app:layout_constraintBottom_toTopOf="@+id/view"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toEndOf="@+id/trainingCounterBar"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.53" />
+        app:layout_constraintVertical_bias="0.48000002" />
 
     <SeekBar
         android:id="@+id/trainingCounterBar"
         style="@style/Widget.AppCompat.SeekBar.Discrete"
-        android:layout_width="276dp"
+        android:layout_width="match_parent"
         android:layout_height="49dp"
+        android:layout_marginStart="30dp"
         android:layout_marginTop="96dp"
+        android:layout_marginEnd="80dp"
         android:layout_marginBottom="8dp"
         android:max="5"
-        android:progress="1"
+        android:progress="0"
         app:layout_constraintBottom_toTopOf="@+id/view"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.461"
+        app:layout_constraintEnd_toStartOf="@+id/trainingCounterValue"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.441" />
 
     <TextView
         android:id="@+id/textView2"
@@ -143,14 +165,14 @@
         app:layout_constraintVertical_bias="0.816" />
 
     <TextView
-        android:id="@+id/textView4"
+        android:id="@+id/selectPackages"
         android:layout_width="0dp"
         android:layout_height="166dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="32dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
-        android:text="Введите ссылку на пакет из базы вопросов db.chgk.info (требует наличия интернета) \n\nПример:\nhttps://db.chgk.info/tour/znat09br"
+        android:text="@string/select_packages_info"
         android:textAlignment="viewStart"
         android:textAllCaps="false"
         android:textAppearance="@style/GrayText"
@@ -189,7 +211,7 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="16dp"
-        android:text="Стандартный пакет"
+        android:text="@string/base_package"
         android:textColor="@color/colorBlackOlive"
         android:textSize="14sp"
         app:layout_constraintBottom_toBottomOf="@+id/view4"

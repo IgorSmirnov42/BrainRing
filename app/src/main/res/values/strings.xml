@@ -13,5 +13,7 @@
     <string name="question">Вопрос</string>
     <string name="answer">Ответ</string>
     <string name="complain">Жалоба</string>
+    <string name="select_packages_info">Введите ссылку на пакет из базы вопросов <a href="https://db.chgk.info/tour"> db.chgk.info</a> (требует наличия интернета) \n\nПример:\n<a href = "https://db.chgk.info/tour/znat09br"> https://db.chgk.info/tour/znat09br </a></string>
+    <string name="base_package">Стандартный пакет</string>
 
 </resources>

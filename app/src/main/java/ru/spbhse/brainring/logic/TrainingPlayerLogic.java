@@ -15,8 +15,7 @@ public class TrainingPlayerLogic {
     private int correctAnswers = 0;
     private int wrongAnswers = 0;
     private Question currentQuestion;
-    private static final int TIME_TO_WRITE_ANSWER = 10;
-    private static final int TIME_TO_SHOW_ANSWER = 5;
+    private static final int TIME_TO_WRITE_ANSWER = 20;
     public static final int DEFAULT_READING_TIME = 10;
     private static final int SECOND = 1000;
     private CountDownTimer timer;
@@ -47,7 +46,7 @@ public class TrainingPlayerLogic {
                     if (millisUntilFinished <= readingTime * SECOND) {
                         long secondsLeft = millisUntilFinished / SECOND;
                         TrainingController.TrainingUIController.setTime(String.valueOf(secondsLeft));
-                        Log.d("BrainRing", "TICK");
+                        Log.d("BrainRing", "TICK" + secondsLeft);
                     }
                 }
             }
@@ -101,18 +100,6 @@ public class TrainingPlayerLogic {
         }
         TrainingController.TrainingUIController.setScore(correctAnswers, wrongAnswers);
         TrainingController.TrainingUIController.setLocation(GameActivityLocation.SHOW_ANSWER);
-        timer = new CountDownTimer(TIME_TO_SHOW_ANSWER * SECOND, SECOND) {
-            @Override
-            public void onTick(long millisUntilFinished) {
-
-            }
-
-            @Override
-            public void onFinish() {
-                newQuestion();
-            }
-        };
-        timer.start();
     }
 
     private void onReceivingTick(long secondsLeft) {

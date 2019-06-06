@@ -80,15 +80,17 @@
 
     <Button
         android:id="@+id/complainButton"
-        android:layout_width="349dp"
+        android:layout_width="match_parent"
         android:layout_height="84dp"
+        android:layout_marginStart="40dp"
+        android:layout_marginEnd="40dp"
         android:layout_marginBottom="68dp"
-        android:text="Пожаловаться на вопрос"
         android:background="@drawable/simple_button"
+        android:text="Пожаловаться на вопрос"
         android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.37"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/questionResult" />
 
@@ -133,7 +135,23 @@
         android:textAppearance="@style/GrayText"
         app:layout_constraintBottom_toTopOf="@+id/complainButton"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/opponentNick" />
+
+    <Button
+        android:id="@+id/continueGameButton"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginStart="100dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="100dp"
+        android:layout_marginBottom="32dp"
+        android:background="@drawable/simple_button"
+        android:text="продолжить игру"
+        android:textAppearance="@style/GrayText"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/complainButton"
+        app:layout_constraintVertical_bias="0.545" />
 </android.support.constraint.ConstraintLayout>

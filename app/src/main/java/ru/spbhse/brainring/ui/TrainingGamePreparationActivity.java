@@ -3,6 +3,9 @@ package ru.spbhse.brainring.ui;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Html;
+import android.text.Spanned;
+import android.text.method.LinkMovementMethod;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -19,13 +22,25 @@ import ru.spbhse.brainring.logic.TrainingPlayerLogic;
 public class TrainingGamePreparationActivity extends AppCompatActivity {
     private int counter = 10;
     private String packageAddress = null;
+    private String basePackageAddress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_select_training_packages);
-//        String[] packageAddress = { null };
-//        int counter = 0;
+
+        TextView packagesInfo = findViewById(R.id.selectPackages);
+        packagesInfo.setMovementMethod(LinkMovementMethod.getInstance());
+
+        basePackageAddress = getResources().getString(R.string.base_package);
+
+        TextView currentPackage = findViewById(R.id.currentPackageName);
+        currentPackage.setText(basePackageAddress);
+        currentPackage.setMovementMethod(LinkMovementMethod.getInstance());
+
+        packageAddress = basePackageAddress;
+
+        EditText urlEditor = findViewById(R.id.urlEditor);
 
         Button startTrainingGameButton = findViewById(R.id.startTrainingGameButton);
         startTrainingGameButton.setOnClickListener(new View.OnClickListener() {
@@ -35,11 +50,9 @@ public class TrainingGamePreparationActivity extends AppCompatActivity {
                 intent.putExtra(Intent.EXTRA_TITLE, packageAddress);
                 intent.putExtra(Intent.EXTRA_TEXT, counter);
                 startActivity(intent);
-                packageAddress = null;
             }
         });
 
-        EditText urlEditor = findViewById(R.id.urlEditor);
         Button urlWrittenButton = findViewById(R.id.urlWrittenButton);
         urlWrittenButton.setOnClickListener(
                 new View.OnClickListener() {
@@ -49,7 +62,10 @@ public class TrainingGamePreparationActivity extends AppCompatActivity {
                             URL hyperlink = new URL(urlEditor.getText().toString());
                             packageAddress = hyperlink.toString();
                             TextView currentPackage = findViewById(R.id.currentPackageName);
-                            currentPackage.setText(hyperlink.getFile());
+                            Spanned currentPackageName = Html.fromHtml(
+                                    "<a href=\"" + hyperlink + "\">" + hyperlink.getFile() + "</a> "
+                            );
+                            currentPackage.setText(currentPackageName);
                             urlEditor.getText().clear();
                         } catch (MalformedURLException e) {
                             urlEditor.getText().clear();
@@ -60,12 +76,21 @@ public class TrainingGamePreparationActivity extends AppCompatActivity {
                     }
                 });
 
+        Button resetCurrentPackage = findViewById(R.id.resetCurrentPackage);
+        resetCurrentPackage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                packageAddress = basePackageAddress;
+                currentPackage.setText(getResources().getString(R.string.base_package));
+            }
+        });
+
         SeekBar timeCounterBar = findViewById(R.id.trainingCounterBar);
         TextView timeCounterValue = findViewById(R.id.trainingCounterValue);
         timeCounterBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                counter = TrainingPlayerLogic.DEFAULT_READING_TIME + progress * 5;
+                counter = TrainingPlayerLogic.DEFAULT_READING_TIME + progress * 10;
                 timeCounterValue.setText(String.valueOf(counter));
             }
 
@@ -79,6 +104,5 @@ public class TrainingGamePreparationActivity extends AppCompatActivity {
 
             }
         });
-
     }
 }

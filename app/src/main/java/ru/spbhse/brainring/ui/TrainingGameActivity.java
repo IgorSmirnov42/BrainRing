@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.os.StrictMode;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -38,7 +39,7 @@ public class TrainingGameActivity extends GameActivity {
         String packageAddress = getIntent().getStringExtra(Intent.EXTRA_TITLE);
         int readingTime = getIntent().getIntExtra(Intent.EXTRA_TEXT, TrainingPlayerLogic.DEFAULT_READING_TIME);
         try {
-            if (packageAddress == null) {
+            if (packageAddress.equals(getResources().getString(R.string.base_package))) {
                 gameTable = dataBase.getBaseTable();
             } else {
                 toClear = true;
@@ -54,6 +55,7 @@ public class TrainingGameActivity extends GameActivity {
 
         TrainingController.createTrainingGame();
         TrainingController.TrainingLogicController.setReadingTime(readingTime);
+        TrainingController.TrainingLogicController.newQuestion();
     }
 
     @Override
@@ -75,5 +77,19 @@ public class TrainingGameActivity extends GameActivity {
         buttonText = "ЖМЯК!!";
         drawLocation();
         findViewById(R.id.textView).setVisibility(View.GONE);
+    }
+
+    @Override
+    protected void drawLocation() {
+        super.drawLocation();
+        if (currentLocation == GameActivityLocation.SHOW_ANSWER) {
+            Button continueGameButton = findViewById(R.id.continueGameButton);
+            continueGameButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    TrainingController.TrainingLogicController.newQuestion();
+                }
+            });
+        }
     }
 }
