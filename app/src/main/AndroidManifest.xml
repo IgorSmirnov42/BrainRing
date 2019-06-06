@@ -12,10 +12,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ui.InfoActivity"></activity>
+        <activity android:name=".ui.OnlineGameFinished"></activity>
+        <activity android:name=".ui.InfoActivity" />
         <activity
             android:name=".ui.ConcreteComplain"
-            android:windowSoftInputMode="adjustPan"></activity>
+            android:windowSoftInputMode="adjustPan" />
         <activity android:name=".ui.ComplainActivity" />
         <activity android:name=".ui.Judging" />
         <activity android:name=".ui.PlayerActivity" />

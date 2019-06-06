@@ -13,7 +13,10 @@ import ru.spbhse.brainring.network.messages.Message;
 import ru.spbhse.brainring.network.messages.MessageGenerator;
 import ru.spbhse.brainring.ui.GameActivityLocation;
 
-/** Realizing user logic in online mode */
+/**
+ * Realizing user logic in online mode.
+ * Most of timers are placed here
+ */
 public class OnlineGameUserLogic {
     private String currentQuestionText;
     private int currentQuestionId;
@@ -65,19 +68,19 @@ public class OnlineGameUserLogic {
                 SECOND) {
             @Override
             public void onTick(long millisUntilFinished) {
-                //if (timer == this) {
+                if (timer == this) {
                     if (millisUntilFinished <= SENDING_COUNTDOWN * SECOND) {
                         onReceivingTick(millisUntilFinished / SECOND);
                     }
-                //}
+                }
             }
 
             @Override
             public void onFinish() {
-                //if (timer == this) {
+                if (timer == this) {
                     Log.d("BrainRing", "Finish first timer");
                     sendTimeLimitedAnswer(1);
-                //}
+                }
             }
         };
         timer.start();
@@ -103,9 +106,9 @@ public class OnlineGameUserLogic {
 
             @Override
             public void onFinish() {
-                //if (timer == this) {
+                if (timer == this) {
                     answerIsWritten(OnlineController.OnlineUIController.getWhatWritten());
-                //}
+                }
             }
         };
         timer.start();
@@ -137,19 +140,19 @@ public class OnlineGameUserLogic {
                 SECOND) {
             @Override
             public void onTick(long millisUntilFinished) {
-                //if (timer == this) {
+                if (timer == this) {
                     if (millisUntilFinished <= SENDING_COUNTDOWN * SECOND) {
                         onReceivingTick(millisUntilFinished / SECOND);
                     }
-                //}
+                }
             }
 
             @Override
             public void onFinish() {
-                //if (timer == this) {
+                if (timer == this) {
                     Log.d("BrainRing", "Finish second timer");
                     sendTimeLimitedAnswer(2);
-                //}
+                }
             }
         };
         timer.start();
@@ -172,7 +175,10 @@ public class OnlineGameUserLogic {
                                   @NonNull String questionMessage) {
         questionReceived = false;
         timeStarted = false;
-        timer = null;
+        if (timer != null) {
+            timer.cancel();
+            timer = null;
+        }
         currentQuestionAnswer = correctAnswer;
 
         new Thread(() -> {
