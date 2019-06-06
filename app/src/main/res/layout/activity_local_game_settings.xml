@@ -16,7 +16,7 @@
         android:text="20"
         android:textAlignment="center"
         android:textAppearance="@style/GrayText"
-        android:textSize="24sp"
+        android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.567"
@@ -44,7 +44,7 @@
         android:layout_height="107dp"
         android:background="@drawable/simple_button"
         android:text="ведущий"
-        android:textSize="30sp"
+        android:textSize="20sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.541"
@@ -54,7 +54,7 @@
 
     <LinearLayout
         android:id="@+id/linearLayout1"
-        android:layout_width="335dp"
+        android:layout_width="341dp"
         android:layout_height="161dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
@@ -74,7 +74,7 @@
             android:layout_weight="1"
             android:background="@drawable/simple_button"
             android:text="Зелёный стол"
-            android:textSize="30sp" />
+            android:textSize="20sp" />
 
         <Button
             android:id="@+id/redPlayerButton"
@@ -84,7 +84,7 @@
             android:layout_weight="1"
             android:background="@drawable/simple_button"
             android:text="Красный стол"
-            android:textSize="30sp" />
+            android:textSize="20sp" />
     </LinearLayout>
 
     <SeekBar
@@ -108,7 +108,7 @@
         android:text="20"
         android:textAlignment="center"
         android:textAppearance="@style/GrayText"
-        android:textSize="24sp"
+        android:textSize="18sp"
         app:layout_constraintBottom_toTopOf="@+id/linearLayout1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.542"
@@ -122,7 +122,7 @@
         android:layout_height="wrap_content"
         android:text="Первый таймер"
         android:textAppearance="@style/GrayText"
-        android:textSize="24sp"
+        android:textSize="18sp"
         app:layout_constraintBottom_toTopOf="@+id/firstCounterBar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.557"
@@ -136,7 +136,7 @@
         android:layout_height="wrap_content"
         android:text="Второй таймер"
         android:textAppearance="@style/GrayText"
-        android:textSize="24sp"
+        android:textSize="18sp"
         app:layout_constraintBottom_toTopOf="@+id/secondCounterBar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.549"
@@ -152,12 +152,14 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
+        android:gravity="center"
         android:text="Выберите свою роль"
         android:textAlignment="center"
         android:textAppearance="@style/GrayText"
-        android:textSize="24sp"
+        android:textSize="18sp"
         app:layout_constraintBottom_toTopOf="@+id/juryModeButton"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.514"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/secondCounterBar"
         app:layout_constraintVertical_bias="1.0" />

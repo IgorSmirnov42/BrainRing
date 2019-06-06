@@ -8,112 +8,125 @@
 
     <Button
         android:id="@+id/startTrainingGameButton"
-        android:layout_width="124dp"
-        android:layout_height="69dp"
+        android:layout_width="182dp"
+        android:layout_height="56dp"
         android:layout_marginStart="161dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="28dp"
         android:layout_marginEnd="162dp"
-        android:layout_marginBottom="68dp"
+        android:layout_marginBottom="8dp"
         android:background="@drawable/simple_button"
         android:text="Начать игру"
+        android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/view4" />
+        app:layout_constraintTop_toBottomOf="@+id/view4"
+        app:layout_constraintVertical_bias="0.254" />
 
     <Button
         android:id="@+id/urlWrittenButton"
-        android:layout_width="0dp"
-        android:layout_height="45dp"
+        android:layout_width="145dp"
+        android:layout_height="49dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:layout_marginEnd="36dp"
+        android:layout_marginEnd="16dp"
         android:layout_marginBottom="8dp"
         android:background="@drawable/simple_button"
         android:text="Добавить пакет"
         android:textAppearance="@style/GrayText"
+        android:textSize="18sp"
         app:layout_constraintBottom_toTopOf="@+id/view4"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toEndOf="@+id/urlEditor"
-        app:layout_constraintTop_toBottomOf="@+id/textView4"
-        app:layout_constraintVertical_bias="0.117" />
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/view"
+        app:layout_constraintVertical_bias="0.71" />
 
     <EditText
         android:id="@+id/urlEditor"
-        android:layout_width="0dp"
+        android:layout_width="189dp"
         android:layout_height="45dp"
         android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
         android:ems="10"
         android:imeOptions="actionDone"
         android:inputType="textUri"
         android:textColor="@color/colorLightGray"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toBottomOf="@+id/view4"
+        app:layout_constraintEnd_toStartOf="@+id/urlWrittenButton"
+        app:layout_constraintHorizontal_bias="0.041"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.523" />
+        app:layout_constraintTop_toBottomOf="@+id/view"
+        app:layout_constraintVertical_bias="0.7" />
 
     <TextView
         android:id="@+id/trainingCounterValue"
         android:layout_width="42dp"
-        android:layout_height="39dp"
+        android:layout_height="35dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="128dp"
+        android:layout_marginTop="100dp"
         android:layout_marginEnd="44dp"
+        android:layout_marginBottom="8dp"
         android:text="15"
         android:textAlignment="center"
         android:textAppearance="@style/GrayText"
-        android:textSize="24sp"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toTopOf="@+id/view"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.571"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toEndOf="@+id/trainingCounterBar"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.53" />
 
     <SeekBar
         android:id="@+id/trainingCounterBar"
         style="@style/Widget.AppCompat.SeekBar.Discrete"
-        android:layout_width="252dp"
-        android:layout_height="45dp"
-        android:layout_marginTop="124dp"
+        android:layout_width="276dp"
+        android:layout_height="49dp"
+        android:layout_marginTop="96dp"
+        android:layout_marginBottom="8dp"
         android:max="5"
         android:progress="1"
+        app:layout_constraintBottom_toTopOf="@+id/view"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.496"
+        app:layout_constraintHorizontal_bias="0.461"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/textView2"
-        android:layout_width="191dp"
-        android:layout_height="30dp"
+        android:layout_width="193dp"
+        android:layout_height="59dp"
         android:layout_marginStart="176dp"
         android:layout_marginTop="80dp"
         android:layout_marginEnd="132dp"
         android:layout_marginBottom="8dp"
-        android:text="Время на ответ"
+        android:text="Время на чтение вопроса"
         android:textAlignment="center"
         android:textAppearance="@style/GrayText"
+        android:textSize="20sp"
         app:layout_constraintBottom_toTopOf="@+id/trainingCounterBar"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.613"
+        app:layout_constraintHorizontal_bias="0.744"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.4" />
+        app:layout_constraintVertical_bias="1.0" />
 
     <View
         android:id="@+id/view"
         android:layout_width="411dp"
         android:layout_height="1dp"
-        android:layout_marginTop="39dp"
-        android:layout_marginBottom="72dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
         android:background="@color/colorDarkGray"
-        app:layout_constraintBottom_toTopOf="@+id/urlEditor"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/trainingCounterBar"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.25" />
 
     <View
         android:id="@+id/view4"
@@ -126,27 +139,29 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/view"
-        app:layout_constraintVertical_bias="0.577" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.816" />
 
     <TextView
         android:id="@+id/textView4"
-        android:layout_width="392dp"
-        android:layout_height="109dp"
+        android:layout_width="0dp"
+        android:layout_height="166dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="32dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
-        android:text="Введите ссылку на пакет из базы вопросов db.chgk.info \n Пример: https://db.chgk.info/tour/znat09br"
+        android:text="Введите ссылку на пакет из базы вопросов db.chgk.info (требует наличия интернета) \n\nПример:\nhttps://db.chgk.info/tour/znat09br"
         android:textAlignment="viewStart"
         android:textAllCaps="false"
         android:textAppearance="@style/GrayText"
-        android:textSize="20sp"
+        android:textSize="16sp"
         android:textStyle="normal"
-        app:layout_constraintBottom_toTopOf="@+id/urlEditor"
+        app:layout_constraintBottom_toTopOf="@+id/view4"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/view" />
+        app:layout_constraintTop_toBottomOf="@+id/view"
+        app:layout_constraintVertical_bias="0.0" />
 
     <TextView
         android:id="@+id/textView10"
@@ -158,29 +173,30 @@
         android:layout_marginBottom="8dp"
         android:text="Текущий пакет:"
         android:textAppearance="@style/GrayText"
+        android:textSize="16sp"
         app:layout_constraintBottom_toTopOf="@+id/view4"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.008"
+        app:layout_constraintHorizontal_bias="0.036"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/urlEditor"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintTop_toBottomOf="@+id/view"
+        app:layout_constraintVertical_bias="0.85" />
 
     <TextView
         android:id="@+id/currentPackageName"
         android:layout_width="268dp"
-        android:layout_height="51dp"
+        android:layout_height="33dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="16dp"
         android:text="Стандартный пакет"
         android:textColor="@color/colorBlackOlive"
-        android:textSize="18sp"
+        android:textSize="14sp"
         app:layout_constraintBottom_toBottomOf="@+id/view4"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.015"
+        app:layout_constraintHorizontal_bias="0.062"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView10"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintTop_toBottomOf="@+id/view"
+        app:layout_constraintVertical_bias="0.971" />
 
 </android.support.constraint.ConstraintLayout>

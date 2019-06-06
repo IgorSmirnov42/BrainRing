@@ -36,7 +36,7 @@ public class TrainingGameActivity extends GameActivity {
         DatabaseController.setDatabase(dataBase);
 
         String packageAddress = getIntent().getStringExtra(Intent.EXTRA_TITLE);
-        int answerTime = getIntent().getIntExtra(Intent.EXTRA_TEXT, TrainingPlayerLogic.DEFAULT_ANSWER_TIME);
+        int readingTime = getIntent().getIntExtra(Intent.EXTRA_TEXT, TrainingPlayerLogic.DEFAULT_READING_TIME);
         try {
             if (packageAddress == null) {
                 gameTable = dataBase.getBaseTable();
@@ -53,7 +53,7 @@ public class TrainingGameActivity extends GameActivity {
         setOpponentNick("Неправильных ответов");
 
         TrainingController.createTrainingGame();
-        TrainingController.TrainingLogicController.setAnswerTime(answerTime);
+        TrainingController.TrainingLogicController.setReadingTime(readingTime);
     }
 
     @Override

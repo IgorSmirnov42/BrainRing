@@ -9,7 +9,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="223dp"
+        android:layout_height="185dp"
         android:layout_marginTop="424dp"
         android:layout_weight="1"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -28,7 +28,7 @@
             android:layout_weight="1"
             android:background="@drawable/simple_button"
             android:text="Принять\nответ"
-            android:textSize="24sp" />
+            android:textSize="18sp" />
 
         <Button
             android:id="@+id/rejectButton"
@@ -40,7 +40,7 @@
             android:layout_weight="1"
             android:background="@drawable/simple_button"
             android:text="Отклонить\nответ"
-            android:textSize="24sp" />
+            android:textSize="18sp" />
     </LinearLayout>
 
     <TextView
@@ -50,7 +50,7 @@
         android:layout_marginTop="8dp"
         android:layout_marginBottom="460dp"
         android:textAlignment="center"
-        android:textSize="70sp"
+        android:textSize="40sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.496"

@@ -37,8 +37,8 @@ public class TrainingController extends Controller {
             return gameController;
         }
 
-        public static void setAnswerTime(int answerTime) {
-            trainingPlayerLogic.setAnswerTime(answerTime);
+        public static void setReadingTime(int readingTime) {
+            trainingPlayerLogic.setReadingTime(readingTime);
         }
 
         @Override

@@ -12,7 +12,7 @@
         android:layout_width="198dp"
         android:layout_height="36dp"
         android:textAlignment="center"
-        android:textSize="24sp"
+        android:textSize="18sp"
         app:layout_constraintBottom_toTopOf="@+id/greenTeamStatus"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
@@ -25,7 +25,7 @@
         android:layout_width="198dp"
         android:layout_height="35dp"
         android:textAlignment="center"
-        android:textSize="24sp"
+        android:textSize="18sp"
         app:layout_constraintBottom_toTopOf="@+id/greenTeamStatus"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
@@ -64,7 +64,7 @@
         android:layout_height="94dp"
         android:background="@drawable/simple_button"
         android:text="Начать чтение вопроса"
-        android:textSize="24sp"
+        android:textSize="18sp"
         app:layout_constraintBottom_toTopOf="@+id/greenTeamStatus"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -88,45 +88,46 @@
         <Button
             android:id="@+id/minusRedTeamButton"
             android:layout_width="0dp"
-            android:layout_height="57dp"
+            android:layout_height="match_parent"
             android:layout_weight="1"
             android:background="@drawable/simple_button"
             android:text="-"
-            android:textSize="36sp" />
+            android:textSize="24sp" />
 
         <TextView
             android:id="@+id/redTeamScore"
             android:layout_width="0dp"
-            android:layout_height="57dp"
+            android:layout_height="match_parent"
             android:layout_weight="1"
+            android:gravity="center"
             android:text="0"
             android:textAlignment="center"
-            android:textSize="36sp" />
+            android:textSize="24sp" />
 
         <Button
             android:id="@+id/plusRedTeamButton"
             android:layout_width="0dp"
-            android:layout_height="57dp"
+            android:layout_height="match_parent"
             android:layout_marginEnd="5dp"
             android:layout_weight="1"
             android:background="@drawable/simple_button"
             android:text="+"
             android:textAlignment="center"
-            android:textSize="36sp" />
+            android:textSize="24sp" />
 
     </LinearLayout>
 
     <TextView
         android:id="@+id/gameStatusInfo"
-        android:layout_width="353dp"
-        android:layout_height="82dp"
+        android:layout_width="362dp"
+        android:layout_height="136dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="60dp"
         android:layout_marginEnd="8dp"
         android:text="Ожидаем подключения игроков"
         android:textAlignment="center"
         android:textAppearance="@style/GrayText"
-        android:textSize="24sp"
+        android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/mainButton" />
@@ -148,7 +149,7 @@
         <Button
             android:id="@+id/minusGreenTeamButton"
             android:layout_width="0dp"
-            android:layout_height="57dp"
+            android:layout_height="match_parent"
             android:layout_marginStart="5dp"
             android:layout_weight="1"
             android:background="@drawable/simple_button"
@@ -158,21 +159,22 @@
         <TextView
             android:id="@+id/greenTeamScore"
             android:layout_width="0dp"
-            android:layout_height="57dp"
+            android:layout_height="match_parent"
             android:layout_weight="1"
+            android:gravity="center"
             android:text="0"
             android:textAlignment="center"
-            android:textSize="36sp" />
+            android:textSize="24sp" />
 
         <Button
             android:id="@+id/plusGreenTeamButton"
             android:layout_width="0dp"
-            android:layout_height="57dp"
+            android:layout_height="match_parent"
             android:layout_weight="1"
             android:background="@drawable/simple_button"
             android:text="+"
             android:textAlignment="center"
-            android:textSize="36sp" />
+            android:textSize="24sp" />
 
     </LinearLayout>
 

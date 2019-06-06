@@ -8,6 +8,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -17,13 +18,13 @@ import ru.spbhse.brainring.logic.TrainingPlayerLogic;
 
 public class TrainingGamePreparationActivity extends AppCompatActivity {
     private int counter = 10;
-    private String packageName = null;
+    private String packageAddress = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_select_training_packages);
-//        String[] packageName = { null };
+//        String[] packageAddress = { null };
 //        int counter = 0;
 
         Button startTrainingGameButton = findViewById(R.id.startTrainingGameButton);
@@ -31,10 +32,10 @@ public class TrainingGamePreparationActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(TrainingGamePreparationActivity.this, TrainingGameActivity.class);
-                intent.putExtra(Intent.EXTRA_TITLE, packageName);
+                intent.putExtra(Intent.EXTRA_TITLE, packageAddress);
                 intent.putExtra(Intent.EXTRA_TEXT, counter);
                 startActivity(intent);
-                packageName = null;
+                packageAddress = null;
             }
         });
 
@@ -45,11 +46,16 @@ public class TrainingGamePreparationActivity extends AppCompatActivity {
                     @Override
                     public void onClick(View v) {
                         try {
-                            URL tmp = new URL(urlEditor.getText().toString());
-                            packageName = tmp.toString();
+                            URL hyperlink = new URL(urlEditor.getText().toString());
+                            packageAddress = hyperlink.toString();
+                            TextView currentPackage = findViewById(R.id.currentPackageName);
+                            currentPackage.setText(hyperlink.getFile());
                             urlEditor.getText().clear();
                         } catch (MalformedURLException e) {
                             urlEditor.getText().clear();
+                            Toast.makeText(TrainingGamePreparationActivity.this,
+                                    "Пакет по данной ссылке не найден, попробуйте еще раз",
+                                    Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
@@ -59,7 +65,7 @@ public class TrainingGamePreparationActivity extends AppCompatActivity {
         timeCounterBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                counter = TrainingPlayerLogic.DEFAULT_ANSWER_TIME + progress * 5;
+                counter = TrainingPlayerLogic.DEFAULT_READING_TIME + progress * 5;
                 timeCounterValue.setText(String.valueOf(counter));
             }
 

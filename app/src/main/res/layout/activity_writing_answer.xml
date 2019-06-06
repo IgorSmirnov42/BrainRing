@@ -15,6 +15,7 @@
         android:scrollbars="vertical"
         android:text="Тут должен быть вопрос"
         android:textColor="@color/colorDarkGray"
+        android:textSize="14sp"
         android:textAlignment="center"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

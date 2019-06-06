@@ -80,6 +80,7 @@ public class InfoActivity extends AppCompatActivity {
                 View licenseInfo = findViewById(R.id.viewLicenseInfo);
                 highlight(licenseInfo);
                 infoText.setText(LICENSE);
+                infoText.scrollTo(0, 0);
             }
         });
 
@@ -90,6 +91,7 @@ public class InfoActivity extends AppCompatActivity {
                 View localInfo = findViewById(R.id.viewLocalInfo);
                 highlight(localInfo);
                 infoText.setText(LOCAL);
+                infoText.scrollTo(0, 0);
             }
         });
 
@@ -100,6 +102,7 @@ public class InfoActivity extends AppCompatActivity {
                 View trainingInfo = findViewById(R.id.viewTrainingInfo);
                 highlight(trainingInfo);
                 infoText.setText(TRAINING);
+                infoText.scrollTo(0, 0);
             }
         });
 
@@ -110,6 +113,7 @@ public class InfoActivity extends AppCompatActivity {
                 View netInfo = findViewById(R.id.viewNetInfo);
                 highlight(netInfo);
                 infoText.setText(NET);
+                infoText.scrollTo(0, 0);
             }
         });
 
