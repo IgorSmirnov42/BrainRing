@@ -26,6 +26,7 @@ public class LocalNetworkPlayer extends LocalNetwork {
     private String serverId;
     /** Green or red table. Values are written in base class */
     private int myColor;
+    private final Object lock = new Object();
 
     /**
      * Creates new instance of LocalNetworkPlayer.
@@ -61,7 +62,7 @@ public class LocalNetworkPlayer extends LocalNetwork {
 
             @Override
             public void onRoomConnected(int code, @Nullable Room room) {
-                synchronized (LocalNetworkPlayer.this) {
+                synchronized (lock) {
                     Log.d("BrainRing", "Connected to room");
                     if (room == null) {
                         Log.wtf("BrainRing", "onRoomConnected got null as room");
@@ -73,7 +74,7 @@ public class LocalNetworkPlayer extends LocalNetwork {
                     } else {
                         Log.d("BrainRing","Error during connecting");
                     }
-                    LocalNetworkPlayer.this.notifyAll();
+                    lock.notifyAll();
                 }
             }
         };
@@ -91,10 +92,10 @@ public class LocalNetworkPlayer extends LocalNetwork {
         Log.d("BrainRing","RECEIVED MESSAGE AS PLAYER!");
         if (!handshaked) {
             new Thread(() -> {
-                synchronized (LocalNetworkPlayer.this) {
+                synchronized (lock) {
                     while (room == null) {
                         try {
-                            wait();
+                            lock.wait();
                         } catch (InterruptedException e) {
                         }
                     }
@@ -143,7 +144,8 @@ public class LocalNetworkPlayer extends LocalNetwork {
     /** Starts quick game with auto matched server and player */
     @Override
     public void startQuickGame() {
-        mRealTimeMultiplayerClient = Games.getRealTimeMultiplayerClient(LocalController.getPlayerActivity(),
+        mRealTimeMultiplayerClient = Games.getRealTimeMultiplayerClient(
+                LocalController.getPlayerActivity(),
                 googleSignInAccount);
         final int MIN_OPPONENTS = 2, MAX_OPPONENTS = 2;
         Bundle autoMatchCriteria = RoomConfig.createAutoMatchCriteria(MIN_OPPONENTS,

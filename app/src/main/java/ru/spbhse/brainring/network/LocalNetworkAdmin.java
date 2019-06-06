@@ -7,6 +7,7 @@ import android.util.Log;
 
 import com.google.android.gms.games.Games;
 import com.google.android.gms.games.GamesCallbackStatusCodes;
+import com.google.android.gms.games.multiplayer.Participant;
 import com.google.android.gms.games.multiplayer.realtime.Room;
 import com.google.android.gms.games.multiplayer.realtime.RoomConfig;
 import com.google.android.gms.games.multiplayer.realtime.RoomUpdateCallback;
@@ -157,6 +158,9 @@ public class LocalNetworkAdmin extends LocalNetwork {
         Log.d("BrainRing", "Writing message");
         sendMessageToOthers(message);
         Log.d("BrainRing", "Message sent");
+        for (Participant participant : room.getParticipants()) {
+            Log.d("BrainRing", participant.getDisplayName() + " " + participant.isConnectedToRoom() + " " + participant.getStatus());
+        }
     }
 
     public void regularHandshake() {

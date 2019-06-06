@@ -181,4 +181,16 @@ public class JuryActivity extends AppCompatActivity {
             }
         }
     }
+
+    public void onBackPressed() {
+        new AlertDialog.Builder(this).setTitle("Выход из локальной игры")
+                .setMessage("Вы хотите выйти?")
+                .setPositiveButton("Да", (dialog, which) -> {
+                    LocalController.finishLocalGame(false);
+                    super.onBackPressed();
+                })
+                .setNegativeButton("Нет", (dialog, which) -> {
+                })
+                .show();
+    }
 }

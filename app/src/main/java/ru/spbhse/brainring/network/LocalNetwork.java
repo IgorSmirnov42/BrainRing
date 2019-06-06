@@ -29,7 +29,7 @@ public abstract class LocalNetwork {
     protected int p2pConnected = 0;
     protected boolean serverRoomConnected = false;
     protected RoomConfig mRoomConfig;
-    protected Room room;
+    protected volatile Room room;
     public GoogleSignInAccount googleSignInAccount;
     protected RealTimeMultiplayerClient mRealTimeMultiplayerClient;
     protected String myParticipantId;
@@ -113,7 +113,7 @@ public abstract class LocalNetwork {
     protected RoomUpdateCallback mRoomUpdateCallback;
 
     /** Gets message and resubmits it to {@code onMessageReceived} with sender id*/
-    public OnRealTimeMessageReceivedListener mOnRealTimeMessageReceivedListener = realTimeMessage -> {
+    protected OnRealTimeMessageReceivedListener mOnRealTimeMessageReceivedListener = realTimeMessage -> {
         byte[] buf = realTimeMessage.getMessageData();
         onMessageReceived(buf, realTimeMessage.getSenderParticipantId());
     };
@@ -142,7 +142,6 @@ public abstract class LocalNetwork {
         }
         mRealTimeMultiplayerClient.sendReliableMessage(message, room.getRoomId(), userId, (i, i1, s) -> {
             if (i != GamesCallbackStatusCodes.OK) {
-
                 Log.e("BrainRing", "Failed to send message. Left " + timesToSend + " tries\n" +
                         "Error is " + GamesCallbackStatusCodes.getStatusCodeString(i));
                 sendMessageToConcreteUserNTimes(userId, message, timesToSend - 1);
