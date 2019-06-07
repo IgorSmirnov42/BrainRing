@@ -9,11 +9,8 @@ import static java.lang.Character.isLetter;
 import static java.lang.Character.toLowerCase;
 import static java.lang.Math.min;
 
-/**
- * Class to store correct answers to questions and to check if given answer is right
- */
+/** Class to store correct answers to questions and to check if given answer is right */
 class Answer {
-
     final private String[] possibleAnswers;
 
     String getMainAnswer() {
@@ -70,6 +67,13 @@ class Answer {
         return false;
     }
 
+    /**
+     * Checks if exists at least one interpretation of {@code answer} that can
+     * be accepted as a right answer
+     * Interpretations of an answer are all possibilities to take or leave optional information
+     * marked with square brackets []
+     * I.e. for answer [aba] caba interpretations will be "aba caba" and "caba"
+     */
     private boolean canCompare(@NonNull String answer, @NonNull String userAnswer, int position,
                                @NonNull StringBuilder builder) {
         if (position == answer.length()) {
@@ -97,11 +101,13 @@ class Answer {
         }
     }
 
-    private static int allowedDistance(String answer) {
+    /** Calculates allowed levenshtein distance such as answers with that distance will be accepted*/
+    private static int allowedDistance(@NonNull String answer) {
         return answer.length() / 5;
     }
 
-    private static int levenshteinDistance(String correctAnswer, String userAnswer) {
+    /** Calculates levenshtein distance between two strings */
+    private static int levenshteinDistance(@NonNull String correctAnswer, @NonNull String userAnswer) {
         int[][] distance = new int[correctAnswer.length() + 1][userAnswer.length() + 1];
         for (int row = 0; row <= correctAnswer.length(); row++) {
             distance[row][0] = row;
@@ -139,7 +145,7 @@ class Answer {
         return builder.toString();
     }
 
-    /** Checks if answers are similar. */
+    /** Checks if answers are similar in terms of levenshtein distance */
     private static boolean compareAnswers(@NonNull String correctAnswer, @NonNull String userAnswer) {
         correctAnswer = prepareString(correctAnswer);
         userAnswer = prepareString(userAnswer);

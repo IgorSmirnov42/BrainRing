@@ -3,8 +3,8 @@ package ru.spbhse.brainring.logic;
 import android.media.MediaPlayer;
 import android.widget.Toast;
 
-import ru.spbhse.brainring.controllers.LocalController;
 import ru.spbhse.brainring.R;
+import ru.spbhse.brainring.controllers.LocalController;
 import ru.spbhse.brainring.network.messages.Message;
 import ru.spbhse.brainring.network.messages.MessageGenerator;
 
@@ -19,28 +19,31 @@ public class LocalGamePlayerLogic {
                 .toByteArray();
     }
 
+    /** Shows toast with forbiddance to answer */
     public void onForbiddenToAnswer() {
         Toast.makeText(LocalController.getPlayerActivity(), "Сервер запретил вам отвечать",
                 Toast.LENGTH_LONG).show();
     }
 
+    /** Shows toast with allowance to answer */
     public void onAllowedToAnswer() {
         Toast.makeText(LocalController.getPlayerActivity(), "Разрешено отвечать!",
                 Toast.LENGTH_LONG).show();
     }
 
+    /** Shows toast with false start message */
     public void onFalseStart() {
         Toast.makeText(LocalController.getPlayerActivity(), "Фальстарт!", Toast.LENGTH_LONG)
                 .show();
     }
 
+    /** Plays sound of time start */
     public void onTimeStart() {
         new Thread(() -> {
             MediaPlayer player = MediaPlayer.create(LocalController.getPlayerActivity(), R.raw.start);
             player.setOnCompletionListener(MediaPlayer::release);
             player.start();
         }).start();
-        // TODO : поменять надпись на кнопке
     }
 
     /**
