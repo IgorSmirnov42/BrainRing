@@ -19,14 +19,17 @@ public class Judging extends AppCompatActivity {
         setContentView(R.layout.activity_judging);
 
         String colorName = getIntent().getStringExtra("color");
+        String playerName;
         TextView answering = findViewById(R.id.answeringId);
         int color;
         if (colorName.equals(LocalGameAdminLogic.RED)) {
             color = ContextCompat.getColor(this, R.color.colorCardinal);
+            playerName = "КРАСНЫЙ ";
         } else {
             color = ContextCompat.getColor(this, R.color.colorJungleGreen);
+            playerName = "ЗЕЛЁНЫЙ";
         }
-        answering.setText(colorName);
+        answering.setText("ОТВЕЧАЕТ " + playerName + " ИГРОК");
         answering.setTextColor(color);
 
         Button acceptButton = findViewById(R.id.acceptButton);
