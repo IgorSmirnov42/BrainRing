@@ -63,7 +63,7 @@ public class TrainingGamePreparationActivity extends AppCompatActivity {
                     } catch (MalformedURLException e) {
                         urlEditor.getText().clear();
                         Toast.makeText(TrainingGamePreparationActivity.this,
-                                "Пакет по данной ссылке не найден, попробуйте еще раз",
+                                "Пакет по данной ссылке не найден, попробуйте ещё раз",
                                 Toast.LENGTH_SHORT).show();
                     }
                 });
