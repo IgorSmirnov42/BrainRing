@@ -224,6 +224,7 @@ public class QuestionDatabase extends SQLiteOpenHelper {
 
                 answer = cursor.getString(cursor.getColumnIndex(DatabaseTable.COLUMN_ANSWER)).
                         replaceFirst("Ответ:", "");
+                answer = answer.substring(0, answer.length() - 1);
 
                 comment = cursor.getString(cursor.getColumnIndex(DatabaseTable.COLUMN_COMMENT)).
                         replaceFirst("Комментарий:", "");
