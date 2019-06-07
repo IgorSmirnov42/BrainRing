@@ -104,7 +104,8 @@ public class TrainingGameActivity extends GameActivity {
     public void onGameFinished() {
         Intent intent = new Intent(this, AfterGameActivity.class);
         String total = String.valueOf(Integer.parseInt(opponentScore) + Integer.parseInt(myScore));
-        String endGameMessage = getString(R.string.answered_right_on) + " " + myScore + " " + getString(R.string.questions_of) + total + ".";
+        String endGameMessage = getString(R.string.answered_right_on) + " " + myScore + " " + getString(R.string.questions_of) +
+                " " + total + ".";
         intent.putExtra(Intent.EXTRA_TEXT, endGameMessage);
         startActivity(intent);
     }
