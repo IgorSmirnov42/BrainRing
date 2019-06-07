@@ -19,7 +19,7 @@
     <string name="button_push_text">ЖМЯК!!</string>
     <string name="forbidden_answer">Сервер запретил Вам отвечать</string>
     <string name="nobody_answered">Никто не ответил на вопрос</string>
-    <string name="answered_right">ответил верно</string>
+    <string name="answered_right"> ответил верно</string>
     <string name="allowed_answer">Разрешено отвечать!</string>
     <string name="connected">Connected</string>
     <string name="cannot_change_score">Изменение счёта невозможно во время вопроса.</string>
