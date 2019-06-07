@@ -24,12 +24,12 @@ public class Judging extends AppCompatActivity {
         int color;
         if (colorName.equals(LocalGameAdminLogic.RED)) {
             color = ContextCompat.getColor(this, R.color.colorCardinal);
-            playerName = "КРАСНЫЙ ";
+            playerName = "КРАСНАЯ ";
         } else {
             color = ContextCompat.getColor(this, R.color.colorJungleGreen);
-            playerName = "ЗЕЛЁНЫЙ";
+            playerName = "ЗЕЛЁНАЯ";
         }
-        answering.setText("ОТВЕЧАЕТ " + playerName + " ИГРОК");
+        answering.setText("НАЖАТА " + playerName + " КНОПКА");
         answering.setTextColor(color);
 
         Button acceptButton = findViewById(R.id.acceptButton);
