@@ -42,7 +42,6 @@
         android:id="@+id/answerEditor"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:contentDescription="Сюда вводить текст"
         android:ems="10"
         android:imeOptions="actionDone"
         android:inputType="textPersonName"
@@ -50,7 +49,9 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.533" />
+        app:layout_constraintVertical_bias="0.533" >
+        <requestFocus/>
+    </EditText>
 
     <TextView
         android:id="@+id/timeLeft"
