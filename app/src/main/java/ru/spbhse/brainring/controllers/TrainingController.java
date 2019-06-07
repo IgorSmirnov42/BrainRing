@@ -20,7 +20,6 @@ public class TrainingController extends Controller {
         return trainingGameActivity.get();
     }
 
-
     public static void createTrainingGame() {
         DatabaseController.generateNewSequence();
         TrainingLogicController.trainingPlayerLogic = new TrainingPlayerLogic();

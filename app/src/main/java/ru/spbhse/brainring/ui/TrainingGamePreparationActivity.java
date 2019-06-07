@@ -6,7 +6,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
 import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.SeekBar;
@@ -63,7 +62,7 @@ public class TrainingGamePreparationActivity extends AppCompatActivity {
                     } catch (MalformedURLException e) {
                         urlEditor.getText().clear();
                         Toast.makeText(TrainingGamePreparationActivity.this,
-                                "Пакет по данной ссылке не найден, попробуйте ещё раз",
+                                getString(R.string.package_not_found),
                                 Toast.LENGTH_SHORT).show();
                     }
                 });

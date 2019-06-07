@@ -19,6 +19,7 @@ import com.google.android.gms.games.Games;
 import java.util.Objects;
 
 import ru.spbhse.brainring.R;
+import ru.spbhse.brainring.controllers.Controller;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -94,13 +95,13 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 String message = result.getStatus().getStatusMessage();
                 if (message == null || message.isEmpty()) {
-                    message = "Неизвестная ошибка. Убедитесь, что у Вас установлены Google Play игры и выполнен вход в аккаунт.";
+                    message = getString(R.string.login_fail);
                 }
                 new AlertDialog.Builder(this).setMessage(message)
                         .setNeutralButton(android.R.string.ok, null).show();
             }
         } else if (requestCode == RC_LEADERBOARD_UI) {
-            Log.d("BrainRing", "Showed leaderboard");
+            Log.d(Controller.APP_TAG, "Showed leaderboard");
         }
     }
 }

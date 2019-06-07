@@ -24,7 +24,6 @@ public class ConcreteComplain extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
         setContentView(R.layout.activity_concrete_complain);
         try {
             list = ComplainsFileHandler.getAllQuestionsFromFile(this);

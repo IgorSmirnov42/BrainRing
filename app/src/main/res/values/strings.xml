@@ -33,5 +33,36 @@
     <string name="unknown_error">Игра прервана. Неизвестная ошибка.</string>
     <string name="opponent_not_found">Соперник не найден</string>
     <string name="default_error">Игра прервана. Потеряно соединение с соперником.</string>
-
+    <string name="email_not_found">Не найдено приложений для отправки электронных сообщений.</string>
+    <string name="send_using">Отправить с помощью…</string>
+    <string name="package_not_found">Пакет по данной ссылке не найден, попробуйте ещё раз</string>
+    <string name="answered_right_on">Вы правильно ответили на</string>
+    <string name="questions_of">вопросов из</string>
+    <string name="right_answers">Правильных ответов</string>
+    <string name="wrong_answers">Неправильных ответов</string>
+    <string name="out_of_local">Выход из локальной игры</string>
+    <string name="yes">Да</string>
+    <string name="no">Нет</string>
+    <string name="login_fail">Неизвестная ошибка. Убедитесь, что у Вас установлены Google Play игры и выполнен вход в аккаунт.</string>
+    <string name="out_of_online">Выход из игры по сети</string>
+    <string name="want_out">Вы хотите выйти?</string>
+    <string name="check_connection">Проверяем подключение</string>
+    <string name="both_connected">Оба игрока подключены. Можем начинать раунд.</string>
+    <string name="begin_reading">Начать чтение вопроса</string>
+    <string name="reading_question">Чтение вопроса. Как только вопрос будет дочитан, нужно нажать на кнопку</string>
+    <string name="start_timer">Запустить таймер</string>
+    <string name="stop_timer">Остановить таймер</string>
+    <string name="something_wrong">Что-то пошло не так. Вы не должны видеть это меню.</string>
+    <string name="cannot_switch">Невозможно переключиться в данный момент</string>
+    <string name="press_longer">Надо нажимать дольше</string>
+    <string name="red">КРАСНАЯ</string>
+    <string name="green">ЗЕЛЁНАЯ</string>
+    <string name="pressed">НАЖАТА</string>
+    <string name="button">КНОПКА</string>
+    <string name="comment">Комментарий:</string>
+    <string name="answer_show">Ответ:</string>
+    <string name="reading_question_btn">Чтение вопроса</string>
+    <string name="added_complain">Вопрос добавлен в список. После игры зайдите во вкладку "Пожаловаться на вопрос", чтобы отправить жалобу</string>
+    <string name="right_answer">Правильный ответ!</string>
+    <string name="wrong_answer">Неверный ответ</string>
 </resources>

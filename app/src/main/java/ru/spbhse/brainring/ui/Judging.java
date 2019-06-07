@@ -1,8 +1,7 @@
 package ru.spbhse.brainring.ui;
 
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Button;
 import android.widget.TextView;
@@ -24,12 +23,13 @@ public class Judging extends AppCompatActivity {
         int color;
         if (colorName.equals(LocalGameAdminLogic.RED)) {
             color = ContextCompat.getColor(this, R.color.colorCardinal);
-            playerName = "КРАСНАЯ ";
+            playerName = getString(R.string.red);
         } else {
             color = ContextCompat.getColor(this, R.color.colorJungleGreen);
-            playerName = "ЗЕЛЁНАЯ";
+            playerName = getString(R.string.green);
         }
-        answering.setText("НАЖАТА " + playerName + " КНОПКА");
+        String text = getString(R.string.pressed) + playerName + getString(R.string.button);
+        answering.setText(text);
         answering.setTextColor(color);
 
         Button acceptButton = findViewById(R.id.acceptButton);

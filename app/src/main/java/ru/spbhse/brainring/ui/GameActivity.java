@@ -14,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import ru.spbhse.brainring.R;
+import ru.spbhse.brainring.controllers.Controller;
 import ru.spbhse.brainring.controllers.GameController;
 import ru.spbhse.brainring.files.ComplainedQuestion;
 import ru.spbhse.brainring.files.ComplainsFileHandler;
@@ -68,7 +69,8 @@ abstract public class GameActivity extends AppCompatActivity {
             makeScrollable(findViewById(R.id.questionText));
 
             EditText answerEditor = findViewById(R.id.answerEditor);
-            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            InputMethodManager imm = (InputMethodManager) getSystemService(
+                    Context.INPUT_METHOD_SERVICE);
             imm.showSoftInput(answerEditor, InputMethodManager.SHOW_IMPLICIT);
 
             Button answerWrittenButton = findViewById(R.id.answerWrittenButton);
@@ -101,8 +103,7 @@ abstract public class GameActivity extends AppCompatActivity {
                     return;
                 }
                 Toast toast = Toast.makeText(GameActivity.this,
-                        "Вопрос добавлен в список. После игры зайдите во вкладку " +
-                                "\"Пожаловаться на вопрос\", чтобы отправить жалобу",
+                        getString(R.string.added_complain),
                         Toast.LENGTH_LONG);
                 toast.setGravity(Gravity.CENTER, 0, 0);
                 toast.show();
@@ -123,7 +124,7 @@ abstract public class GameActivity extends AppCompatActivity {
     public void onNewQuestion() {
         setOpponentAnswer("");
         setTime("");
-        setButtonText("Чтение вопроса");
+        setButtonText(getString(R.string.reading_question_btn));
     }
 
     public void setOpponentNick(@NonNull String nick) {
@@ -197,7 +198,7 @@ abstract public class GameActivity extends AppCompatActivity {
         this.answer = answer;
         TextView rightAnswerTextField = findViewById(R.id.rightAnswerTextField);
         if (rightAnswerTextField != null) {
-            String answerToShow = "Ответ: " + answer;
+            String answerToShow = getString(R.string.answer_show) + " " + answer;
             rightAnswerTextField.setText(answerToShow);
         }
     }
@@ -208,7 +209,7 @@ abstract public class GameActivity extends AppCompatActivity {
         if (commentField != null) {
             String commentToShow = comment;
             if (!comment.equals("")) {
-                commentToShow = "Комментарий: " + commentToShow;
+                commentToShow = getString(R.string.comment) + " " + commentToShow;
             }
             commentField.setText(commentToShow);
         }
@@ -224,7 +225,7 @@ abstract public class GameActivity extends AppCompatActivity {
         if (answerEditor != null) {
             return answerEditor.getText().toString();
         } else {
-            Log.wtf("BrainRing", "Answer editing wasn't open but should");
+            Log.wtf(Controller.APP_TAG, "Answer editing wasn't open but should");
             return "";
         }
     }
