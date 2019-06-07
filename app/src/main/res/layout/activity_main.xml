@@ -92,6 +92,6 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="6"
-        android:background="@drawable/icon_with_suitable_background"/>
+        android:src="@drawable/icon_with_suitable_background"/>
 
 </LinearLayout>
