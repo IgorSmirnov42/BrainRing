@@ -7,21 +7,20 @@ import android.widget.TextView;
 
 import ru.spbhse.brainring.R;
 
-public class OnlineGameFinished extends AppCompatActivity {
+public class GameFinished extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_online_game_finished);
+        setContentView(R.layout.activity_game_finished);
 
         String message = getIntent().getStringExtra("message");
 
         TextView messageView = findViewById(R.id.gameResult);
         messageView.setText(message);
 
-        Button toSelectOnlineOpponentButton = findViewById(R.id.toSelectOnlineOpponent);
-        toSelectOnlineOpponentButton.setOnClickListener(v -> {
-            // Back to select opponent activity
+        Button toGameStart = findViewById(R.id.toGameStart);
+        toGameStart.setOnClickListener(v -> {
             finish();
         });
     }
