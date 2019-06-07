@@ -31,6 +31,10 @@ public class TrainingPlayerLogic {
             timer.cancel();
             timer = null;
         }
+        if (DatabaseController.getNumberOfRemainingQuestions() == 0) {
+            TrainingController.TrainingUIController.onGameFinished();
+            return;
+        }
         currentQuestion = DatabaseController.getRandomQuestion();
         TrainingController.TrainingUIController.setLocation(GameActivityLocation.SHOW_QUESTION);
         TrainingController.TrainingUIController.setQuestionText(currentQuestion.getQuestion());
