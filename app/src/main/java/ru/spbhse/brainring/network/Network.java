@@ -268,11 +268,13 @@ public class Network {
                 case Message.SENDING_QUESTION:
                     int questionId = is.readInt();
                     String question = is.readUTF();
-                    OnlineController.OnlineUserLogicController.onReceivingQuestion(questionId, question);
+                    OnlineController.OnlineUserLogicController
+                            .onReceivingQuestion(questionId, question);
                     break;
                 case Message.SENDING_INCORRECT_OPPONENT_ANSWER:
                     String opponentAnswer = is.readUTF();
-                    OnlineController.OnlineUserLogicController.onIncorrectOpponentAnswer(opponentAnswer);
+                    OnlineController.OnlineUserLogicController
+                            .onIncorrectOpponentAnswer(opponentAnswer);
                     break;
                 case Message.SENDING_CORRECT_ANSWER_AND_SCORE:
                     String correctAnswer = is.readUTF();

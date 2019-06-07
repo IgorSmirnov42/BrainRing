@@ -56,6 +56,7 @@ public class OnlineGameAdminLogic {
     private static final int SECOND = 1000;
     private static final int TIME_TO_READ_QUESTION = 10;
     private static final int DELIVERING_FAULT_MILLIS = 1000;
+    private static final int TIME_TO_SEND = 2000;
 
     /** Returns UserScore object connected with given user */
     public OnlineGameAdminLogic() {
@@ -248,12 +249,14 @@ public class OnlineGameAdminLogic {
                             .writeInt(user2Code)
                             .toByteArray()
             );
-            OnlineController.NetworkController.sendMessageToConcreteUser(user1.status.participantId,
-                    MessageGenerator.create()
-                            .writeInt(Message.FINISH)
-                            .writeInt(user1Code)
-                            .toByteArray()
-            );
+            new Handler().postDelayed(() -> {
+                OnlineController.NetworkController.sendMessageToConcreteUser(user1.status.participantId,
+                        MessageGenerator.create()
+                                .writeInt(Message.FINISH)
+                                .writeInt(user1Code)
+                                .toByteArray()
+                );
+            }, TIME_TO_SEND);
             return;
         }
 
