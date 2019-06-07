@@ -37,4 +37,8 @@ public class DatabaseController {
         Collections.shuffle(questionSequence, RAND);
         currentQuestion = 0;
     }
+
+    public static int getNumberOfRemainingQuestions() {
+        return questionSequence.size() - currentQuestion;
+    }
 }
