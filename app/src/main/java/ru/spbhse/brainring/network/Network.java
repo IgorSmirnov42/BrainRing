@@ -44,20 +44,61 @@ public class Network {
     private GoogleSignInAccount googleSignInAccount;
     private RealTimeMultiplayerClient mRealTimeMultiplayerClient;
     private String myParticipantId;
+    /**
+     * Timer that counts {@code HANDSHAKE_TIME} ms (or {@code FIRST_HANDSHAKE_TIME} if it is first
+     *      handshake in a game and panics if haven't received handshake message by that time.
+     * Handshake messages are sent by server before each round to check if opponent is connected
+     */
     private CountDownTimer handshakeTimer;
     private LeaderboardsClient leaderboardsClient;
+    /**
+     * Number of points in all online games earned by this player.
+     * Increments on every right answer in current game and then sends to leaderboard
+     * In the beginning of the game downloaded from the leaderboard
+     */
     private long scoreSum;
+    /** Flag that determines whether any message was already sent */
     private boolean firstMessage = true;
+    /**
+     * Time that handshake longs.
+     * It must be the time that message may go from server to client and back
+     * Reasonably to make it {@code DELIVERING_FAULT_MILLIS} (from {@code OnlineGameAdminLogic})
+     *          multiplied by 2
+     */
     private static final int HANDSHAKE_TIME = 2000;
+    /**
+     * First message takes much longer time if server and client are connected in different networks
+     * So time for first handshake should be longer too
+     */
     private static final int FIRST_HANDSHAKE_TIME = 5000; // first message may take longer time
+    /**
+     * If server doesn't receive any messages during that time it panics and finishes game
+     * This time is bigger than a longest time without messages from concrete user, so if timer
+     *      panics then definitely something gone wrong
+     */
     private static final int MAXIMUM_TIME_WITHOUT_MESSAGES = 80 * 1000;
+    /**
+     * Timer that checks if last message from opponent was too much time ago
+     * Also determines whether online opponent was not found
+     */
     private static CountDownTimer timer;
     private boolean gameIsFinished = false;
+    /**
+     * Game should start only if {@code onRoomConnected} and {@code onP2PConnected were called}
+     * This is the counter to determine if both of them were called
+     */
     private int counterOfConnections = 0;
+    /** Number of tries that should be done to deliver a message that was failed to deliver */
     private static final int TIMES_TO_SEND = 100;
+    /**
+     * We can receive some of room disconnected messages before the message with real game finish
+     *      reason comes.
+     * So we have to wait {@code WAIT_FOR_MESSAGE} to check whether a message with cause of finish
+     *      was sent
+     */
     private static final int WAIT_FOR_MESSAGE = 2000;
+    /** Time when last handshake started to determine time it takes */
     private long handshakeStartTime;
-
 
     private RoomStatusUpdateCallback mRoomStatusUpdateCallback = new RoomStatusUpdateCallback() {
         @Override
@@ -123,6 +164,10 @@ public class Network {
             waitOrFinish();
         }
 
+        /**
+         * Checks whether {@code onRoomConnected} had already been called.
+         * If so and I am server, starts game
+         */
         @Override
         public void onP2PConnected(@NonNull String s) {
             Log.d("BrainRing", "onP2PConnected " + s);
@@ -131,6 +176,7 @@ public class Network {
                 OnlineController.startOnlineGame();
             }
         }
+
 
         @Override
         public void onP2PDisconnected(@NonNull String s) {
@@ -157,6 +203,12 @@ public class Network {
             waitOrFinish();
         }
 
+        /**
+         * Determines which player is a server (with minimal participantId)
+         * Gets {@code myParticipantId}
+         * If I am server and {@code onP2PConnected} with opponent was already called
+         * then starts game
+         */
         @Override
         public void onRoomConnected(int code, @Nullable Room room) {
             Log.d("BrainRing", "Connected to room");
@@ -189,12 +241,14 @@ public class Network {
                     });
         }
     };
+    /** Sends received message to {@code onMessageReceived} */
     private OnRealTimeMessageReceivedListener mOnRealTimeMessageReceivedListener = realTimeMessage -> {
         Log.d("BrainRing","Received message");
         byte[] buf = realTimeMessage.getMessageData();
         onMessageReceived(buf, realTimeMessage.getSenderParticipantId());
     };
 
+    /** Prints all room members' names, sets nicknames to score counter */
     private void walkRoomMembers() {
         Log.d("BrainRing", "Start printing room members");
         if (room != null) {
@@ -210,6 +264,7 @@ public class Network {
         Log.d("BrainRing", "Finish printing room members");
     }
 
+    /** Closes connection to room */
     private void leaveRoom() {
         if (room != null) {
             Games.getRealTimeMultiplayerClient(OnlineController.getOnlineGameActivity(),
@@ -218,6 +273,10 @@ public class Network {
         }
     }
 
+    /**
+     * Finishes network part of online game
+     * Cancels all timers, leaves room, updates rating
+     */
     public void finish() {
         if (gameIsFinished) {
             return;
@@ -235,7 +294,10 @@ public class Network {
         updateRating();
     }
 
-    /** Reacts on received message */
+    /**
+     * Reacts on received message
+     * Reloads {@code timer} if message if from another user
+     */
     private void onMessageReceived(@NonNull byte[] buf, @NonNull String userId) {
         if (gameIsFinished) {
             Log.e("BrainRing", "received message but game is over");
@@ -330,12 +392,12 @@ public class Network {
                     OnlineController.OnlineAdminLogicController.onReadyForQuestion(userId);
                     break;
             }
-
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
+    /** Send immediate update o\to rating */
     private void updateRating() {
         if (leaderboardsClient == null || scoreSum == -1) {
             return;
@@ -345,6 +407,7 @@ public class Network {
                 OnlineController.getOnlineGameActivity().getString(R.string.leaderboard), scoreSum);
     }
 
+    /** Reloads {@code timer} */
     private void startNewTimer() {
         timer = new CountDownTimer(MAXIMUM_TIME_WITHOUT_MESSAGES, MAXIMUM_TIME_WITHOUT_MESSAGES) {
             @Override
@@ -369,6 +432,7 @@ public class Network {
         timer.start();
     }
 
+    /** Continues game cycle after successful handshake */
     private void continueGame() {
         if (handshakeTimer != null) {
             handshakeTimer.cancel();
@@ -379,6 +443,7 @@ public class Network {
         }
     }
 
+    /** Saves Google account, loads current score of user. On success starts searching for opponents */
     public void onSignedIn(@NonNull GoogleSignInAccount signInAccount) {
         googleSignInAccount = signInAccount;
         mRealTimeMultiplayerClient = Games.getRealTimeMultiplayerClient(OnlineController.getOnlineGameActivity(),
@@ -415,6 +480,10 @@ public class Network {
         mRealTimeMultiplayerClient.create(mRoomConfig);
     }
 
+    /**
+     * Waits {@code WAIT_FOR_MESSAGE} time. If no message with cause of finish was delivered sets
+     * default cause
+     */
     private void waitOrFinish() {
         if (gameIsFinished) {
             return;
@@ -424,6 +493,10 @@ public class Network {
                 WAIT_FOR_MESSAGE);
     }
 
+    /**
+     * Finishes game
+     * @param message description of reason of finishing game
+     */
     public void finishImmediately(@NonNull String message) {
         if (gameIsFinished) {
             return;
@@ -432,7 +505,7 @@ public class Network {
         OnlineController.showGameFinishedActivity(message);
     }
 
-    /** Sends message to all users in a room (and to itself). Guarantees delivering */
+    /** Sends message to all users in a room (and to itself) */
     public void sendMessageToAll(@NonNull byte[] message) {
         // The order of sending is critical!
         if (getOpponentParticipantId() != null) {
@@ -441,6 +514,11 @@ public class Network {
         onMessageReceived(message, myParticipantId);
     }
 
+    /**
+     * Sends message to user by id reliably.
+     * If sending is unsuccessful repeats it {@code TIMES_TO_SEND} times until success
+     * If there was no success, panics
+     */
     public void sendMessageToConcreteUser(@NonNull String userId, @NonNull byte[] message) {
         if (myParticipantId == null || room == null) {
             Log.e("BrainRing", "Cannot send message before initialization");
@@ -455,6 +533,11 @@ public class Network {
         }
     }
 
+    /**
+     * Sends message to user by id reliably.
+     * If sending is unsuccessful repeats it {@code timesToSend} times until success
+     * If there was no success, panics
+     */
     private void sendMessageToConcreteUserNTimes(@NonNull String userId, @NonNull byte[] message,
                                           int timesToSend) {
         if (gameIsFinished) {
@@ -478,6 +561,7 @@ public class Network {
         });
     }
 
+    /** Sends question. Starts {@code handshakeTimer} */
     public void sendQuestion(@NonNull byte[] message) {
         sendMessageToAll(message);
         int handshakeTime = HANDSHAKE_TIME;
@@ -492,7 +576,8 @@ public class Network {
 
             @Override
             public void onFinish() {
-                if (handshakeTimer == this) { // check in case message was delivered right before finish
+                // check in case message was delivered right before finish
+                if (handshakeTimer == this) {
                     Log.wtf("BrainRing", "Unsuccessful handshake");
                     sendMessageToAll(MessageGenerator.create()
                             .writeInt(Message.FINISH)
@@ -506,6 +591,7 @@ public class Network {
         handshakeTimer.start();
     }
 
+    /** Returns participant's name by his/her id */
     public String getParticipantName(@NonNull String userId) {
         for (Participant participant : room.getParticipants()) {
             if (participant.getParticipantId().equals(userId)) {
@@ -515,6 +601,7 @@ public class Network {
         return null;
     }
 
+    /** Sends message directly to server */
     public void sendMessageToServer(@NonNull byte[] message) {
         if (isServer) {
             onMessageReceived(message, myParticipantId);
@@ -527,10 +614,15 @@ public class Network {
         return myParticipantId;
     }
 
+    /** Determines whether server of this game is on current device */
     public boolean iAmServer() {
         return isServer;
     }
 
+    /**
+     * Returns opponent's participant id
+     * Returns null if was not found
+     */
     public String getOpponentParticipantId() {
         if (room == null) {
             return null;
