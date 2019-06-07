@@ -8,6 +8,7 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
 
+import ru.spbhse.brainring.controllers.Controller;
 import ru.spbhse.brainring.controllers.DatabaseController;
 import ru.spbhse.brainring.controllers.OnlineController;
 import ru.spbhse.brainring.network.messages.Message;
@@ -66,22 +67,22 @@ public class OnlineGameAdminLogic {
 
     /** Returns UserScore object connected with given user */
     private UserScore getThisUser(@NonNull String userId) {
-        return user1.status.participantId.equals(userId) ? user1 : user2;
+        return user1.status.getParticipantId().equals(userId) ? user1 : user2;
     }
 
     /** Returns UserScore object connected with opponent of given user */
     private UserScore getOtherUser(@NonNull String userId) {
-        return user1.status.participantId.equals(userId) ? user2 : user1;
+        return user1.status.getParticipantId().equals(userId) ? user2 : user1;
     }
 
     public void onFalseStart(@NonNull String userId) {
         if (!published) {
-            getThisUser(userId).status.alreadyAnswered = true;
+            getThisUser(userId).status.setAlreadyAnswered(true);
         } else {
             if (answeringUserId != null) { // somebody is answering
-                getThisUser(userId).status.alreadyAnswered = true;
+                getThisUser(userId).status.setAlreadyAnswered(true);
             } else {
-                if (getOtherUser(userId).status.alreadyAnswered) {
+                if (getOtherUser(userId).status.getAlreadyAnswered()) {
                     showAnswer(null);
                 }
             }
@@ -89,17 +90,17 @@ public class OnlineGameAdminLogic {
     }
 
     private void allowAnswer(@NonNull String userId) {
-        Log.d("BrainRing","Allow to answer " + userId);
+        Log.d(Controller.APP_TAG,"Allow to answer " + userId);
         answeringUserId = userId;
         UserScore user = getThisUser(userId);
-        user.status.alreadyAnswered = true;
+        user.status.setAlreadyAnswered(true);
         OnlineController.NetworkController.sendMessageToConcreteUser(userId, ALLOW_ANSWER);
         OnlineController.NetworkController.sendMessageToConcreteUser(
-                getOtherUser(userId).status.participantId, OPPONENT_ANSWERING);
+                getOtherUser(userId).status.getParticipantId(), OPPONENT_ANSWERING);
     }
 
     private void forbidAnswer(@NonNull String userId) {
-        Log.d("BrainRing","Allow to answer " + userId);
+        Log.d(Controller.APP_TAG,"Allow to answer " + userId);
         OnlineController.NetworkController.sendMessageToConcreteUser(userId, FORBID_ANSWER);
     }
 
@@ -108,14 +109,14 @@ public class OnlineGameAdminLogic {
         if (roundNumber != currentRound) {
             return;
         }
-        if (getOtherUser(userId).status.alreadyAnswered ||
+        if (getOtherUser(userId).status.getAlreadyAnswered() ||
                 !userId.equals(OnlineController.NetworkController.getMyParticipantId())) {
-            getThisUser(userId).status.alreadyAnswered = true;
+            getThisUser(userId).status.setAlreadyAnswered(true);
             showAnswer(null);
         } else {
             new Handler().postDelayed(() -> {
                 if (roundNumber == currentRound) {
-                    getThisUser(userId).status.alreadyAnswered = true;
+                    getThisUser(userId).status.setAlreadyAnswered(true);
                 }
             }, DELIVERING_FAULT_MILLIS);
         }
@@ -127,14 +128,14 @@ public class OnlineGameAdminLogic {
      */
     public void onAnswerIsReady(@NonNull String userId, long time) {
         UserScore user = getThisUser(userId);
-        if (user.status.alreadyAnswered || answeringUserId != null) {
+        if (user.status.getAlreadyAnswered() || answeringUserId != null) {
             forbidAnswer(userId);
         } else {
-            Log.d("BrainRing", "Received answer from user " + userId + " at " + time);
+            Log.d(Controller.APP_TAG, "Received answer from user " + userId + " at " + time);
             currentRound = 2;
             // If other user has already answered or not admin wants and current don't
             // then allow immediately
-            if (getOtherUser(userId).status.alreadyAnswered ||
+            if (getOtherUser(userId).status.getAlreadyAnswered() ||
                     (!userId.equals(OnlineController.NetworkController.getMyParticipantId())
                             && waitingAnswer.isEmpty())) {
                 allowAnswer(userId);
@@ -148,9 +149,9 @@ public class OnlineGameAdminLogic {
     }
 
     private void judgeFirst() {
-        Log.d("BrainRing", "Start judging");
+        Log.d(Controller.APP_TAG, "Start judging");
         if (waitingAnswer.isEmpty()) {
-            Log.wtf("BrainRing", "No one wants to answer, judgeFirst called");
+            Log.wtf(Controller.APP_TAG, "No one wants to answer, judgeFirst called");
             return;
         }
         AnswerTime best = waitingAnswer.get(0);
@@ -175,7 +176,7 @@ public class OnlineGameAdminLogic {
             return;
         }
         OnlineController.NetworkController.sendMessageToConcreteUser(
-                getOtherUser(previousUserId).status.participantId,
+                getOtherUser(previousUserId).status.getParticipantId(),
                 MessageGenerator.create()
                         .writeInt(Message.SENDING_INCORRECT_OPPONENT_ANSWER)
                         .writeString(previousAnswer)
@@ -185,7 +186,7 @@ public class OnlineGameAdminLogic {
 
     /** Rejects or accepts answer written by user */
     public void onAnswerIsWritten(@NonNull String writtenAnswer, @NonNull String id) {
-        Log.d("BrainRing","Got answer: " + writtenAnswer + " from user " + id);
+        Log.d(Controller.APP_TAG,"Got answer: " + writtenAnswer + " from user " + id);
         if (!id.equals(answeringUserId)) {
             return;
         }
@@ -195,7 +196,7 @@ public class OnlineGameAdminLogic {
             OnlineController.NetworkController.sendMessageToConcreteUser(id, CORRECT_ANSWER);
         }
         if (!currentQuestion.checkAnswer(writtenAnswer)) {
-            if (!getOtherUser(userId).status.alreadyAnswered) {
+            if (!getOtherUser(userId).status.getAlreadyAnswered()) {
                 restartTime(userId, writtenAnswer);
             } else {
                 showAnswer(null);
@@ -208,7 +209,7 @@ public class OnlineGameAdminLogic {
 
     /** Sends answer and shows it for {@code TIME_TO_SHOW_ANSWER} seconds */
     private void showAnswer(@Nullable String answeredUserId) {
-        Log.d("BrainRing", "show answer " + answeredUserId);
+        Log.d(Controller.APP_TAG, "show answer " + answeredUserId);
         String questionMessage;
         if (answeredUserId == null) {
             questionMessage = "Никто не ответил на вопрос";
@@ -216,7 +217,7 @@ public class OnlineGameAdminLogic {
             questionMessage = OnlineController.NetworkController.getParticipantName(answeredUserId) +
                     " ответил верно";
         }
-        Log.d("BrainRing", "Question message:" + questionMessage);
+        Log.d(Controller.APP_TAG, "Question message:" + questionMessage);
         readyUsers = 0;
         OnlineController.NetworkController.sendMessageToAll(
                 MessageGenerator.create()
@@ -233,24 +234,26 @@ public class OnlineGameAdminLogic {
     /** Determines if game is finished. If not, generates new question and sends it */
     public void newQuestion() {
         if (questionNumber >= QUESTIONS_NUMBER_MIN && user1.score != user2.score) {
-            Log.d("BrainRing", "Game finished");
+            Log.d(Controller.APP_TAG, "Game finished");
             int user1Code, user2Code;
             if (user1.score > user2.score) {
                 user1Code = OnlineFinishCodes.GAME_FINISHED_CORRECTLY_WON;
-                user2Code = OnlineFinishCodes.GAME_FINISHED_CORRECTLY_LOOSE;
+                user2Code = OnlineFinishCodes.GAME_FINISHED_CORRECTLY_LOST;
             } else {
                 user2Code = OnlineFinishCodes.GAME_FINISHED_CORRECTLY_WON;
-                user1Code = OnlineFinishCodes.GAME_FINISHED_CORRECTLY_LOOSE;
+                user1Code = OnlineFinishCodes.GAME_FINISHED_CORRECTLY_LOST;
             }
             // The order of sending here is critical!
-            OnlineController.NetworkController.sendMessageToConcreteUser(user2.status.participantId,
+            OnlineController.NetworkController.sendMessageToConcreteUser(
+                    user2.status.getParticipantId(),
                     MessageGenerator.create()
                             .writeInt(Message.FINISH)
                             .writeInt(user2Code)
                             .toByteArray()
             );
             new Handler().postDelayed(() -> {
-                OnlineController.NetworkController.sendMessageToConcreteUser(user1.status.participantId,
+                OnlineController.NetworkController.sendMessageToConcreteUser(
+                        user1.status.getParticipantId(),
                         MessageGenerator.create()
                                 .writeInt(Message.FINISH)
                                 .writeInt(user1Code)
@@ -260,7 +263,7 @@ public class OnlineGameAdminLogic {
             return;
         }
 
-        Log.d("BrainRing", "New question");
+        Log.d(Controller.APP_TAG, "New question");
         user1.status.onNewQuestion();
         user2.status.onNewQuestion();
 
@@ -281,7 +284,7 @@ public class OnlineGameAdminLogic {
     }
 
     private boolean bothAnswered() {
-        return user1.status.alreadyAnswered && user2.status.alreadyAnswered;
+        return user1.status.getAlreadyAnswered() && user2.status.getAlreadyAnswered();
     }
 
     private void publishQuestion() {

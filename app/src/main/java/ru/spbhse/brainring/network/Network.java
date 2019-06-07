@@ -27,6 +27,7 @@ import java.util.Collections;
 import java.util.List;
 
 import ru.spbhse.brainring.R;
+import ru.spbhse.brainring.controllers.Controller;
 import ru.spbhse.brainring.controllers.OnlineController;
 import ru.spbhse.brainring.network.messages.Message;
 import ru.spbhse.brainring.network.messages.MessageGenerator;
@@ -103,63 +104,63 @@ public class Network {
     private RoomStatusUpdateCallback mRoomStatusUpdateCallback = new RoomStatusUpdateCallback() {
         @Override
         public void onRoomConnecting(@Nullable Room room) {
-            Log.d("BrainRing", "onRoomConnecting");
+            Log.d(Controller.APP_TAG, "onRoomConnecting");
             Network.this.room = room;
         }
 
         @Override
         public void onRoomAutoMatching(@Nullable Room room) {
-            Log.d("BrainRing", "onRoomAutoMatching");
+            Log.d(Controller.APP_TAG, "onRoomAutoMatching");
             Network.this.room = room;
         }
 
         @Override
         public void onPeerInvitedToRoom(@Nullable Room room, @NonNull List<String> list) {
-            Log.d("BrainRing", "onPeerInvitedToRoom");
+            Log.d(Controller.APP_TAG, "onPeerInvitedToRoom");
             Network.this.room = room;
         }
 
         @Override
         public void onPeerDeclined(@Nullable Room room, @NonNull List<String> list) {
-            Log.d("BrainRing", "onPeerDeclined");
+            Log.d(Controller.APP_TAG, "onPeerDeclined");
             Network.this.room = room;
         }
 
         @Override
         public void onPeerJoined(@Nullable Room room, @NonNull List<String> list) {
-            Log.d("BrainRing", "onPeerJoined");
+            Log.d(Controller.APP_TAG, "onPeerJoined");
             Network.this.room = room;
         }
 
         @Override
         public void onPeerLeft(@Nullable Room room, @NonNull List<String> list) {
-            Log.d("BrainRing", "onPeerLeft");
+            Log.d(Controller.APP_TAG, "onPeerLeft");
             Network.this.room = room;
             waitOrFinish();
         }
 
         @Override
         public void onConnectedToRoom(@Nullable Room room) {
-            Log.d("BrainRing", "onConnectedToRoom");
+            Log.d(Controller.APP_TAG, "onConnectedToRoom");
             Network.this.room = room;
         }
 
         @Override
         public void onDisconnectedFromRoom(@Nullable Room room) {
-            Log.d("BrainRing", "onDisconnectedFromRoom");
+            Log.d(Controller.APP_TAG, "onDisconnectedFromRoom");
             Network.this.room = room;
             waitOrFinish();
         }
 
         @Override
         public void onPeersConnected(@Nullable Room room, @NonNull List<String> list) {
-            Log.d("BrainRing", "onPeersConnected");
+            Log.d(Controller.APP_TAG, "onPeersConnected");
             Network.this.room = room;
         }
 
         @Override
         public void onPeersDisconnected(@Nullable Room room, @NonNull List<String> list) {
-            Log.d("BrainRing", "onPeersDisconnected");
+            Log.d(Controller.APP_TAG, "onPeersDisconnected");
             Network.this.room = room;
             waitOrFinish();
         }
@@ -170,7 +171,7 @@ public class Network {
          */
         @Override
         public void onP2PConnected(@NonNull String s) {
-            Log.d("BrainRing", "onP2PConnected " + s);
+            Log.d(Controller.APP_TAG, "onP2PConnected " + s);
             ++counterOfConnections;
             if (counterOfConnections == 2 && isServer) {
                 OnlineController.startOnlineGame();
@@ -180,26 +181,26 @@ public class Network {
 
         @Override
         public void onP2PDisconnected(@NonNull String s) {
-            Log.d("BrainRing", "onP2PDisconnected " + s);
+            Log.d(Controller.APP_TAG, "onP2PDisconnected " + s);
             waitOrFinish();
         }
     };
     private RoomUpdateCallback mRoomUpdateCallback = new RoomUpdateCallback() {
         @Override
         public void onRoomCreated(int i, @Nullable Room room) {
-            Log.d("BrainRing", "Room was created");
+            Log.d(Controller.APP_TAG, "Room was created");
             startNewTimer();
         }
 
         @Override
         public void onJoinedRoom(int i, @Nullable Room room) {
-            Log.d("BrainRing", "Joined room");
+            Log.d(Controller.APP_TAG, "Joined room");
             Network.this.room = room;
         }
 
         @Override
         public void onLeftRoom(int i, @NonNull String s) {
-            Log.d("BrainRing", "Left room");
+            Log.d(Controller.APP_TAG, "Left room");
             waitOrFinish();
         }
 
@@ -211,16 +212,16 @@ public class Network {
          */
         @Override
         public void onRoomConnected(int code, @Nullable Room room) {
-            Log.d("BrainRing", "Connected to room");
+            Log.d(Controller.APP_TAG, "Connected to room");
             if (room == null) {
-                Log.wtf("BrainRing", "onRoomConnected got null as room");
+                Log.wtf(Controller.APP_TAG, "onRoomConnected got null as room");
                 return;
             }
             Network.this.room = room;
             if (code == GamesCallbackStatusCodes.OK) {
-                Log.d("BrainRing","Connected");
+                Log.d(Controller.APP_TAG,"Connected");
             } else {
-                Log.d("BrainRing","Error during connecting");
+                Log.d(Controller.APP_TAG,"Error during connecting");
             }
             serverId = Collections.min(room.getParticipantIds());
 
@@ -228,11 +229,11 @@ public class Network {
                     .getCurrentPlayerId()
                     .addOnSuccessListener(myPlayerId -> {
                         myParticipantId = room.getParticipantId(myPlayerId);
-                        Log.d("BrainRing", "Received participant id");
+                        Log.d(Controller.APP_TAG, "Received participant id");
                         walkRoomMembers();
                         if (myParticipantId.equals(serverId)) {
                             isServer = true;
-                            Log.d("BrainRing", "I am server");
+                            Log.d(Controller.APP_TAG, "I am server");
                             ++counterOfConnections;
                             if (counterOfConnections == 2) {
                                 OnlineController.startOnlineGame();
@@ -243,14 +244,14 @@ public class Network {
     };
     /** Sends received message to {@code onMessageReceived} */
     private OnRealTimeMessageReceivedListener mOnRealTimeMessageReceivedListener = realTimeMessage -> {
-        Log.d("BrainRing","Received message");
+        Log.d(Controller.APP_TAG,"Received message");
         byte[] buf = realTimeMessage.getMessageData();
         onMessageReceived(buf, realTimeMessage.getSenderParticipantId());
     };
 
     /** Prints all room members' names, sets nicknames to score counter */
     private void walkRoomMembers() {
-        Log.d("BrainRing", "Start printing room members");
+        Log.d(Controller.APP_TAG, "Start printing room members");
         if (room != null) {
             for (Participant participant : room.getParticipants()) {
                 if (participant.getParticipantId().equals(myParticipantId)) {
@@ -258,10 +259,10 @@ public class Network {
                 } else {
                     OnlineController.OnlineUIController.setOpponentNick(participant.getDisplayName());
                 }
-                Log.d("BrainRing", participant.getDisplayName());
+                Log.d(Controller.APP_TAG, participant.getDisplayName());
             }
         }
-        Log.d("BrainRing", "Finish printing room members");
+        Log.d(Controller.APP_TAG, "Finish printing room members");
     }
 
     /** Closes connection to room */
@@ -300,17 +301,17 @@ public class Network {
      */
     private void onMessageReceived(@NonNull byte[] buf, @NonNull String userId) {
         if (gameIsFinished) {
-            Log.e("BrainRing", "received message but game is over");
+            Log.e(Controller.APP_TAG, "received message but game is over");
             return;
         }
         if (timer != null && !userId.equals(myParticipantId)) {
             timer.cancel();
             startNewTimer();
         }
-        Log.d("BrainRing","Received message! User id is " + userId);
+        Log.d(Controller.APP_TAG,"Received message! User id is " + userId);
         try (DataInputStream is = new DataInputStream(new ByteArrayInputStream(buf))) {
             int identifier = is.readInt();
-            Log.d("BrainRing","Identifier is " + identifier);
+            Log.d(Controller.APP_TAG,"Identifier is " + identifier);
 
             switch (identifier) {
                 case Message.ANSWER_IS_READY:
@@ -374,7 +375,7 @@ public class Network {
                             message = "Игра прервана. Потеряно соединение или произошла непоправимая" +
                                     " ошибка.";
                             break;
-                        case OnlineFinishCodes.GAME_FINISHED_CORRECTLY_LOOSE:
+                        case OnlineFinishCodes.GAME_FINISHED_CORRECTLY_LOST:
                             message = "Игра завершена. К сожалению, Вы проиграли.";
                             break;
                         case OnlineFinishCodes.GAME_FINISHED_CORRECTLY_WON:
@@ -402,7 +403,7 @@ public class Network {
         if (leaderboardsClient == null || scoreSum == -1) {
             return;
         }
-        Log.d("BrainRing", "Updating rating");
+        Log.d(Controller.APP_TAG, "Updating rating");
         leaderboardsClient.submitScoreImmediate(
                 OnlineController.getOnlineGameActivity().getString(R.string.leaderboard), scoreSum);
     }
@@ -437,7 +438,7 @@ public class Network {
         if (handshakeTimer != null) {
             handshakeTimer.cancel();
             handshakeTimer = null;
-            Log.d("BrainRing", "Successful handshake. Took "
+            Log.d(Controller.APP_TAG, "Successful handshake. Took "
                     + (System.currentTimeMillis() - handshakeStartTime) + "ms");
             OnlineController.OnlineAdminLogicController.publishing();
         }
@@ -446,23 +447,24 @@ public class Network {
     /** Saves Google account, loads current score of user. On success starts searching for opponents */
     public void onSignedIn(@NonNull GoogleSignInAccount signInAccount) {
         googleSignInAccount = signInAccount;
-        mRealTimeMultiplayerClient = Games.getRealTimeMultiplayerClient(OnlineController.getOnlineGameActivity(),
-                googleSignInAccount);
+        mRealTimeMultiplayerClient = Games.getRealTimeMultiplayerClient(
+                OnlineController.getOnlineGameActivity(), googleSignInAccount);
         leaderboardsClient = Games.getLeaderboardsClient(OnlineController.getOnlineGameActivity(),
                 googleSignInAccount);
         leaderboardsClient.loadCurrentPlayerLeaderboardScore(
                 OnlineController.getOnlineGameActivity().getString(R.string.leaderboard),
-                TIME_SPAN_ALL_TIME, COLLECTION_PUBLIC).addOnSuccessListener(leaderboardScoreAnnotatedData -> {
-                    Log.d("BrainRing", "Got score");
-                    LeaderboardScore score = leaderboardScoreAnnotatedData.get();
-                    if (score != null) {
-                        scoreSum = score.getRawScore();
-                    } else {
-                        scoreSum = 0;
-                    }
-                    Log.d("BrainRing", "Score is " + scoreSum);
-                    OnlineController.NetworkController.startGame();
-                });
+                TIME_SPAN_ALL_TIME, COLLECTION_PUBLIC).addOnSuccessListener(
+                        leaderboardScoreAnnotatedData -> {
+                            Log.d(Controller.APP_TAG, "Got score");
+                            LeaderboardScore score = leaderboardScoreAnnotatedData.get();
+                            if (score != null) {
+                                scoreSum = score.getRawScore();
+                            } else {
+                                scoreSum = 0;
+                            }
+                            Log.d(Controller.APP_TAG, "Score is " + scoreSum);
+                            OnlineController.NetworkController.startGame();
+                        });
     }
 
     /** Starts quick game with 1 auto matched player */
@@ -518,17 +520,18 @@ public class Network {
      * Sends message to user by id reliably.
      * If sending is unsuccessful repeats it {@code TIMES_TO_SEND} times until success
      * If there was no success, panics
+     * Can send message to itself
      */
     public void sendMessageToConcreteUser(@NonNull String userId, @NonNull byte[] message) {
         if (myParticipantId == null || room == null) {
-            Log.e("BrainRing", "Cannot send message before initialization");
+            Log.e(Controller.APP_TAG, "Cannot send message before initialization");
             return;
         }
         if (userId.equals(myParticipantId)) {
-            Log.d("BrainRing", "Sending message to myself");
+            Log.d(Controller.APP_TAG, "Sending message to myself");
             onMessageReceived(message, myParticipantId);
         } else {
-            Log.d("BrainRing", "Start sending message to " + userId);
+            Log.d(Controller.APP_TAG, "Start sending message to " + userId);
             sendMessageToConcreteUserNTimes(userId, message, TIMES_TO_SEND);
         }
     }
@@ -544,18 +547,18 @@ public class Network {
             return;
         }
         if (timesToSend < 0) {
-            Log.wtf("BrainRing", "Failed to send message too many times. Finish game");
+            Log.wtf(Controller.APP_TAG, "Failed to send message too many times. Finish game");
             finishImmediately("Игра прервана. Потеряна связь с соперником.");
             return;
         }
         mRealTimeMultiplayerClient.sendReliableMessage(message, room.getRoomId(), userId, (i, i1, s) -> {
             if (i != GamesCallbackStatusCodes.OK) {
 
-                Log.e("BrainRing", "Failed to send message. Left " + timesToSend + " tries\n" +
+                Log.e(Controller.APP_TAG, "Failed to send message. Left " + timesToSend + " tries\n" +
                                 "Error is " + GamesCallbackStatusCodes.getStatusCodeString(i));
                 sendMessageToConcreteUserNTimes(userId, message, timesToSend - 1);
             } else {
-                Log.d("BrainRing", "Message to " + userId + " is delivered. Took " +
+                Log.d(Controller.APP_TAG, "Message to " + userId + " is delivered. Took " +
                         (TIMES_TO_SEND - timesToSend + 1) + " tries");
             }
         });
@@ -578,7 +581,7 @@ public class Network {
             public void onFinish() {
                 // check in case message was delivered right before finish
                 if (handshakeTimer == this) {
-                    Log.wtf("BrainRing", "Unsuccessful handshake");
+                    Log.wtf(Controller.APP_TAG, "Unsuccessful handshake");
                     sendMessageToAll(MessageGenerator.create()
                             .writeInt(Message.FINISH)
                             .writeInt(OnlineFinishCodes.UNSUCCESSFUL_HANDSHAKE)
@@ -632,7 +635,7 @@ public class Network {
                 return participantId;
             }
         }
-        Log.wtf("BrainRing", "Opponent id was not found.");
+        Log.wtf(Controller.APP_TAG, "Opponent id was not found.");
         return null;
     }
 }

@@ -7,6 +7,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import ru.spbhse.brainring.R;
+import ru.spbhse.brainring.controllers.Controller;
 import ru.spbhse.brainring.controllers.OnlineController;
 import ru.spbhse.brainring.files.ComplainedQuestion;
 import ru.spbhse.brainring.network.messages.Message;
@@ -103,7 +104,7 @@ public class OnlineGameUserLogic {
             @Override
             public void onFinish() {
                 if (timer == this) {
-                    Log.d("BrainRing", "Finish first timer");
+                    Log.d(Controller.APP_TAG, "Finish first timer");
                     sendTimeLimitedAnswer(1);
                 }
             }
@@ -123,7 +124,7 @@ public class OnlineGameUserLogic {
 
     /** Reacts on server's allowance to answer */
     public void onAllowedToAnswer() {
-        Log.d("BrainRing","Allowed to answer");
+        Log.d(Controller.APP_TAG,"Allowed to answer");
         OnlineController.OnlineUIController.setLocation(GameActivityLocation.WRITE_ANSWER);
         timer = new CountDownTimer(TIME_TO_WRITE_ANSWER * SECOND, SECOND) {
             @Override
@@ -176,7 +177,7 @@ public class OnlineGameUserLogic {
             @Override
             public void onFinish() {
                 if (timer == this) {
-                    Log.d("BrainRing", "Finish second timer");
+                    Log.d(Controller.APP_TAG, "Finish second timer");
                     sendTimeLimitedAnswer(2);
                 }
             }

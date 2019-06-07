@@ -15,6 +15,7 @@ import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 
+import ru.spbhse.brainring.controllers.Controller;
 import ru.spbhse.brainring.controllers.LocalController;
 import ru.spbhse.brainring.network.messages.Message;
 import ru.spbhse.brainring.network.messages.MessageGenerator;
@@ -44,19 +45,19 @@ public class LocalNetworkPlayer extends LocalNetwork {
         mRoomUpdateCallback = new RoomUpdateCallback() {
             @Override
             public void onRoomCreated(int i, @Nullable Room room) {
-                Log.d("BrainRing", "Room was created");
+                Log.d(Controller.APP_TAG, "Room was created");
                 LocalNetworkPlayer.this.room = room;
             }
 
             @Override
             public void onJoinedRoom(int i, @Nullable Room room) {
-                Log.d("BrainRing", "Joined room");
+                Log.d(Controller.APP_TAG, "Joined room");
                 LocalNetworkPlayer.this.room = room;
             }
 
             @Override
             public void onLeftRoom(int i, @NonNull String s) {
-                Log.d("BrainRing", "Left room");
+                Log.d(Controller.APP_TAG, "Left room");
                 if (!gameIsFinished) {
                     LocalController.finishLocalGame(true);
                 }
@@ -64,16 +65,16 @@ public class LocalNetworkPlayer extends LocalNetwork {
 
             @Override
             public void onRoomConnected(int code, @Nullable Room room) {
-                Log.d("BrainRing", "Connected to room");
+                Log.d(Controller.APP_TAG, "Connected to room");
                 if (room == null) {
-                    Log.wtf("BrainRing", "onRoomConnected got null as room");
+                    Log.wtf(Controller.APP_TAG, "onRoomConnected got null as room");
                     return;
                 }
                 LocalNetworkPlayer.this.room = room;
                 if (code == GamesCallbackStatusCodes.OK) {
-                    Log.d("BrainRing","Connected");
+                    Log.d(Controller.APP_TAG,"Connected");
                 } else {
-                    Log.d("BrainRing","Error during connecting");
+                    Log.d(Controller.APP_TAG,"Error during connecting");
                 }
             }
         };
@@ -88,11 +89,11 @@ public class LocalNetworkPlayer extends LocalNetwork {
         if (gameIsFinished) {
             return;
         }
-        Log.d("BrainRing","RECEIVED MESSAGE AS PLAYER!");
+        Log.d(Controller.APP_TAG,"RECEIVED MESSAGE AS PLAYER!");
 
         try (DataInputStream is = new DataInputStream(new ByteArrayInputStream(buf))) {
             int identifier = is.readInt();
-            Log.d("BrainRing","Identifier is " + identifier);
+            Log.d(Controller.APP_TAG,"Identifier is " + identifier);
 
             switch (identifier) {
                 case Message.INITIAL_HANDSHAKE:
@@ -114,7 +115,7 @@ public class LocalNetworkPlayer extends LocalNetwork {
                     sendMessageToConcreteUser(userId, buf);
                     break;
                 default:
-                    Log.wtf("BrainRing", "Unexpected message received");
+                    Log.wtf(Controller.APP_TAG, "Unexpected message received");
             }
 
         } catch (IOException e) {
@@ -126,14 +127,19 @@ public class LocalNetworkPlayer extends LocalNetwork {
         this.serverId = serverId;
         handshaked = true;
         if (myColor == ROLE_GREEN) {
-            Log.d("BrainRing", "I am green");
+            Log.d(Controller.APP_TAG, "I am green");
             sendMessageToConcreteUser(serverId,
                     MessageGenerator.create()
-                    .writeInt(Message.INITIAL_HANDSHAKE)
+                    .writeInt(Message.I_AM_GREEN)
                     .toByteArray()
             );
         } else {
-            Log.d("BrainRing", "I am red");
+            Log.d(Controller.APP_TAG, "I am red");
+            sendMessageToConcreteUser(serverId,
+                    MessageGenerator.create()
+                            .writeInt(Message.I_AM_RED)
+                            .toByteArray()
+            );
         }
     }
 
@@ -163,7 +169,7 @@ public class LocalNetworkPlayer extends LocalNetwork {
      */
     public void sendMessageToServer(@NonNull byte[] message) {
         if (serverId == null) {
-            Log.d("BrainRing", "Sending message before handshake");
+            Log.d(Controller.APP_TAG, "Sending message before handshake");
         } else {
             sendMessageToConcreteUser(serverId, message);
         }
@@ -181,6 +187,6 @@ public class LocalNetworkPlayer extends LocalNetwork {
 
     @Override
     protected void handshake() {
-        Log.wtf("BrainRing", "Handshake was called for player");
+        Log.wtf(Controller.APP_TAG, "Handshake was called for player");
     }
 }

@@ -16,6 +16,7 @@ import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 
+import ru.spbhse.brainring.controllers.Controller;
 import ru.spbhse.brainring.controllers.LocalController;
 import ru.spbhse.brainring.network.messages.Message;
 import ru.spbhse.brainring.network.messages.MessageGenerator;
@@ -45,36 +46,37 @@ public class LocalNetworkAdmin extends LocalNetwork {
         mRoomUpdateCallback = new RoomUpdateCallback() {
             @Override
             public void onRoomCreated(int i, @Nullable Room room) {
-                Log.d("BrainRing", "Room was created");
+                Log.d(Controller.APP_TAG, "Room was created");
                 LocalNetworkAdmin.this.room = room;
             }
 
             @Override
             public void onJoinedRoom(int i, @Nullable Room room) {
-                Log.d("BrainRing", "Joined room");
+                Log.d(Controller.APP_TAG, "Joined room");
                 LocalNetworkAdmin.this.room = room;
             }
 
             @Override
             public void onLeftRoom(int i, @NonNull String s) {
-                Log.d("BrainRing", "Left room");
+                Log.d(Controller.APP_TAG, "Left room");
                 if (!gameIsFinished) {
                     LocalController.finishLocalGame(true);
                 }
             }
 
+            /** Gets participant id. If both players are p2p connected starts handshake process */
             @Override
             public void onRoomConnected(int code, @Nullable Room room) {
-                Log.d("BrainRing", "Connected to room");
+                Log.d(Controller.APP_TAG, "Connected to room");
                 if (room == null) {
-                    Log.wtf("BrainRing", "onRoomConnected got null as room");
+                    Log.wtf(Controller.APP_TAG, "onRoomConnected got null as room");
                     return;
                 }
                 LocalNetworkAdmin.this.room = room;
                 if (code == GamesCallbackStatusCodes.OK) {
-                    Log.d("BrainRing","Connected");
+                    Log.d(Controller.APP_TAG,"Connected");
                 } else {
-                    Log.d("BrainRing","Connecting error");
+                    Log.d(Controller.APP_TAG,"Connecting error");
                 }
                 Games.getPlayersClient(LocalController.getJuryActivity(), googleSignInAccount)
                         .getCurrentPlayerId()
@@ -89,24 +91,23 @@ public class LocalNetworkAdmin extends LocalNetwork {
         };
     }
 
-
-    /**
-     * Decodes byte message received by server and calls needed functions in LocalController
-     * If it is a first message to server fills player's ids
-     */
+    /** Decodes byte message received by server and calls needed functions in LocalController */
     @Override
     protected void onMessageReceived(@NonNull byte[] buf, @NonNull String userId) {
         if (gameIsFinished) {
             return;
         }
-        Log.d("BrainRing", "Received message as admin!");
+        Log.d(Controller.APP_TAG, "Received message as admin!");
         try (DataInputStream is = new DataInputStream(new ByteArrayInputStream(buf))) {
             int identifier = is.readInt();
-            Log.d("BrainRing", "Identifier is " + identifier);
+            Log.d(Controller.APP_TAG, "Identifier is " + identifier);
 
             switch(identifier) {
-                case Message.INITIAL_HANDSHAKE:
+                case Message.I_AM_GREEN:
                     setGreenPlayer(userId);
+                    break;
+                case Message.I_AM_RED:
+                    setRedPlayer(userId);
                     break;
                 case Message.ANSWER_IS_READY:
                     LocalController.LocalAdminLogicController.onAnswerIsReady(userId);
@@ -120,23 +121,30 @@ public class LocalNetworkAdmin extends LocalNetwork {
         }
     }
 
+    /** Sets green player id. If both players shared their ids starts game cycle */
     private void setGreenPlayer(@NonNull String userId) {
         if (handshaked) {
-            Log.d("BrainRing", "Handshake is done");
+            Log.d(Controller.APP_TAG, "Handshake is done");
             return;
         }
         greenId = userId;
-        handshaked = true;
-        for (String id : room.getParticipantIds()) {
-            if (!id.equals(myParticipantId) && !id.equals(greenId)) {
-                redId = id;
-                break;
-            }
+        if (redId != null) {
+            handshaked = true;
+            LocalController.LocalNetworkAdminController.startGameCycle();
         }
-        Log.d("BrainRing","Successful handshake");
+    }
 
-        assert redId != null;
-        LocalController.LocalNetworkAdminController.startGameCycle();
+    /** Sets red player id. If both players shared their ids starts game cycle */
+    private void setRedPlayer(@NonNull String userId) {
+        if (handshaked) {
+            Log.d(Controller.APP_TAG, "Handshake is done");
+            return;
+        }
+        redId = userId;
+        if (greenId != null) {
+            handshaked = true;
+            LocalController.LocalNetworkAdminController.startGameCycle();
+        }
     }
 
     /** Starts quick game with two auto matched players */
@@ -168,7 +176,7 @@ public class LocalNetworkAdmin extends LocalNetwork {
         if (handshaked) {
             return;
         }
-        Log.d("BrainRing", "Start handshake");
+        Log.d(Controller.APP_TAG, "Start handshake");
         byte[] message = MessageGenerator.create()
                 .writeInt(Message.INITIAL_HANDSHAKE)
                 .toByteArray();
@@ -178,6 +186,10 @@ public class LocalNetworkAdmin extends LocalNetwork {
         new Handler().postDelayed(this::handshake, HANDSHAKE_DELAY);
     }
 
+    /**
+     * Sends {@code HANDSHAKE} message to others to check that both players are connected
+     * Called before each question
+     */
     public void regularHandshake() {
         sendMessageToOthers(HANDSHAKE);
     }
@@ -185,7 +197,7 @@ public class LocalNetworkAdmin extends LocalNetwork {
     @Override
     protected void leaveRoom() {
         if (room != null) {
-            Log.d("BrainRing","Leaving room");
+            Log.d(Controller.APP_TAG,"Leaving room");
             Games.getRealTimeMultiplayerClient(LocalController.getJuryActivity(),
                     googleSignInAccount).leave(mRoomConfig, room.getRoomId());
             room = null;
@@ -193,12 +205,10 @@ public class LocalNetworkAdmin extends LocalNetwork {
     }
 
     public String getGreenId() {
-        //waitHandshake();
         return greenId;
     }
 
     public String getRedId() {
-        //waitHandshake();
         return redId;
     }
 }

@@ -1,16 +1,27 @@
 package ru.spbhse.brainring.logic;
 
+/** Class to store data about user in two-players game */
 class UserStatus {
-    public boolean alreadyAnswered;
-    public String opponentAnswer;
-    public String participantId;
+    private boolean alreadyAnswered;
+    private String participantId;
 
-    public UserStatus(String participantId) {
+    UserStatus(String participantId) {
         this.participantId = participantId;
     }
 
-    public void onNewQuestion() {
+    void onNewQuestion() {
         alreadyAnswered = false;
-        opponentAnswer = null;
+    }
+
+    String getParticipantId() {
+        return participantId;
+    }
+
+    boolean getAlreadyAnswered() {
+        return alreadyAnswered;
+    }
+
+    void setAlreadyAnswered(boolean status) {
+        alreadyAnswered = status;
     }
 }
