@@ -14,7 +14,6 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.io.DataInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 import ru.spbhse.brainring.R;
+import ru.spbhse.brainring.controllers.Controller;
 import ru.spbhse.brainring.utils.Question;
 
 public class QuestionDatabase extends SQLiteOpenHelper {
@@ -39,11 +39,10 @@ public class QuestionDatabase extends SQLiteOpenHelper {
         super(context, DATABASE_NAME, null, 1);
         Scanner versionScanner = new Scanner(
                 context.getResources().openRawResource(R.raw.database_version));
-//            System.out.println(versionInputStream.readUTF());
         try {
             databaseVersion = versionScanner.nextInt();
         } catch(Exception e) {
-            Log.wtf("BrainRing","couldn't read version from its resource");
+            Log.wtf(Controller.APP_TAG,"couldn't read version from its resource");
         }
         baseTable = new DatabaseTable("baseTable");
         DATABASE_PATH = context.getDatabasePath(DATABASE_NAME).getPath();
@@ -51,7 +50,6 @@ public class QuestionDatabase extends SQLiteOpenHelper {
         if (!alreadyExists(baseTable) || newVersion != databaseVersion) {
             try {
                 createDatabase();
-                databaseVersion = newVersion;
 
                 InputStream in = context.getAssets().open("Questions.db");
                 OutputStream out = new FileOutputStream(DATABASE_PATH);
@@ -102,11 +100,12 @@ public class QuestionDatabase extends SQLiteOpenHelper {
 
                 db.execSQL(deleteBaseTable);
                 db.execSQL(createNewBaseTable);
+                databaseVersion = newVersion;
 
                 out.close();
                 in.close();
             } catch (IOException e) {
-                Log.wtf("BrainRing", "failed to read database");
+                Log.wtf(Controller.APP_TAG, "failed to read database");
             }
         }
     }
@@ -153,7 +152,7 @@ public class QuestionDatabase extends SQLiteOpenHelper {
         }
 
         if (alreadyExists(table)) {
-            Log.d("BrainRing", "Check successful");
+            Log.d(Controller.APP_TAG, "Check successful");
             return;
         }
 
@@ -162,7 +161,7 @@ public class QuestionDatabase extends SQLiteOpenHelper {
             Document doc = Jsoup.connect(table.getURL()).get();
             loadQuestions(doc, table);
         } catch (IOException e) {
-            Log.wtf("BrainRing", "Error occurred while connecting to the url " + table.getURL());
+            Log.wtf(Controller.APP_TAG, "Error occurred while connecting to the url " + table.getURL());
         }
     }
 
@@ -248,7 +247,7 @@ public class QuestionDatabase extends SQLiteOpenHelper {
             checkDB = SQLiteDatabase.openDatabase(
                     DATABASE_PATH, null, SQLiteDatabase.OPEN_READONLY);
         } catch (SQLException e) {
-            Log.wtf("BrainRing", "database not found");
+            Log.wtf(Controller.APP_TAG, "database not found");
         }
 
         if (checkDB != null) {

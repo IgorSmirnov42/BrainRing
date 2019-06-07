@@ -70,7 +70,8 @@ public class LocalGameAdminLogic {
 
                     if (millisUntilFinished - FAULT <= SENDING_COUNTDOWN * SECOND) {
                         new Thread(() -> {
-                            MediaPlayer player = MediaPlayer.create(LocalController.getJuryActivity(), R.raw.countdown);
+                            MediaPlayer player = MediaPlayer.create(LocalController.getJuryActivity(),
+                                    R.raw.countdown);
                             player.setOnCompletionListener(MediaPlayer::release);
                             player.start();
                         }).start();
@@ -83,7 +84,8 @@ public class LocalGameAdminLogic {
                 Log.d(Controller.APP_TAG, "Finish first timer");
                 if (timer == this) {
                     new Thread(() -> {
-                        MediaPlayer player = MediaPlayer.create(LocalController.getJuryActivity(), R.raw.beep);
+                        MediaPlayer player = MediaPlayer.create(LocalController.getJuryActivity(),
+                                R.raw.beep);
                         player.setOnCompletionListener(MediaPlayer::release);
                         player.start();
                     }).start();
@@ -102,7 +104,8 @@ public class LocalGameAdminLogic {
 
                     if (millisUntilFinished - FAULT <= SENDING_COUNTDOWN * SECOND) {
                         new Thread(() -> {
-                            MediaPlayer player = MediaPlayer.create(LocalController.getJuryActivity(), R.raw.countdown);
+                            MediaPlayer player = MediaPlayer.create(LocalController.getJuryActivity(),
+                                    R.raw.countdown);
                             player.setOnCompletionListener(MediaPlayer::release);
                             player.start();
                         }).start();

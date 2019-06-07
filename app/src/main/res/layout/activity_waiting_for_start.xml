@@ -11,7 +11,7 @@
         android:id="@+id/waitingStartInfo"
         android:layout_width="319dp"
         android:layout_height="233dp"
-        android:text="Ожидаем подключения соперника"
+        android:text="@string/waiting_opponent"
         android:textAppearance="@style/GrayText"
         android:textAlignment="center"
         android:textSize="18sp"

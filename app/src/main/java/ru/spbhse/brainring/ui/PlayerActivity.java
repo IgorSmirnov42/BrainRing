@@ -69,7 +69,7 @@ public class PlayerActivity extends AppCompatActivity {
             } else {
                 String message = result.getStatus().getStatusMessage();
                 if (message == null || message.isEmpty()) {
-                    message = "Неизвестная ошибка. Убедитесь, что у Вас установлены Google Play игры и выполнен вход в аккаунт.";
+                    message = getString(R.string.login_fail);
                 }
                 new AlertDialog.Builder(this).setMessage(message)
                         .setNeutralButton(android.R.string.ok, null).show();
@@ -85,13 +85,13 @@ public class PlayerActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        new AlertDialog.Builder(this).setTitle("Выход из локальной игры")
-                .setMessage("Вы хотите выйти?")
-                .setPositiveButton("Да", (dialog, which) -> {
+        new AlertDialog.Builder(this).setTitle(getString(R.string.out_of_local))
+                .setMessage(getString(R.string.want_out))
+                .setPositiveButton(getString(R.string.yes), (dialog, which) -> {
                     LocalController.finishLocalGame(false);
                     super.onBackPressed();
                 })
-                .setNegativeButton("Нет", (dialog, which) -> {
+                .setNegativeButton(getString(R.string.no), (dialog, which) -> {
                 })
                 .show();
     }

@@ -18,6 +18,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.games.GamesActivityResultCodes;
 
 import ru.spbhse.brainring.R;
+import ru.spbhse.brainring.controllers.Controller;
 import ru.spbhse.brainring.controllers.DatabaseController;
 import ru.spbhse.brainring.controllers.OnlineController;
 import ru.spbhse.brainring.database.QuestionDatabase;
@@ -55,7 +56,7 @@ public class OnlineGameActivity extends GameActivity {
         GoogleSignInOptions signInOptions = GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN;
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
         if (GoogleSignIn.hasPermissions(account, signInOptions.getScopeArray())) {
-            Log.d("BrainRing", "Already logged in");
+            Log.d(Controller.APP_TAG, "Already logged in");
             OnlineController.NetworkController.loggedIn(account);
         } else {
             GoogleSignInClient signInClient = GoogleSignIn.getClient(this,
@@ -75,30 +76,28 @@ public class OnlineGameActivity extends GameActivity {
             } else {
                 String message = result.getStatus().getStatusMessage();
                 if (message == null || message.isEmpty()) {
-                    message = "Ошибка входа в аккаунт Google Play Games";
+                    message = getString(R.string.login_fail);
                 }
                 new AlertDialog.Builder(this).setMessage(message)
                         .setNeutralButton(android.R.string.ok, (dialog, which) -> finish()).show();
             }
         } else if (requestCode == GamesActivityResultCodes.RESULT_LEFT_ROOM) {
-            Log.d("BrainRing", "Left room from activity");
+            Log.d(Controller.APP_TAG, "Left room from activity");
             OnlineController.finishOnlineGame();
-            OnlineController.NetworkController.finishImmediately("Игра прервана. Разорвано соединение с соперником.");
+            OnlineController.NetworkController.finishImmediately(getString(R.string.default_error));
             finish();
         } else if (requestCode == GamesActivityResultCodes.RESULT_SEND_REQUEST_FAILED) {
-            Log.d("BrainRing", "Send request failed");
+            Log.d(Controller.APP_TAG, "Send request failed");
         } else if (requestCode == GamesActivityResultCodes.RESULT_NETWORK_FAILURE) {
-            Log.d("BrainRing", "Network failure");
+            Log.d(Controller.APP_TAG, "Network failure");
         }
     }
 
     public void onBackPressed() {
-        new AlertDialog.Builder(this).setTitle("Выход из игры по сети")
-                .setMessage("Вы хотите выйти?")
-                .setPositiveButton("Да", (dialog, which) -> {
-                    finish();
-                })
-                .setNegativeButton("Нет", (dialog, which) -> {
+        new AlertDialog.Builder(this).setTitle(getString(R.string.out_of_online))
+                .setMessage(getString(R.string.want_out))
+                .setPositiveButton(getString(R.string.yes), (dialog, which) -> finish())
+                .setNegativeButton(getString(R.string.no), (dialog, which) -> {
                 })
                 .show();
     }
@@ -122,7 +121,7 @@ public class OnlineGameActivity extends GameActivity {
 
     @Override
     protected void onStop() {
-        Log.d("BrainRing", "Stopping activity. Leaving room");
+        Log.d(Controller.APP_TAG, "Stopping activity. Leaving room");
         super.onStop();
         OnlineController.finishOnlineGame();
     }

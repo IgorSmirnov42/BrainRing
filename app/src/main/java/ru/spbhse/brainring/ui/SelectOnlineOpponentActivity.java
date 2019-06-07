@@ -16,7 +16,8 @@ public class SelectOnlineOpponentActivity extends AppCompatActivity {
 
         Button searchOpponentButton = findViewById(R.id.searchOpponentButton);
         searchOpponentButton.setOnClickListener(v -> {
-            Intent intent = new Intent(SelectOnlineOpponentActivity.this, OnlineGameActivity.class);
+            Intent intent = new Intent(SelectOnlineOpponentActivity.this,
+                    OnlineGameActivity.class);
             startActivity(intent);
         });
     }

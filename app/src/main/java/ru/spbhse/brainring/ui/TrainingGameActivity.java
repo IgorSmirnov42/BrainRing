@@ -14,11 +14,12 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import ru.spbhse.brainring.R;
+import ru.spbhse.brainring.controllers.Controller;
 import ru.spbhse.brainring.controllers.DatabaseController;
 import ru.spbhse.brainring.controllers.GameController;
 import ru.spbhse.brainring.controllers.TrainingController;
-import ru.spbhse.brainring.database.QuestionDatabase;
 import ru.spbhse.brainring.database.DatabaseTable;
+import ru.spbhse.brainring.database.QuestionDatabase;
 import ru.spbhse.brainring.logic.TrainingPlayerLogic;
 
 public class TrainingGameActivity extends GameActivity {
@@ -53,15 +54,15 @@ public class TrainingGameActivity extends GameActivity {
         }
         GameController gameController = TrainingController.TrainingLogicController.getInstance();
         setGameController(gameController);
-        setMyNick("Правильных ответов");
-        setOpponentNick("Неправильных ответов");
+        setMyNick(getString(R.string.right_answers));
+        setOpponentNick(getString(R.string.wrong_answers));
 
         new LoadPackageTask(this, spinner).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     @Override
     protected void onStop() {
-        Log.d("BrainRing", "Stop training game");
+        Log.d(Controller.APP_TAG, "Stop training game");
         super.onStop();
         TrainingController.TrainingLogicController.finishGame();
         if (toClear) {
@@ -75,7 +76,7 @@ public class TrainingGameActivity extends GameActivity {
     public void onNewQuestion() {
         setOpponentAnswer("");
         setTime("");
-        buttonText = "ЖМЯК!!";
+        buttonText = getString(R.string.button_push_text);
         drawLocation();
         findViewById(R.id.textView).setVisibility(View.GONE);
     }
@@ -103,7 +104,7 @@ public class TrainingGameActivity extends GameActivity {
     public void onGameFinished() {
         Intent intent = new Intent(this, AfterGameActivity.class);
         String total = String.valueOf(Integer.parseInt(opponentScore) + Integer.parseInt(myScore));
-        String endGameMessage = "Вы правильно ответили на " + myScore + " вопросов из " + total + ".";
+        String endGameMessage = getString(R.string.answered_right_on) + " " + myScore + " " + getString(R.string.questions_of) + total + ".";
         intent.putExtra(Intent.EXTRA_TEXT, endGameMessage);
         startActivity(intent);
     }

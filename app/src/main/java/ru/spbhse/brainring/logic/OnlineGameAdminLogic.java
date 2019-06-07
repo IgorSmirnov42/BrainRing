@@ -254,7 +254,7 @@ public class OnlineGameAdminLogic {
                     .getString(R.string.nobody_answered);
         } else {
             questionMessage = OnlineController.NetworkController.getParticipantName(answeredUserId) +
-                    OnlineController.getOnlineGameActivity().getString(R.string.answered_right);
+                    " " + OnlineController.getOnlineGameActivity().getString(R.string.answered_right);
         }
         Log.d(Controller.APP_TAG, "Question message: " + questionMessage);
         readyUsers = 0;

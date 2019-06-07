@@ -97,10 +97,12 @@ public class TrainingPlayerLogic {
         TrainingController.TrainingUIController.setTime("");
         Log.d(Controller.APP_TAG, "Checking answer " + answer);
         if (currentQuestion.checkAnswer(answer)) {
-            TrainingController.TrainingUIController.setQuestionResult("Правильный ответ!");
+            TrainingController.TrainingUIController.setQuestionResult(
+                    TrainingController.getTrainingGameActivity().getString(R.string.right_answer));
             correctAnswers++;
         } else {
-            TrainingController.TrainingUIController.setQuestionResult("Неверный ответ");
+            TrainingController.TrainingUIController.setQuestionResult(
+                    TrainingController.getTrainingGameActivity().getString(R.string.wrong_answer));
             wrongAnswers++;
         }
         TrainingController.TrainingUIController.setScore(correctAnswers, wrongAnswers);
@@ -109,7 +111,8 @@ public class TrainingPlayerLogic {
 
     private void onReceivingTick(long secondsLeft) {
         new Thread(() -> {
-            MediaPlayer player = MediaPlayer.create(TrainingController.getTrainingGameActivity(), R.raw.countdown);
+            MediaPlayer player = MediaPlayer.create(TrainingController.getTrainingGameActivity(),
+                    R.raw.countdown);
             player.setOnCompletionListener(MediaPlayer::release);
             player.start();
         }).start();
