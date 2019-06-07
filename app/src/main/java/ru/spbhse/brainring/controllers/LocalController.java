@@ -70,7 +70,7 @@ public class LocalController extends Controller {
         LocalPlayerLogicController.playerLogic = new LocalGamePlayerLogic();
     }
 
-    /** Functions to interact with admin's logic */
+    /** Methods to interact with admin's logic */
     public static class LocalAdminLogicController {
         private static LocalGameAdminLogic adminLogic;
 
@@ -126,7 +126,7 @@ public class LocalController extends Controller {
         }
     }
 
-    /** Functions to interact with player's logic */
+    /** Methods to interact with player's logic */
     public static class LocalPlayerLogicController {
         private static LocalGamePlayerLogic playerLogic;
 
@@ -159,7 +159,7 @@ public class LocalController extends Controller {
         }
     }
 
-    /** Functions to interact with admin's UI */
+    /** Methods to interact with admin's UI */
     public static class LocalAdminUIController {
         public static void redraw() {
             juryActivity.get().redrawLocation();
@@ -186,7 +186,7 @@ public class LocalController extends Controller {
         }
     }
 
-    /** Functions to interact with admin's part of network */
+    /** Methods to interact with admin's part of network */
     public static class LocalNetworkAdminController {
         private static LocalNetworkAdmin network;
 
@@ -209,7 +209,7 @@ public class LocalController extends Controller {
         }
     }
 
-    /** Functions to interact with player's part of network */
+    /** Methods to interact with player's part of network */
     public static class LocalNetworkPlayerController {
         private static LocalNetworkPlayer network;
 
@@ -226,10 +226,11 @@ public class LocalController extends Controller {
         }
     }
 
-    /** Functions that are common in network for player and jury */
+    /** Methods that are common in network for player and jury */
     public static class LocalNetworkController {
         private static LocalNetwork network;
 
+        /** Starts quick game after logging in */
         public static void loggedIn(GoogleSignInAccount signedInAccount) {
             network.signIn(signedInAccount);
             network.startQuickGame();
