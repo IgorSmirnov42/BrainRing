@@ -45,7 +45,7 @@
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
         android:background="@drawable/simple_button"
-        android:text="ведущий"
+        android:text="@string/jury"
         android:textSize="20sp"
         app:layout_constraintBottom_toTopOf="@+id/linearLayout1"
         app:layout_constraintEnd_toEndOf="parent"
@@ -75,7 +75,7 @@
             android:layout_marginEnd="15dp"
             android:layout_weight="1"
             android:background="@drawable/simple_button"
-            android:text="Зелёный стол"
+            android:text="@string/green_table"
             android:textSize="20sp" />
 
         <Button
@@ -86,7 +86,7 @@
             android:layout_marginEnd="15dp"
             android:layout_weight="1"
             android:background="@drawable/simple_button"
-            android:text="Красный стол"
+            android:text="@string/red_table"
             android:textSize="20sp" />
     </LinearLayout>
 
@@ -124,7 +124,7 @@
         android:id="@+id/textView7"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Первый таймер"
+        android:text="@string/first_timer"
         android:textAppearance="@style/GrayText"
         android:textSize="18sp"
         app:layout_constraintBottom_toTopOf="@+id/firstCounterBar"
@@ -138,7 +138,7 @@
         android:id="@+id/textView8"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Второй таймер"
+        android:text="@string/second_timer"
         android:textAppearance="@style/GrayText"
         android:textSize="18sp"
         app:layout_constraintBottom_toTopOf="@+id/secondCounterBar"
@@ -157,7 +157,7 @@
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
         android:gravity="center"
-        android:text="Выберите свою роль"
+        android:text="@string/choose_role"
         android:textAlignment="center"
         android:textAppearance="@style/GrayText"
         android:textSize="18sp"
