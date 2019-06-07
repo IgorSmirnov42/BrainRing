@@ -26,12 +26,15 @@ public class OnlineGameUserLogic {
     private boolean questionReceived;
     private boolean readyForQuestion;
     private boolean timeStarted;
+    private boolean alreadyAnswered;
+
     private static final int TIME_TO_SHOW_ANSWER = 10;
     private static final int TIME_TO_WRITE_ANSWER = 20;
     private static final int FIRST_COUNTDOWN = 20;
     private static final int SECOND_COUNTDOWN = 20;
     private static final int SENDING_COUNTDOWN = 5;
     private static final int SECOND = 1000;
+
     private static final byte[] FALSE_START;
     private static final byte[] HANDSHAKE;
     private static final byte[] READY_FOR_QUESTION;
@@ -63,6 +66,7 @@ public class OnlineGameUserLogic {
     }
 
     private void onFalseStart() {
+        alreadyAnswered = true;
         Toast.makeText(OnlineController.getOnlineGameActivity(), "Фальстарт!",
                 Toast.LENGTH_LONG).show();
         OnlineController.NetworkController.sendMessageToServer(FALSE_START);
@@ -124,6 +128,7 @@ public class OnlineGameUserLogic {
 
     /** Reacts on server's allowance to answer */
     public void onAllowedToAnswer() {
+        alreadyAnswered = true;
         Log.d(Controller.APP_TAG,"Allowed to answer");
         OnlineController.OnlineUIController.setLocation(GameActivityLocation.WRITE_ANSWER);
         timer = new CountDownTimer(TIME_TO_WRITE_ANSWER * SECOND, SECOND) {
@@ -146,6 +151,7 @@ public class OnlineGameUserLogic {
         if (!OnlineController.NetworkController.iAmServer()) {
             OnlineController.NetworkController.sendMessageToServer(HANDSHAKE);
         }
+        alreadyAnswered = false;
         currentQuestionId = questionId;
         currentQuestionText = question;
         currentQuestionAnswer = null;
@@ -252,10 +258,17 @@ public class OnlineGameUserLogic {
         OnlineController.OnlineUIController.setLocation(GameActivityLocation.OPPONENT_IS_ANSWERING);
     }
 
-    /** Sends request to server trying to answer */
+    /**
+     * Sends request to server trying to answer
+     * Blocked in case of false start and if already answered
+     */
     public void answerButtonPushed() {
         if (questionReceived && !timeStarted) {
             onFalseStart();
+            return;
+        }
+        if (alreadyAnswered) {
+            onForbiddenToAnswer();
             return;
         }
         if (timer != null) {
