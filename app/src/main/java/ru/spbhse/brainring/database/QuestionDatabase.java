@@ -39,7 +39,6 @@ public class QuestionDatabase extends SQLiteOpenHelper {
         super(context, DATABASE_NAME, null, 1);
         Scanner versionScanner = new Scanner(
                 context.getResources().openRawResource(R.raw.database_version));
-//            System.out.println(versionInputStream.readUTF());
         try {
             databaseVersion = versionScanner.nextInt();
         } catch(Exception e) {
@@ -51,7 +50,6 @@ public class QuestionDatabase extends SQLiteOpenHelper {
         if (!alreadyExists(baseTable) || newVersion != databaseVersion) {
             try {
                 createDatabase();
-                databaseVersion = newVersion;
 
                 InputStream in = context.getAssets().open("Questions.db");
                 OutputStream out = new FileOutputStream(DATABASE_PATH);
@@ -102,6 +100,7 @@ public class QuestionDatabase extends SQLiteOpenHelper {
 
                 db.execSQL(deleteBaseTable);
                 db.execSQL(createNewBaseTable);
+                databaseVersion = newVersion;
 
                 out.close();
                 in.close();
