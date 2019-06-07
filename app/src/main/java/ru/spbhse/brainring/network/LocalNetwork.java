@@ -22,15 +22,15 @@ public abstract class LocalNetwork {
     protected static final int ROLE_ADMIN = 1;
     protected static final int ROLE_GREEN = 1 << 1;
     protected static final int ROLE_RED = 1 << 2;
-    private static final int TIMES_TO_SEND = 10000;
+    private static final int TIMES_TO_SEND = 100;
     /** Flag to determine if handshake was done */
-    protected volatile boolean handshaked = false;
+    protected boolean handshaked = false;
     protected boolean gameIsFinished = false;
     protected int p2pConnected = 0;
     protected boolean serverRoomConnected = false;
     protected RoomConfig mRoomConfig;
-    protected volatile Room room;
-    public GoogleSignInAccount googleSignInAccount;
+    protected Room room;
+    protected GoogleSignInAccount googleSignInAccount;
     protected RealTimeMultiplayerClient mRealTimeMultiplayerClient;
     protected String myParticipantId;
     protected RoomStatusUpdateCallback mRoomStatusUpdateCallback = new RoomStatusUpdateCallback() {
@@ -171,6 +171,10 @@ public abstract class LocalNetwork {
             gameIsFinished = true;
             leaveRoom();
         }
+    }
+
+    public void signIn(GoogleSignInAccount account) {
+        googleSignInAccount = account;
     }
 
     /** Sends message to all users in a room except itself */

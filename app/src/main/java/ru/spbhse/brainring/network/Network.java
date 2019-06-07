@@ -334,7 +334,7 @@ public class Network {
         }
     }
 
-    public void updateRating() {
+    private void updateRating() {
         if (leaderboardsClient == null || scoreSum == -1) {
             return;
         }

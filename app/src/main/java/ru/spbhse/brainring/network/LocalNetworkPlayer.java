@@ -17,6 +17,7 @@ import java.io.IOException;
 
 import ru.spbhse.brainring.controllers.LocalController;
 import ru.spbhse.brainring.network.messages.Message;
+import ru.spbhse.brainring.network.messages.MessageGenerator;
 
 /**
  * Class with methods to interact with network
@@ -26,7 +27,6 @@ public class LocalNetworkPlayer extends LocalNetwork {
     private String serverId;
     /** Green or red table. Values are written in base class */
     private int myColor;
-    private final Object lock = new Object();
 
     /**
      * Creates new instance of LocalNetworkPlayer.
@@ -64,19 +64,16 @@ public class LocalNetworkPlayer extends LocalNetwork {
 
             @Override
             public void onRoomConnected(int code, @Nullable Room room) {
-                synchronized (lock) {
-                    Log.d("BrainRing", "Connected to room");
-                    if (room == null) {
-                        Log.wtf("BrainRing", "onRoomConnected got null as room");
-                        return;
-                    }
-                    LocalNetworkPlayer.this.room = room;
-                    if (code == GamesCallbackStatusCodes.OK) {
-                        Log.d("BrainRing","Connected");
-                    } else {
-                        Log.d("BrainRing","Error during connecting");
-                    }
-                    lock.notifyAll();
+                Log.d("BrainRing", "Connected to room");
+                if (room == null) {
+                    Log.wtf("BrainRing", "onRoomConnected got null as room");
+                    return;
+                }
+                LocalNetworkPlayer.this.room = room;
+                if (code == GamesCallbackStatusCodes.OK) {
+                    Log.d("BrainRing","Connected");
+                } else {
+                    Log.d("BrainRing","Error during connecting");
                 }
             }
         };
@@ -92,33 +89,15 @@ public class LocalNetworkPlayer extends LocalNetwork {
             return;
         }
         Log.d("BrainRing","RECEIVED MESSAGE AS PLAYER!");
-        if (!handshaked) {
-            new Thread(() -> {
-                synchronized (lock) {
-                    while (room == null) {
-                        try {
-                            lock.wait();
-                        } catch (InterruptedException e) {
-                        }
-                    }
-                    handshaked = true;
-                    serverId = userId;
-                    if (myColor == ROLE_GREEN) {
-                        Log.d("BrainRing", "I am green");
-                        sendMessageToConcreteUser(userId, buf);
-                    } else {
-                        Log.d("BrainRing", "I am red");
-                    }
-                }
-            }).start();
-            return;
-        }
 
         try (DataInputStream is = new DataInputStream(new ByteArrayInputStream(buf))) {
             int identifier = is.readInt();
             Log.d("BrainRing","Identifier is " + identifier);
 
             switch (identifier) {
+                case Message.INITIAL_HANDSHAKE:
+                    doInitialHandshake(userId);
+                    break;
                 case Message.FORBIDDEN_TO_ANSWER:
                     LocalController.LocalPlayerLogicController.onForbiddenToAnswer();
                     break;
@@ -140,6 +119,21 @@ public class LocalNetworkPlayer extends LocalNetwork {
 
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    private void doInitialHandshake(@NonNull String serverId) {
+        this.serverId = serverId;
+        handshaked = true;
+        if (myColor == ROLE_GREEN) {
+            Log.d("BrainRing", "I am green");
+            sendMessageToConcreteUser(serverId,
+                    MessageGenerator.create()
+                    .writeInt(Message.INITIAL_HANDSHAKE)
+                    .toByteArray()
+            );
+        } else {
+            Log.d("BrainRing", "I am red");
         }
     }
 
