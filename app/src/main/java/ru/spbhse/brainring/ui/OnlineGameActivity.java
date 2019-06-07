@@ -104,8 +104,8 @@ public class OnlineGameActivity extends GameActivity {
     }
 
     public void showGameFinishedActivity(@NonNull String message) {
-        Intent intent = new Intent(this, OnlineGameFinished.class);
-        intent.putExtra("message", message);
+        Intent intent = new Intent(this, AfterGameActivity.class);
+        intent.putExtra(Intent.EXTRA_TEXT, message);
         startActivity(intent);
         finish();
     }

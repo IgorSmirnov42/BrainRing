@@ -4,15 +4,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.OnlineGameFinished">
+    tools:context=".ui.AfterGameActivity">
 
     <TextView
         android:id="@+id/gameResult"
-        android:layout_width="266dp"
-        android:layout_height="208dp"
+        android:layout_width="279dp"
+        android:layout_height="230dp"
+        android:gravity="center|top"
         android:text="Результат игры"
-        android:textAlignment="center"
-        android:textSize="24sp"
+        android:textAppearance="@style/GrayText"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.426"
@@ -21,14 +21,15 @@
         app:layout_constraintVertical_bias="0.157" />
 
     <Button
-        android:id="@+id/toSelectOnlineOpponent"
-        android:layout_width="195dp"
-        android:layout_height="158dp"
-        android:text="OK"
-        android:textSize="30sp"
+        android:id="@+id/toGameStart"
+        android:layout_width="234dp"
+        android:layout_height="187dp"
+        android:background="@drawable/simple_button"
+        android:text="Вернуться в начало игры"
+        android:textSize="24sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/gameResult" />
+        app:layout_constraintTop_toBottomOf="@+id/gameResult"
+        app:layout_constraintVertical_bias="0.664" />
 </android.support.constraint.ConstraintLayout>

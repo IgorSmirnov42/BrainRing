@@ -37,7 +37,6 @@ public class TrainingGameActivity extends GameActivity {
         DatabaseController.setDatabase(dataBase);
 
         String packageAddress = getIntent().getStringExtra(Intent.EXTRA_TITLE);
-        int readingTime = getIntent().getIntExtra(Intent.EXTRA_TEXT, TrainingPlayerLogic.DEFAULT_READING_TIME);
         try {
             if (packageAddress.equals(getResources().getString(R.string.base_package))) {
                 gameTable = dataBase.getBaseTable();
@@ -56,8 +55,7 @@ public class TrainingGameActivity extends GameActivity {
         setGameController(gameController);
         setMyNick("Правильных ответов");
         setOpponentNick("Неправильных ответов");
-        TrainingController.createTrainingGame();
-        TrainingController.TrainingLogicController.setReadingTime(readingTime);
+
         new LoadPackageTask(this, spinner).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
@@ -102,6 +100,15 @@ public class TrainingGameActivity extends GameActivity {
         gameController = newGameController;
     }
 
+    public void onGameFinished() {
+        Intent intent = new Intent(this, AfterGameActivity.class);
+        String total = String.valueOf(Integer.parseInt(opponentScore) + Integer.parseInt(myScore));
+        String endGameMessage = "Вы правильно ответили на " + myScore + " вопросов из " + total + ".";
+        intent.putExtra(Intent.EXTRA_TEXT, endGameMessage);
+        startActivity(intent);
+    }
+
+
     private static class LoadPackageTask extends AsyncTask<Void, Void, String> {
         private WeakReference<TrainingGameActivity> trainingGameActivity;
         private QuestionDatabase dataBase;
@@ -122,6 +129,10 @@ public class TrainingGameActivity extends GameActivity {
         protected String doInBackground(Void... voids) {
             DatabaseTable gameTable = trainingGameActivity.get().getGameTable();
             dataBase.createTable(gameTable);
+            TrainingController.createTrainingGame();
+            int readingTime = trainingGameActivity.get().getIntent().
+                    getIntExtra(Intent.EXTRA_TEXT, TrainingPlayerLogic.DEFAULT_READING_TIME);
+            TrainingController.TrainingLogicController.setReadingTime(readingTime);
             return "finished";
         }
 

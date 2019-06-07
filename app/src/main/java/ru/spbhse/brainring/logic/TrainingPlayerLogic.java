@@ -5,6 +5,7 @@ import android.os.CountDownTimer;
 import android.util.Log;
 
 import ru.spbhse.brainring.R;
+import ru.spbhse.brainring.controllers.Controller;
 import ru.spbhse.brainring.controllers.DatabaseController;
 import ru.spbhse.brainring.controllers.TrainingController;
 import ru.spbhse.brainring.files.ComplainedQuestion;
@@ -31,6 +32,10 @@ public class TrainingPlayerLogic {
             timer.cancel();
             timer = null;
         }
+        if (DatabaseController.getNumberOfRemainingQuestions() == 0) {
+            TrainingController.TrainingUIController.onGameFinished();
+            return;
+        }
         currentQuestion = DatabaseController.getRandomQuestion();
         TrainingController.TrainingUIController.setLocation(GameActivityLocation.SHOW_QUESTION);
         TrainingController.TrainingUIController.setQuestionText(currentQuestion.getQuestion());
@@ -38,7 +43,7 @@ public class TrainingPlayerLogic {
         TrainingController.TrainingUIController.setAnswer(currentQuestion.getAllAnswers());
         TrainingController.TrainingUIController.setComment(currentQuestion.getComment());
         TrainingController.TrainingUIController.onNewQuestion();
-        Log.d("BrainRing", "New question");
+        Log.d(Controller.APP_TAG, "New question");
         timer = new CountDownTimer(readingTime * SECOND, SECOND) {
             @Override
             public void onTick(long millisUntilFinished) {
@@ -46,7 +51,7 @@ public class TrainingPlayerLogic {
                     if (millisUntilFinished <= readingTime * SECOND) {
                         long secondsLeft = millisUntilFinished / SECOND;
                         TrainingController.TrainingUIController.setTime(String.valueOf(secondsLeft));
-                        Log.d("BrainRing", "TICK" + secondsLeft);
+                        Log.d(Controller.APP_TAG, "TICK" + secondsLeft);
                     }
                 }
             }
@@ -90,7 +95,7 @@ public class TrainingPlayerLogic {
             timer = null;
         }
         TrainingController.TrainingUIController.setTime("");
-        Log.d("BrainRing", "Checking answer " + answer);
+        Log.d(Controller.APP_TAG, "Checking answer " + answer);
         if (currentQuestion.checkAnswer(answer)) {
             TrainingController.TrainingUIController.setQuestionResult("Правильный ответ!");
             correctAnswers++;

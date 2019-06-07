@@ -101,5 +101,9 @@ public class TrainingController extends Controller {
         public static String getWhatWritten() {
             return trainingGameActivity.get().getWhatWritten();
         }
+
+        public static void onGameFinished() {
+            trainingGameActivity.get().onGameFinished();
+        }
     }
 }

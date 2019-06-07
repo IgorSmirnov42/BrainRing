@@ -72,7 +72,7 @@
             android:screenOrientation="portrait" />
 
         <activity
-            android:name=".ui.OnlineGameFinished"
+            android:name=".ui.AfterGameActivity"
             android:screenOrientation="portrait" />
 
         <activity android:name=".ui.LaunchActivity" android:screenOrientation="portrait" >

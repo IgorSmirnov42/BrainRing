@@ -14,9 +14,11 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
+/** Allows to add, delete, edit complains on questions */
 public class ComplainsFileHandler {
     private static final String filename = "complains.json";
 
+    /** Returns list of questions read from file */
     @NonNull
     public static List<ComplainedQuestion> getAllQuestionsFromFile(@NonNull Context context) throws IOException, JSONException {
         List<ComplainedQuestion> questions = new ArrayList<>();
@@ -50,6 +52,7 @@ public class ComplainsFileHandler {
         return questions;
     }
 
+    /** Adds new complain to the back of the list */
     public static void appendComplain(@NonNull ComplainedQuestion question,
                                       @NonNull Context context) throws IOException, JSONException {
         List<ComplainedQuestion> questions = getAllQuestionsFromFile(context);
@@ -57,6 +60,7 @@ public class ComplainsFileHandler {
         saveComplainsToFile(questions, context);
     }
 
+    /** Tranforms all complains to readable view */
     public static String allReadable(@NonNull List<ComplainedQuestion> questions) {
         StringBuilder result = new StringBuilder();
         for (ComplainedQuestion question : questions) {
@@ -65,12 +69,14 @@ public class ComplainsFileHandler {
         return result.toString();
     }
 
+    /** Rewrites file with new text */
     private static void rewriteFile(@NonNull String text, @NonNull Context context) throws IOException {
         try (FileOutputStream outputStream = context.openFileOutput(filename, Context.MODE_PRIVATE)) {
             outputStream.write(text.getBytes());
         }
     }
 
+    /** Saves all complains rewriting file */
     public static void saveComplainsToFile(@NonNull List<ComplainedQuestion> questions,
                                            @NonNull Context context) throws IOException, JSONException {
         List<JSONObject> complains = new ArrayList<>();
