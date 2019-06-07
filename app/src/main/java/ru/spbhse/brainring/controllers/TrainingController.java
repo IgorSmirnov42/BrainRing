@@ -22,6 +22,7 @@ public class TrainingController extends Controller {
 
 
     public static void createTrainingGame() {
+        DatabaseController.generateNewSequence();
         TrainingLogicController.trainingPlayerLogic = new TrainingPlayerLogic();
     }
 
