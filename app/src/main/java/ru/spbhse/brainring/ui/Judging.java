@@ -28,7 +28,7 @@ public class Judging extends AppCompatActivity {
             color = ContextCompat.getColor(this, R.color.colorJungleGreen);
             playerName = getString(R.string.green);
         }
-        String text = getString(R.string.pressed) + playerName + getString(R.string.button);
+        String text = getString(R.string.pressed) + " " + playerName + " " + getString(R.string.button);
         answering.setText(text);
         answering.setTextColor(color);
 

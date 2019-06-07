@@ -93,7 +93,7 @@ public class JuryActivity extends AppCompatActivity {
         redStatus = findViewById(R.id.redStatus);
 
         redrawLocation();
-        statusText.setText("Ожидаем подключение игроков");
+        statusText.setText(getString(R.string.waiting_connection));
 
         LocalController.LocalNetworkAdminController.createLocalGame();
     }
