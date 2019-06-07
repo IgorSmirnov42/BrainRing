@@ -14,19 +14,24 @@ public class LocalGamePlayerLogic {
     private static byte[] PUSHED_BUTTON;
 
     static {
-        PUSHED_BUTTON = MessageGenerator.create().writeInt(Message.ANSWER_IS_READY).toByteArray();
+        PUSHED_BUTTON = MessageGenerator.create()
+                .writeInt(Message.ANSWER_IS_READY)
+                .toByteArray();
     }
 
     public void onForbiddenToAnswer() {
-        Toast.makeText(LocalController.getPlayerActivity(), "Сервер запретил вам отвечать", Toast.LENGTH_LONG).show();
+        Toast.makeText(LocalController.getPlayerActivity(), "Сервер запретил вам отвечать",
+                Toast.LENGTH_LONG).show();
     }
 
     public void onAllowedToAnswer() {
-        Toast.makeText(LocalController.getPlayerActivity(), "Разрешено отвечать!", Toast.LENGTH_LONG).show();
+        Toast.makeText(LocalController.getPlayerActivity(), "Разрешено отвечать!",
+                Toast.LENGTH_LONG).show();
     }
 
     public void onFalseStart() {
-        Toast.makeText(LocalController.getPlayerActivity(), "Фальстарт!", Toast.LENGTH_LONG).show();
+        Toast.makeText(LocalController.getPlayerActivity(), "Фальстарт!", Toast.LENGTH_LONG)
+                .show();
     }
 
     public void onTimeStart() {

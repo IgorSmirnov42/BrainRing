@@ -43,46 +43,35 @@ public class TrainingGamePreparationActivity extends AppCompatActivity {
         EditText urlEditor = findViewById(R.id.urlEditor);
 
         Button startTrainingGameButton = findViewById(R.id.startTrainingGameButton);
-        startTrainingGameButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(TrainingGamePreparationActivity.this, TrainingGameActivity.class);
-                intent.putExtra(Intent.EXTRA_TITLE, packageAddress);
-                intent.putExtra(Intent.EXTRA_TEXT, counter);
-                startActivity(intent);
-            }
+        startTrainingGameButton.setOnClickListener(v -> {
+            Intent intent = new Intent(TrainingGamePreparationActivity.this, TrainingGameActivity.class);
+            intent.putExtra(Intent.EXTRA_TITLE, packageAddress);
+            intent.putExtra(Intent.EXTRA_TEXT, counter);
+            startActivity(intent);
         });
 
         Button urlWrittenButton = findViewById(R.id.urlWrittenButton);
-        urlWrittenButton.setOnClickListener(
-                new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        try {
-                            URL hyperlink = new URL(urlEditor.getText().toString());
-                            packageAddress = hyperlink.toString();
-                            TextView currentPackage = findViewById(R.id.currentPackageName);
-                            Spanned currentPackageName = Html.fromHtml(
-                                    "<a href=\"" + hyperlink + "\">" + hyperlink.getFile() + "</a> "
-                            );
-                            currentPackage.setText(currentPackageName);
-                            urlEditor.getText().clear();
-                        } catch (MalformedURLException e) {
-                            urlEditor.getText().clear();
-                            Toast.makeText(TrainingGamePreparationActivity.this,
-                                    "Пакет по данной ссылке не найден, попробуйте еще раз",
-                                    Toast.LENGTH_SHORT).show();
-                        }
+        urlWrittenButton.setOnClickListener(v -> {
+                    try {
+                        URL hyperlink = new URL(urlEditor.getText().toString());
+                        packageAddress = hyperlink.toString();
+                        Spanned currentPackageName = Html.fromHtml(
+                                "<a href=\"" + hyperlink + "\">" + hyperlink.getFile() + "</a> "
+                        );
+                        currentPackage.setText(currentPackageName);
+                        urlEditor.getText().clear();
+                    } catch (MalformedURLException e) {
+                        urlEditor.getText().clear();
+                        Toast.makeText(TrainingGamePreparationActivity.this,
+                                "Пакет по данной ссылке не найден, попробуйте ещё раз",
+                                Toast.LENGTH_SHORT).show();
                     }
                 });
 
         Button resetCurrentPackage = findViewById(R.id.resetCurrentPackage);
-        resetCurrentPackage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                packageAddress = basePackageAddress;
-                currentPackage.setText(getResources().getString(R.string.base_package));
-            }
+        resetCurrentPackage.setOnClickListener(v -> {
+            packageAddress = basePackageAddress;
+            currentPackage.setText(getResources().getString(R.string.base_package));
         });
 
         SeekBar timeCounterBar = findViewById(R.id.trainingCounterBar);

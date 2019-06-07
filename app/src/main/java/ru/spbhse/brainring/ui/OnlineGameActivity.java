@@ -96,10 +96,6 @@ public class OnlineGameActivity extends GameActivity {
         new AlertDialog.Builder(this).setTitle("Выход из игры по сети")
                 .setMessage("Вы хотите выйти?")
                 .setPositiveButton("Да", (dialog, which) -> {
-                    Intent intent = new Intent(OnlineGameActivity.this,
-                            SelectOnlineOpponentActivity.class);
-                    startActivity(intent);
-
                     finish();
                 })
                 .setNegativeButton("Нет", (dialog, which) -> {

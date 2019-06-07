@@ -8,6 +8,7 @@ public class DatabaseTable implements BaseColumns {
     public static final String COLUMN_QUESTION = "question";
     public static final String COLUMN_ANSWER = "answer";
     public static final String COLUMN_COMMENT = "comment";
+    public static final String COLUMN_PASS_CRITERIA = "passcriteria";
 
     private String tableName;
     private String url;

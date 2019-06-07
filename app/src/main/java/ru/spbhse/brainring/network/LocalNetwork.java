@@ -22,46 +22,52 @@ public abstract class LocalNetwork {
     protected static final int ROLE_ADMIN = 1;
     protected static final int ROLE_GREEN = 1 << 1;
     protected static final int ROLE_RED = 1 << 2;
-    private static final int TIMES_TO_SEND = 10000;
+    private static final int TIMES_TO_SEND = 100;
     /** Flag to determine if handshake was done */
-    protected volatile boolean handshaked = false;
+    protected boolean handshaked = false;
     protected boolean gameIsFinished = false;
     protected int p2pConnected = 0;
     protected boolean serverRoomConnected = false;
     protected RoomConfig mRoomConfig;
     protected Room room;
-    public GoogleSignInAccount googleSignInAccount;
+    protected GoogleSignInAccount googleSignInAccount;
     protected RealTimeMultiplayerClient mRealTimeMultiplayerClient;
     protected String myParticipantId;
     protected RoomStatusUpdateCallback mRoomStatusUpdateCallback = new RoomStatusUpdateCallback() {
         @Override
         public void onRoomConnecting(@Nullable Room room) {
             Log.d("BrainRing", "onRoomConnecting");
+            LocalNetwork.this.room = room;
         }
 
         @Override
         public void onRoomAutoMatching(@Nullable Room room) {
             Log.d("BrainRing", "onRoomAutoMatching");
+            LocalNetwork.this.room = room;
         }
 
         @Override
         public void onPeerInvitedToRoom(@Nullable Room room, @NonNull List<String> list) {
             Log.d("BrainRing", "onPeerInvitedToRoom");
+            LocalNetwork.this.room = room;
         }
 
         @Override
         public void onPeerDeclined(@Nullable Room room, @NonNull List<String> list) {
             Log.d("BrainRing", "onPeerDeclined");
+            LocalNetwork.this.room = room;
         }
 
         @Override
         public void onPeerJoined(@Nullable Room room, @NonNull List<String> list) {
             Log.d("BrainRing", "onPeerJoined");
+            LocalNetwork.this.room = room;
         }
 
         @Override
         public void onPeerLeft(@Nullable Room room, @NonNull List<String> list) {
             Log.d("BrainRing", "onPeerLeft");
+            LocalNetwork.this.room = room;
             if (!gameIsFinished) {
                 LocalController.finishLocalGame(true);
             }
@@ -70,11 +76,13 @@ public abstract class LocalNetwork {
         @Override
         public void onConnectedToRoom(@Nullable Room room) {
             Log.d("BrainRing", "onConnectedToRoom");
+            LocalNetwork.this.room = room;
         }
 
         @Override
         public void onDisconnectedFromRoom(@Nullable Room room) {
             Log.d("BrainRing", "onDisconnectedFromRoom");
+            LocalNetwork.this.room = room;
             if (!gameIsFinished) {
                 LocalController.finishLocalGame(true);
             }
@@ -83,11 +91,13 @@ public abstract class LocalNetwork {
         @Override
         public void onPeersConnected(@Nullable Room room, @NonNull List<String> list) {
             Log.d("BrainRing", "onPeersConnected");
+            LocalNetwork.this.room = room;
         }
 
         @Override
         public void onPeersDisconnected(@Nullable Room room, @NonNull List<String> list) {
             Log.d("BrainRing", "onPeersDisconnected");
+            LocalNetwork.this.room = room;
             if (!gameIsFinished) {
                 LocalController.finishLocalGame(true);
             }
@@ -113,7 +123,7 @@ public abstract class LocalNetwork {
     protected RoomUpdateCallback mRoomUpdateCallback;
 
     /** Gets message and resubmits it to {@code onMessageReceived} with sender id*/
-    public OnRealTimeMessageReceivedListener mOnRealTimeMessageReceivedListener = realTimeMessage -> {
+    protected OnRealTimeMessageReceivedListener mOnRealTimeMessageReceivedListener = realTimeMessage -> {
         byte[] buf = realTimeMessage.getMessageData();
         onMessageReceived(buf, realTimeMessage.getSenderParticipantId());
     };
@@ -142,7 +152,6 @@ public abstract class LocalNetwork {
         }
         mRealTimeMultiplayerClient.sendReliableMessage(message, room.getRoomId(), userId, (i, i1, s) -> {
             if (i != GamesCallbackStatusCodes.OK) {
-
                 Log.e("BrainRing", "Failed to send message. Left " + timesToSend + " tries\n" +
                         "Error is " + GamesCallbackStatusCodes.getStatusCodeString(i));
                 sendMessageToConcreteUserNTimes(userId, message, timesToSend - 1);
@@ -162,6 +171,10 @@ public abstract class LocalNetwork {
             gameIsFinished = true;
             leaveRoom();
         }
+    }
+
+    public void signIn(GoogleSignInAccount account) {
+        googleSignInAccount = account;
     }
 
     /** Sends message to all users in a room except itself */

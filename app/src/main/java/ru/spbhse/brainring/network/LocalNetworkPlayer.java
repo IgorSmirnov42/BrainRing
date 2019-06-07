@@ -17,6 +17,7 @@ import java.io.IOException;
 
 import ru.spbhse.brainring.controllers.LocalController;
 import ru.spbhse.brainring.network.messages.Message;
+import ru.spbhse.brainring.network.messages.MessageGenerator;
 
 /**
  * Class with methods to interact with network
@@ -44,11 +45,13 @@ public class LocalNetworkPlayer extends LocalNetwork {
             @Override
             public void onRoomCreated(int i, @Nullable Room room) {
                 Log.d("BrainRing", "Room was created");
+                LocalNetworkPlayer.this.room = room;
             }
 
             @Override
             public void onJoinedRoom(int i, @Nullable Room room) {
                 Log.d("BrainRing", "Joined room");
+                LocalNetworkPlayer.this.room = room;
             }
 
             @Override
@@ -61,19 +64,16 @@ public class LocalNetworkPlayer extends LocalNetwork {
 
             @Override
             public void onRoomConnected(int code, @Nullable Room room) {
-                synchronized (LocalNetworkPlayer.this) {
-                    Log.d("BrainRing", "Connected to room");
-                    if (room == null) {
-                        Log.wtf("BrainRing", "onRoomConnected got null as room");
-                        return;
-                    }
-                    LocalNetworkPlayer.this.room = room;
-                    if (code == GamesCallbackStatusCodes.OK) {
-                        Log.d("BrainRing","Connected");
-                    } else {
-                        Log.d("BrainRing","Error during connecting");
-                    }
-                    LocalNetworkPlayer.this.notifyAll();
+                Log.d("BrainRing", "Connected to room");
+                if (room == null) {
+                    Log.wtf("BrainRing", "onRoomConnected got null as room");
+                    return;
+                }
+                LocalNetworkPlayer.this.room = room;
+                if (code == GamesCallbackStatusCodes.OK) {
+                    Log.d("BrainRing","Connected");
+                } else {
+                    Log.d("BrainRing","Error during connecting");
                 }
             }
         };
@@ -89,33 +89,15 @@ public class LocalNetworkPlayer extends LocalNetwork {
             return;
         }
         Log.d("BrainRing","RECEIVED MESSAGE AS PLAYER!");
-        if (!handshaked) {
-            new Thread(() -> {
-                synchronized (LocalNetworkPlayer.this) {
-                    while (room == null) {
-                        try {
-                            wait();
-                        } catch (InterruptedException e) {
-                        }
-                    }
-                    handshaked = true;
-                    serverId = userId;
-                    if (myColor == ROLE_GREEN) {
-                        Log.d("BrainRing", "I am green");
-                        sendMessageToConcreteUser(userId, buf);
-                    } else {
-                        Log.d("BrainRing", "I am red");
-                    }
-                }
-            }).start();
-            return;
-        }
 
         try (DataInputStream is = new DataInputStream(new ByteArrayInputStream(buf))) {
             int identifier = is.readInt();
             Log.d("BrainRing","Identifier is " + identifier);
 
             switch (identifier) {
+                case Message.INITIAL_HANDSHAKE:
+                    doInitialHandshake(userId);
+                    break;
                 case Message.FORBIDDEN_TO_ANSWER:
                     LocalController.LocalPlayerLogicController.onForbiddenToAnswer();
                     break;
@@ -140,10 +122,26 @@ public class LocalNetworkPlayer extends LocalNetwork {
         }
     }
 
+    private void doInitialHandshake(@NonNull String serverId) {
+        this.serverId = serverId;
+        handshaked = true;
+        if (myColor == ROLE_GREEN) {
+            Log.d("BrainRing", "I am green");
+            sendMessageToConcreteUser(serverId,
+                    MessageGenerator.create()
+                    .writeInt(Message.INITIAL_HANDSHAKE)
+                    .toByteArray()
+            );
+        } else {
+            Log.d("BrainRing", "I am red");
+        }
+    }
+
     /** Starts quick game with auto matched server and player */
     @Override
     public void startQuickGame() {
-        mRealTimeMultiplayerClient = Games.getRealTimeMultiplayerClient(LocalController.getPlayerActivity(),
+        mRealTimeMultiplayerClient = Games.getRealTimeMultiplayerClient(
+                LocalController.getPlayerActivity(),
                 googleSignInAccount);
         final int MIN_OPPONENTS = 2, MAX_OPPONENTS = 2;
         Bundle autoMatchCriteria = RoomConfig.createAutoMatchCriteria(MIN_OPPONENTS,

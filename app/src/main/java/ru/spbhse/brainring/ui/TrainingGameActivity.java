@@ -1,17 +1,21 @@
 package ru.spbhse.brainring.ui;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.StrictMode;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
+import java.lang.ref.WeakReference;
 import java.net.MalformedURLException;
 import java.net.URL;
 
 import ru.spbhse.brainring.R;
 import ru.spbhse.brainring.controllers.DatabaseController;
+import ru.spbhse.brainring.controllers.GameController;
 import ru.spbhse.brainring.controllers.TrainingController;
 import ru.spbhse.brainring.database.QuestionDatabase;
 import ru.spbhse.brainring.database.DatabaseTable;
@@ -24,12 +28,8 @@ public class TrainingGameActivity extends GameActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        /////////////
-        StrictMode.ThreadPolicy policy = new
-                StrictMode.ThreadPolicy.Builder().permitAll().build();
-        StrictMode.setThreadPolicy(policy);
-        /////////////
         super.onCreate(savedInstanceState);
+        drawLocation();
 
         TrainingController.setUI(TrainingGameActivity.this);
 
@@ -48,14 +48,17 @@ public class TrainingGameActivity extends GameActivity {
         } catch (MalformedURLException ignored) {
         }
         dataBase.setGameTable(gameTable);
-        dataBase.createTable(gameTable);
-        gameController = TrainingController.TrainingLogicController.getInstance();
+        ProgressBar spinner = findViewById(R.id.progressSpinner);
+        if (spinner == null) {
+            throw new IllegalStateException();
+        }
+        GameController gameController = TrainingController.TrainingLogicController.getInstance();
+        setGameController(gameController);
         setMyNick("Правильных ответов");
         setOpponentNick("Неправильных ответов");
-
         TrainingController.createTrainingGame();
         TrainingController.TrainingLogicController.setReadingTime(readingTime);
-        TrainingController.TrainingLogicController.newQuestion();
+        new LoadPackageTask(this, spinner).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     @Override
@@ -82,14 +85,54 @@ public class TrainingGameActivity extends GameActivity {
     @Override
     protected void drawLocation() {
         super.drawLocation();
+
+        if (currentLocation == GameActivityLocation.GAME_WAITING_START) {
+            TextView waitingForOpponent = findViewById(R.id.waitingStartInfo);
+            waitingForOpponent.setVisibility(View.INVISIBLE);
+        }
+
         if (currentLocation == GameActivityLocation.SHOW_ANSWER) {
             Button continueGameButton = findViewById(R.id.continueGameButton);
-            continueGameButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    TrainingController.TrainingLogicController.newQuestion();
-                }
-            });
+            continueGameButton.setOnClickListener(v ->
+                    TrainingController.TrainingLogicController.newQuestion());
         }
+    }
+
+    public void setGameController(GameController newGameController) {
+        gameController = newGameController;
+    }
+
+    private static class LoadPackageTask extends AsyncTask<Void, Void, String> {
+        private WeakReference<TrainingGameActivity> trainingGameActivity;
+        private QuestionDatabase dataBase;
+        private ProgressBar spinner;
+
+        private LoadPackageTask(TrainingGameActivity activity, ProgressBar spinner) {
+            trainingGameActivity = new WeakReference<>(activity);
+            dataBase = trainingGameActivity.get().dataBase;
+            this.spinner = spinner;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            spinner.setIndeterminate(true);
+        }
+
+        @Override
+        protected String doInBackground(Void... voids) {
+            DatabaseTable gameTable = trainingGameActivity.get().getGameTable();
+            dataBase.createTable(gameTable);
+            return "finished";
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            spinner.setVisibility(View.INVISIBLE);
+            TrainingController.TrainingLogicController.newQuestion();
+        }
+    }
+
+    private DatabaseTable getGameTable() {
+        return gameTable;
     }
 }

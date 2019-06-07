@@ -1,6 +1,5 @@
 package ru.spbhse.brainring.ui;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Button;
@@ -22,9 +21,7 @@ public class OnlineGameFinished extends AppCompatActivity {
 
         Button toSelectOnlineOpponentButton = findViewById(R.id.toSelectOnlineOpponent);
         toSelectOnlineOpponentButton.setOnClickListener(v -> {
-            Intent intent = new Intent(OnlineGameFinished.this,
-                    SelectOnlineOpponentActivity.class);
-            startActivity(intent);
+            // Back to select opponent activity
             finish();
         });
     }

@@ -195,11 +195,12 @@ public class LocalController extends Controller {
         private static LocalNetwork network;
 
         public static void loggedIn(GoogleSignInAccount signedInAccount) {
-            network.googleSignInAccount = signedInAccount;
+            network.signIn(signedInAccount);
             network.startQuickGame();
         }
 
-        public static void sendMessageToConcreteUser(@NonNull String userId, @NonNull byte[] message) {
+        public static void sendMessageToConcreteUser(@NonNull String userId,
+                                                     @NonNull byte[] message) {
             network.sendMessageToConcreteUser(userId, message);
         }
 

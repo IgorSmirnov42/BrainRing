@@ -226,6 +226,7 @@ public class OnlineController extends Controller {
             network = new Network();
             Log.d("BrainRing", "Network: " + network);
             OnlineUserLogicController.userLogic = new OnlineGameUserLogic();
+            DatabaseController.generateNewSequence();
             onlineGameActivity.get().signIn();
         }
 

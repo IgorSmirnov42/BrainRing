@@ -1,6 +1,7 @@
 package ru.spbhse.brainring.network;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -27,9 +28,12 @@ public class LocalNetworkAdmin extends LocalNetwork {
     private String redId;
     private String greenId;
     private static final byte[] HANDSHAKE;
+    private static final int HANDSHAKE_DELAY = 1000;
 
     static {
-        HANDSHAKE = MessageGenerator.create().writeInt(Message.HANDSHAKE).toByteArray();
+        HANDSHAKE = MessageGenerator.create()
+                .writeInt(Message.HANDSHAKE)
+                .toByteArray();
     }
 
     /**
@@ -42,11 +46,13 @@ public class LocalNetworkAdmin extends LocalNetwork {
             @Override
             public void onRoomCreated(int i, @Nullable Room room) {
                 Log.d("BrainRing", "Room was created");
+                LocalNetworkAdmin.this.room = room;
             }
 
             @Override
             public void onJoinedRoom(int i, @Nullable Room room) {
                 Log.d("BrainRing", "Joined room");
+                LocalNetworkAdmin.this.room = room;
             }
 
             @Override
@@ -94,26 +100,14 @@ public class LocalNetworkAdmin extends LocalNetwork {
             return;
         }
         Log.d("BrainRing", "Received message as admin!");
-        if (!handshaked) {
-            greenId = userId;
-            handshaked = true;
-            for (String id : room.getParticipantIds()) {
-                if (!id.equals(myParticipantId) && !id.equals(greenId)) {
-                    redId = id;
-                    break;
-                }
-            }
-            Log.d("BrainRing","Successful handshake");
-
-            assert redId != null;
-            LocalController.LocalNetworkAdminController.startGameCycle();
-            return;
-        }
         try (DataInputStream is = new DataInputStream(new ByteArrayInputStream(buf))) {
             int identifier = is.readInt();
             Log.d("BrainRing", "Identifier is " + identifier);
 
             switch(identifier) {
+                case Message.INITIAL_HANDSHAKE:
+                    setGreenPlayer(userId);
+                    break;
                 case Message.ANSWER_IS_READY:
                     LocalController.LocalAdminLogicController.onAnswerIsReady(userId);
                     break;
@@ -126,11 +120,30 @@ public class LocalNetworkAdmin extends LocalNetwork {
         }
     }
 
+    private void setGreenPlayer(@NonNull String userId) {
+        if (handshaked) {
+            Log.d("BrainRing", "Handshake is done");
+            return;
+        }
+        greenId = userId;
+        handshaked = true;
+        for (String id : room.getParticipantIds()) {
+            if (!id.equals(myParticipantId) && !id.equals(greenId)) {
+                redId = id;
+                break;
+            }
+        }
+        Log.d("BrainRing","Successful handshake");
+
+        assert redId != null;
+        LocalController.LocalNetworkAdminController.startGameCycle();
+    }
+
     /** Starts quick game with two auto matched players */
     @Override
     public void startQuickGame() {
-        mRealTimeMultiplayerClient = Games.getRealTimeMultiplayerClient(LocalController.getJuryActivity(),
-                googleSignInAccount);
+        mRealTimeMultiplayerClient = Games.getRealTimeMultiplayerClient(
+                LocalController.getJuryActivity(), googleSignInAccount);
         final int MIN_OPPONENTS = 2, MAX_OPPONENTS = 2;
         Bundle autoMatchCriteria = RoomConfig.createAutoMatchCriteria(MIN_OPPONENTS,
                 MAX_OPPONENTS, ROLE_ADMIN);
@@ -152,11 +165,17 @@ public class LocalNetworkAdmin extends LocalNetwork {
      */
     @Override
     protected void handshake() {
+        if (handshaked) {
+            return;
+        }
         Log.d("BrainRing", "Start handshake");
-        byte[] message = new byte[0];
-        Log.d("BrainRing", "Writing message");
+        byte[] message = MessageGenerator.create()
+                .writeInt(Message.INITIAL_HANDSHAKE)
+                .toByteArray();
         sendMessageToOthers(message);
-        Log.d("BrainRing", "Message sent");
+        // Sometimes first message doesn't reach opponent for some reason
+        // so we have to send it one more time
+        new Handler().postDelayed(this::handshake, HANDSHAKE_DELAY);
     }
 
     public void regularHandshake() {

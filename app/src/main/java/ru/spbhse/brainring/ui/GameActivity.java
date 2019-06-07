@@ -1,10 +1,13 @@
 package ru.spbhse.brainring.ui;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -40,6 +43,8 @@ abstract public class GameActivity extends AppCompatActivity {
     protected void drawLocation() {
         if (currentLocation == GAME_WAITING_START) {
             setContentView(R.layout.activity_waiting_for_start);
+            TextView waitingForOpponent = findViewById(R.id.waitingStartInfo);
+            waitingForOpponent.setVisibility(View.VISIBLE);
         }
         if (currentLocation == SHOW_QUESTION) {
             setContentView(R.layout.activity_showing_question);
@@ -63,6 +68,9 @@ abstract public class GameActivity extends AppCompatActivity {
             makeScrollable(findViewById(R.id.questionText));
 
             EditText answerEditor = findViewById(R.id.answerEditor);
+            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.showSoftInput(answerEditor, InputMethodManager.SHOW_IMPLICIT);
+
             Button answerWrittenButton = findViewById(R.id.answerWrittenButton);
             answerWrittenButton.setOnClickListener(
                     v -> gameController.answerIsWritten(
@@ -199,7 +207,7 @@ abstract public class GameActivity extends AppCompatActivity {
         TextView commentField = findViewById(R.id.commentField);
         if (commentField != null) {
             String commentToShow = comment;
-            if (!comment.equals("") && !comment.startsWith("Комментарий: ")) {
+            if (!comment.equals("")) {
                 commentToShow = "Комментарий: " + commentToShow;
             }
             commentField.setText(commentToShow);

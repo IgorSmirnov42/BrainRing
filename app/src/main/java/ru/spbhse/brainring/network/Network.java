@@ -63,53 +63,63 @@ public class Network {
         @Override
         public void onRoomConnecting(@Nullable Room room) {
             Log.d("BrainRing", "onRoomConnecting");
+            Network.this.room = room;
         }
 
         @Override
         public void onRoomAutoMatching(@Nullable Room room) {
             Log.d("BrainRing", "onRoomAutoMatching");
+            Network.this.room = room;
         }
 
         @Override
         public void onPeerInvitedToRoom(@Nullable Room room, @NonNull List<String> list) {
             Log.d("BrainRing", "onPeerInvitedToRoom");
+            Network.this.room = room;
         }
 
         @Override
         public void onPeerDeclined(@Nullable Room room, @NonNull List<String> list) {
             Log.d("BrainRing", "onPeerDeclined");
+            Network.this.room = room;
         }
 
         @Override
         public void onPeerJoined(@Nullable Room room, @NonNull List<String> list) {
             Log.d("BrainRing", "onPeerJoined");
+            Network.this.room = room;
         }
 
         @Override
         public void onPeerLeft(@Nullable Room room, @NonNull List<String> list) {
             Log.d("BrainRing", "onPeerLeft");
+            Network.this.room = room;
             waitOrFinish();
         }
 
         @Override
         public void onConnectedToRoom(@Nullable Room room) {
             Log.d("BrainRing", "onConnectedToRoom");
+            Network.this.room = room;
         }
 
         @Override
         public void onDisconnectedFromRoom(@Nullable Room room) {
             Log.d("BrainRing", "onDisconnectedFromRoom");
+            Network.this.room = room;
             waitOrFinish();
         }
 
         @Override
         public void onPeersConnected(@Nullable Room room, @NonNull List<String> list) {
             Log.d("BrainRing", "onPeersConnected");
+            Network.this.room = room;
         }
 
         @Override
         public void onPeersDisconnected(@Nullable Room room, @NonNull List<String> list) {
             Log.d("BrainRing", "onPeersDisconnected");
+            Network.this.room = room;
             waitOrFinish();
         }
 
@@ -138,6 +148,7 @@ public class Network {
         @Override
         public void onJoinedRoom(int i, @Nullable Room room) {
             Log.d("BrainRing", "Joined room");
+            Network.this.room = room;
         }
 
         @Override
@@ -323,7 +334,7 @@ public class Network {
         }
     }
 
-    public void updateRating() {
+    private void updateRating() {
         if (leaderboardsClient == null || scoreSum == -1) {
             return;
         }

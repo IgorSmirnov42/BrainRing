@@ -38,18 +38,18 @@ class Answer {
      *                     Symbol "/" if forbidden as a part of answer
      */
     Answer(@NonNull String mainAnswer, @Nullable String validAnswers) {
-        String[] validAnswersSplitted;
+        String[] validAnswersSplit;
         if (validAnswers != null) {
-            validAnswersSplitted = validAnswers.split("/");
+            validAnswersSplit = validAnswers.split("/");
         } else {
-            validAnswersSplitted = new String[0];
+            validAnswersSplit = new String[0];
         }
 
-        possibleAnswers = new String[validAnswersSplitted.length + 1];
+        possibleAnswers = new String[validAnswersSplit.length + 1];
 
         int currentAnswerCounter = 0;
         possibleAnswers[currentAnswerCounter++] = mainAnswer;
-        for (String currentAnswer : validAnswersSplitted) {
+        for (String currentAnswer : validAnswersSplit) {
             possibleAnswers[currentAnswerCounter++] = currentAnswer;
         }
     }
