@@ -41,9 +41,11 @@ class Answer {
         String[] validAnswersSplit;
         if (validAnswers != null) {
             validAnswersSplit = validAnswers.split("/");
-            for (int i = 0; i < validAnswers.length(); i++) {
-                validAnswersSplit[i] = validAnswersSplit[i].
-                        substring(0, validAnswersSplit[i].length() - 1);
+            for (int i = 0; i < validAnswersSplit.length; i++) {
+                if (validAnswersSplit[i].length() >= 1) {
+                    validAnswersSplit[i] = validAnswersSplit[i].
+                            substring(0, validAnswersSplit[i].length() - 1);
+                }
             }
         } else {
             validAnswersSplit = new String[0];
