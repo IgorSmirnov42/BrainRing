@@ -8,6 +8,7 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
 
+import ru.spbhse.brainring.R;
 import ru.spbhse.brainring.controllers.Controller;
 import ru.spbhse.brainring.controllers.DatabaseController;
 import ru.spbhse.brainring.controllers.OnlineController;
@@ -107,6 +108,8 @@ public class OnlineGameAdminLogic {
             } else {
                 if (getOtherUser(userId).status.getAlreadyAnswered()) {
                     showAnswer(null);
+                } else {
+                    getThisUser(userId).status.setAlreadyAnswered(true);
                 }
             }
         }
@@ -247,12 +250,13 @@ public class OnlineGameAdminLogic {
         Log.d(Controller.APP_TAG, "show answer " + answeredUserId);
         String questionMessage;
         if (answeredUserId == null) {
-            questionMessage = "Никто не ответил на вопрос";
+            questionMessage = OnlineController.getOnlineGameActivity()
+                    .getString(R.string.nobody_answered);
         } else {
             questionMessage = OnlineController.NetworkController.getParticipantName(answeredUserId) +
-                    " ответил верно";
+                    OnlineController.getOnlineGameActivity().getString(R.string.answered_right);
         }
-        Log.d(Controller.APP_TAG, "Question message:" + questionMessage);
+        Log.d(Controller.APP_TAG, "Question message: " + questionMessage);
         readyUsers = 0;
         OnlineController.NetworkController.sendMessageToAll(
                 MessageGenerator.create()

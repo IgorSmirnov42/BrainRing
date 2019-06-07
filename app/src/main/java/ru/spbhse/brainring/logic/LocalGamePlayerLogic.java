@@ -21,20 +21,23 @@ public class LocalGamePlayerLogic {
 
     /** Shows toast with forbiddance to answer */
     public void onForbiddenToAnswer() {
-        Toast.makeText(LocalController.getPlayerActivity(), "Сервер запретил вам отвечать",
+        Toast.makeText(LocalController.getPlayerActivity(), 
+                LocalController.getPlayerActivity().getString(R.string.forbidden_answer),
                 Toast.LENGTH_LONG).show();
     }
 
     /** Shows toast with allowance to answer */
     public void onAllowedToAnswer() {
-        Toast.makeText(LocalController.getPlayerActivity(), "Разрешено отвечать!",
+        Toast.makeText(LocalController.getPlayerActivity(),
+                LocalController.getPlayerActivity().getString(R.string.allowed_answer),
                 Toast.LENGTH_LONG).show();
     }
 
     /** Shows toast with false start message */
     public void onFalseStart() {
-        Toast.makeText(LocalController.getPlayerActivity(), "Фальстарт!", Toast.LENGTH_LONG)
-                .show();
+        Toast.makeText(LocalController.getPlayerActivity(),
+                LocalController.getPlayerActivity().getString(R.string.false_start),
+                Toast.LENGTH_LONG).show();
     }
 
     /** Plays sound of time start */

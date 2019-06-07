@@ -369,20 +369,24 @@ public class Network {
                     String message;
                     switch (finishCode) {
                         case OnlineFinishCodes.UNSUCCESSFUL_HANDSHAKE:
-                            message = "Игра прервана. Соединение с соперником слишком медленное.";
+                            message = OnlineController.getOnlineGameActivity()
+                                    .getString(R.string.slow_connection);
                             break;
                         case OnlineFinishCodes.SERVER_TIMER_TIMEOUT:
-                            message = "Игра прервана. Потеряно соединение или произошла непоправимая" +
-                                    " ошибка.";
+                            message = OnlineController.getOnlineGameActivity()
+                                    .getString(R.string.timeout);
                             break;
                         case OnlineFinishCodes.GAME_FINISHED_CORRECTLY_LOST:
-                            message = "Игра завершена. К сожалению, Вы проиграли.";
+                            message = OnlineController.getOnlineGameActivity()
+                                    .getString(R.string.lost);
                             break;
                         case OnlineFinishCodes.GAME_FINISHED_CORRECTLY_WON:
-                            message = "Игра завершена. Вы победили!";
+                            message = OnlineController.getOnlineGameActivity()
+                                    .getString(R.string.win);
                             break;
                         default:
-                            message = "Игра прервана. Неизвестная ошибка.";
+                            message = OnlineController.getOnlineGameActivity()
+                                    .getString(R.string.unknown_error);
                     }
                     finishImmediately(message);
                     break;
@@ -419,7 +423,8 @@ public class Network {
             public void onFinish() {
                 if (timer == this) {
                     if (counterOfConnections == 0) {
-                        finishImmediately("Соперник не найден");
+                        finishImmediately(OnlineController.getOnlineGameActivity()
+                                .getString(R.string.opponent_not_found));
                     } else {
                         sendMessageToAll(MessageGenerator.create()
                                 .writeInt(Message.FINISH)
@@ -446,6 +451,7 @@ public class Network {
 
     /** Saves Google account, loads current score of user. On success starts searching for opponents */
     public void onSignedIn(@NonNull GoogleSignInAccount signInAccount) {
+        Log.d(Controller.APP_TAG, "Logged in");
         googleSignInAccount = signInAccount;
         mRealTimeMultiplayerClient = Games.getRealTimeMultiplayerClient(
                 OnlineController.getOnlineGameActivity(), googleSignInAccount);
@@ -491,7 +497,8 @@ public class Network {
             return;
         }
         new Handler().postDelayed(() ->
-                finishImmediately("Игра прервана. Потеряно соединение с соперником."),
+                finishImmediately(OnlineController.getOnlineGameActivity()
+                        .getString(R.string.default_error)),
                 WAIT_FOR_MESSAGE);
     }
 
@@ -548,7 +555,8 @@ public class Network {
         }
         if (timesToSend < 0) {
             Log.wtf(Controller.APP_TAG, "Failed to send message too many times. Finish game");
-            finishImmediately("Игра прервана. Потеряна связь с соперником.");
+            finishImmediately(OnlineController.getOnlineGameActivity()
+                    .getString(R.string.default_error));
             return;
         }
         mRealTimeMultiplayerClient.sendReliableMessage(message, room.getRoomId(), userId, (i, i1, s) -> {

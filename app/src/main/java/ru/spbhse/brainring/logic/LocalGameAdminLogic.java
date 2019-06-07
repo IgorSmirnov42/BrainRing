@@ -142,9 +142,11 @@ public class LocalGameAdminLogic {
     public void onRejectAnswer() {
         UserScore other = getOtherUser(answeringUserId);
         if (isGreen(answeringUserId)) {
-            LocalController.LocalAdminUIController.setGreenStatus("Ответил");
+            LocalController.LocalAdminUIController.setGreenStatus(
+                    LocalController.getJuryActivity().getString(R.string.answered));
         } else {
-            LocalController.LocalAdminUIController.setRedStatus("Ответил");
+            LocalController.LocalAdminUIController.setRedStatus(
+                    LocalController.getJuryActivity().getString(R.string.answered));
         }
         answeringUserId = null;
         if (!other.status.getAlreadyAnswered()) {
@@ -236,9 +238,11 @@ public class LocalGameAdminLogic {
             user.status.setAlreadyAnswered(true);
             LocalController.LocalNetworkController.sendMessageToConcreteUser(userId, FALSE_START);
             if (isGreen(userId)) {
-                LocalController.LocalAdminUIController.setGreenStatus("Фальстарт");
+                LocalController.LocalAdminUIController.setGreenStatus(
+                        LocalController.getJuryActivity().getString(R.string.false_start));
             } else {
-                LocalController.LocalAdminUIController.setRedStatus("Фальстарт");
+                LocalController.LocalAdminUIController.setRedStatus(
+                        LocalController.getJuryActivity().getString(R.string.false_start));
             }
             if (bothAnswered()) {
                 newQuestion();
@@ -304,9 +308,11 @@ public class LocalGameAdminLogic {
             return;
         }
         if (getColor(userId).equals("red")) {
-            LocalController.LocalAdminUIController.setRedStatus("Connected");
+            LocalController.LocalAdminUIController.setRedStatus(
+                    LocalController.getJuryActivity().getString(R.string.connected));
         } else {
-            LocalController.LocalAdminUIController.setGreenStatus("Connected");
+            LocalController.LocalAdminUIController.setGreenStatus(
+                    LocalController.getJuryActivity().getString(R.string.connected));
         }
     }
 
@@ -334,7 +340,7 @@ public class LocalGameAdminLogic {
             return true;
         } else {
             Toast.makeText(LocalController.getJuryActivity(),
-                    "Изменение счёта невозможно во время вопроса.",
+                    LocalController.getJuryActivity().getString(R.string.cannot_change_score),
                     Toast.LENGTH_LONG).show();
             return false;
         }

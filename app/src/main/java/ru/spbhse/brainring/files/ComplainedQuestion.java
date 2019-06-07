@@ -2,6 +2,7 @@ package ru.spbhse.brainring.files;
 
 import android.support.annotation.NonNull;
 
+/** Question that was complained storage */
 public class ComplainedQuestion {
     private static final int SHORTEN_LENGTH = 20;
     @NonNull private final String questionText;
@@ -50,6 +51,7 @@ public class ComplainedQuestion {
         this.complainText = complainText;
     }
 
+    /** Transfers instance to human readable string */
     public String humanReadable() {
         String readableComplain = "";
         readableComplain += "Id вопроса: " + questionId + "\n";
@@ -59,6 +61,7 @@ public class ComplainedQuestion {
         return readableComplain;
     }
 
+    /** Shorts given string */
     @NonNull
     private String shortenForm(@NonNull String string) {
         if (string.length() <= SHORTEN_LENGTH) {

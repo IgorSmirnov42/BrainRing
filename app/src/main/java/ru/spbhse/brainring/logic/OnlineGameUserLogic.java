@@ -81,16 +81,20 @@ public class OnlineGameUserLogic {
      * 3. User did false start before
      */
     public void onForbiddenToAnswer() {
-        Toast.makeText(OnlineController.getOnlineGameActivity(), "Сервер запретил Вам отвечать",
-                Toast.LENGTH_LONG).show();
+        Toast.makeText(OnlineController.getOnlineGameActivity(),
+                OnlineController.getOnlineGameActivity().getString(R.string.forbidden_answer),
+                Toast.LENGTH_SHORT).show();
     }
 
     /** Reacts on user's false start */
     private void onFalseStart() {
-        alreadyAnswered = true;
-        Toast.makeText(OnlineController.getOnlineGameActivity(), "Фальстарт!",
-                Toast.LENGTH_LONG).show();
-        OnlineController.NetworkController.sendMessageToServer(FALSE_START);
+        if (!alreadyAnswered) {
+            alreadyAnswered = true;
+            OnlineController.NetworkController.sendMessageToServer(FALSE_START);
+        }
+        Toast.makeText(OnlineController.getOnlineGameActivity(), 
+                OnlineController.getOnlineGameActivity().getString(R.string.false_start),
+                Toast.LENGTH_SHORT).show();
     }
 
     /** Signalizes server that user is now ready to continue a game */
@@ -118,7 +122,8 @@ public class OnlineGameUserLogic {
             player.setOnCompletionListener(MediaPlayer::release);
             player.start();
         }).start();
-        OnlineController.OnlineUIController.setButtonText("ЖМЯК!!");
+        OnlineController.OnlineUIController.setButtonText(OnlineController.getOnlineGameActivity()
+                .getString(R.string.button_push_text));
         startQuestionTime = System.currentTimeMillis();
         timer = new CountDownTimer(FIRST_COUNTDOWN * SECOND,
                 SECOND) {
@@ -196,7 +201,8 @@ public class OnlineGameUserLogic {
         alreadyAnswered = false;
     }
 
-    /** Reacts on opponent's incorrect answer.
+    /**
+     * Reacts on opponent's incorrect answer.
      * Shows opponent's answer, starts timer on {@code SECOND_COUNTDOWN} seconds
      */
     public void onIncorrectOpponentAnswer(@NonNull String opponentAnswer) {
