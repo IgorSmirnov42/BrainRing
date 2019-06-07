@@ -100,6 +100,15 @@ public class TrainingGameActivity extends GameActivity {
         gameController = newGameController;
     }
 
+    public void onGameFinished() {
+        Intent intent = new Intent(this, AfterGameActivity.class);
+        String total = String.valueOf(Integer.parseInt(opponentScore) + Integer.parseInt(myScore));
+        String endGameMessage = "Вы правильно ответили на " + myScore + " вопросов из " + total + ".";
+        intent.putExtra(Intent.EXTRA_TEXT, endGameMessage);
+        startActivity(intent);
+    }
+
+
     private static class LoadPackageTask extends AsyncTask<Void, Void, String> {
         private WeakReference<TrainingGameActivity> trainingGameActivity;
         private QuestionDatabase dataBase;
