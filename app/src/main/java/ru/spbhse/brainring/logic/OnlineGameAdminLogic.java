@@ -100,18 +100,11 @@ public class OnlineGameAdminLogic {
 
     /** Reacts on one's false start. Can be called even after publishing */
     public void onFalseStart(@NonNull String userId) {
-        if (!published) {
-            getThisUser(userId).status.setAlreadyAnswered(true);
+        if (published && answeringUserId == null &&
+                getOtherUser(userId).status.getAlreadyAnswered()) {
+            showAnswer(null);
         } else {
-            if (answeringUserId != null) { // somebody is answering
-                getThisUser(userId).status.setAlreadyAnswered(true);
-            } else {
-                if (getOtherUser(userId).status.getAlreadyAnswered()) {
-                    showAnswer(null);
-                } else {
-                    getThisUser(userId).status.setAlreadyAnswered(true);
-                }
-            }
+            getThisUser(userId).status.setAlreadyAnswered(true);
         }
     }
 
