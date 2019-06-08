@@ -21,6 +21,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.regex.Pattern;
 
 import ru.spbhse.brainring.R;
 import ru.spbhse.brainring.controllers.Controller;
@@ -219,7 +220,10 @@ public class QuestionDatabase extends SQLiteOpenHelper {
 
                 answer = cursor.getString(cursor.getColumnIndex(DatabaseTable.COLUMN_ANSWER)).
                         replaceFirst("Ответ:", "");
-                answer = answer.substring(0, answer.length() - 1);
+                if (Pattern.compile("[^.]\\.$").matcher(answer).find()) {
+                    answer = answer.substring(0, answer.length() - 1);
+                }
+
 
                 comment = cursor.getString(cursor.getColumnIndex(DatabaseTable.COLUMN_COMMENT)).
                         replaceFirst("Комментарий:", "");

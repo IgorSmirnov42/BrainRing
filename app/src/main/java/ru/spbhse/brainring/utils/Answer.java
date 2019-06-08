@@ -4,6 +4,8 @@ package ru.spbhse.brainring.utils;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import java.util.regex.Pattern;
+
 import static java.lang.Character.isDigit;
 import static java.lang.Character.isLetter;
 import static java.lang.Character.toLowerCase;
@@ -39,9 +41,9 @@ class Answer {
         if (validAnswers != null) {
             validAnswersSplit = validAnswers.split("/");
             for (int i = 0; i < validAnswersSplit.length; i++) {
-                if (validAnswersSplit[i].length() >= 1) {
-                    validAnswersSplit[i] = validAnswersSplit[i].
-                            substring(0, validAnswersSplit[i].length() - 1);
+                if (Pattern.compile("[^.]\\.$").matcher(validAnswersSplit[i]).find()) {
+                    validAnswersSplit[i] =
+                            validAnswersSplit[i].substring(0, validAnswersSplit[i].length() - 1);
                 }
             }
         } else {
