@@ -21,6 +21,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import ru.spbhse.brainring.R;
 import ru.spbhse.brainring.controllers.LocalController;
 
+/** This activity is for maintaining score of teams in local game */
 public class JuryActivity extends AppCompatActivity {
     private TextView statusText;
     private Button mainButton;
@@ -34,12 +35,13 @@ public class JuryActivity extends AppCompatActivity {
     private static final int RC_SIGN_IN = 42;
 
     private final View.OnClickListener longerClick = v -> {
-        Toast toast = Toast.makeText(JuryActivity.this, "Надо нажимать дольше",
+        Toast toast = Toast.makeText(JuryActivity.this, getString(R.string.press_longer),
                 Toast.LENGTH_LONG);
         toast.setGravity(Gravity.CENTER, 0, 0);
         toast.show();
     };
 
+    /** {@inheritDoc} */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,7 +53,7 @@ public class JuryActivity extends AppCompatActivity {
         mainButton = findViewById(R.id.mainButton);
         mainButton.setOnLongClickListener(v -> {
             if (!LocalController.LocalAdminLogicController.toNextState()) {
-                Toast.makeText(JuryActivity.this, "Невозможно переключиться в данный момент",
+                Toast.makeText(JuryActivity.this, getString(R.string.cannot_switch),
                         Toast.LENGTH_LONG).show();
             }
             return true;
@@ -93,64 +95,70 @@ public class JuryActivity extends AppCompatActivity {
         redStatus = findViewById(R.id.redStatus);
 
         redrawLocation();
-        statusText.setText("Ожидаем подключение игроков");
+        statusText.setText(getString(R.string.waiting_connection));
 
         LocalController.LocalNetworkAdminController.createLocalGame();
     }
 
+    /** Sets current location */
     public void setLocation(LocalGameLocation location) {
         currentLocation = location;
         redrawLocation();
     }
 
+    /** Redraws activity, based on current location */
     public void redrawLocation() {
         greenTeamScore.setText(LocalController.LocalAdminLogicController.getGreenScore());
         redTeamScore.setText(LocalController.LocalAdminLogicController.getRedScore());
         if (currentLocation == LocalGameLocation.GAME_WAITING_START) {
-            statusText.setText("Проверяем подключение");
+            statusText.setText(getString(R.string.check_connection));
             mainButton.setVisibility(View.GONE);
         }
         if (currentLocation == LocalGameLocation.NOT_STARTED) {
-            statusText.setText("Оба игрока подключены. Можем начинать раунд.");
-            mainButton.setText("Начать чтение вопроса");
+            statusText.setText(getString(R.string.both_connected));
+            mainButton.setText(getString(R.string.begin_reading));
             mainButton.setVisibility(View.VISIBLE);
         }
         if (currentLocation == LocalGameLocation.READING_QUESTION) {
-            statusText.setText("Чтение вопроса. Как только вопрос будет дочитан, нужно нажать на кнопку");
-            mainButton.setText("Запустить таймер");
+            statusText.setText(getString(R.string.reading_question));
+            mainButton.setText(getString(R.string.start_timer));
             mainButton.setVisibility(View.VISIBLE);
         }
         if (currentLocation == LocalGameLocation.COUNTDOWN) {
-            mainButton.setText("Остановить таймер");
+            mainButton.setText(getString(R.string.stop_timer));
             mainButton.setVisibility(View.VISIBLE);
         }
         if (currentLocation == LocalGameLocation.ONE_IS_ANSWERING) {
-            statusText.setText("Что-то пошло не так. Вы не должны видеть это меню.");
-            //mainButton.setText("Остановить таймер");
+            statusText.setText(getString(R.string.something_wrong));
             mainButton.setVisibility(View.GONE);
         }
     }
 
+    /** Reacts on pressing the answer button from some team*/
     public void onReceivingAnswer(String color) {
-        Intent intent = new Intent(JuryActivity.this, Judging.class);
+        Intent intent = new Intent(JuryActivity.this, JudgingActivity.class);
         intent.putExtra("color", color);
         startActivity(intent);
     }
 
+    /** Sets green team status */
     public void setGreenStatus(String status) {
         greenStatus.setText(status);
     }
 
+    /** Sets red team status */
     public void setRedStatus(String status) {
         redStatus.setText(status);
     }
 
+    /** Sets remaining time */
     public void showTime(long time) {
         statusText.setText(String.valueOf(time));
     }
 
     /* I know that this function is out of content here,
        but it is linked with onActivityResult that can be placed only here */
+    /** Signs in to GooglePlay */
     public void signIn() {
         GoogleSignInOptions signInOptions = GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN;
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
@@ -164,6 +172,7 @@ public class JuryActivity extends AppCompatActivity {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -174,7 +183,7 @@ public class JuryActivity extends AppCompatActivity {
             } else {
                 String message = result.getStatus().getStatusMessage();
                 if (message == null || message.isEmpty()) {
-                    message = "Неизвестная ошибка. Убедитесь, что у Вас установлены Google Play игры и выполнен вход в аккаунт.";
+                    message = getString(R.string.login_fail);
                 }
                 new AlertDialog.Builder(this).setMessage(message)
                         .setNeutralButton(android.R.string.ok, null).show();
@@ -182,14 +191,16 @@ public class JuryActivity extends AppCompatActivity {
         }
     }
 
+    /** {@inheritDoc} */
+    @Override
     public void onBackPressed() {
-        new AlertDialog.Builder(this).setTitle("Выход из локальной игры")
-                .setMessage("Вы хотите выйти?")
-                .setPositiveButton("Да", (dialog, which) -> {
+        new AlertDialog.Builder(this).setTitle(getString(R.string.out_of_local))
+                .setMessage(getString(R.string.want_out))
+                .setPositiveButton(getString(R.string.yes), (dialog, which) -> {
                     LocalController.finishLocalGame(false);
                     super.onBackPressed();
                 })
-                .setNegativeButton("Нет", (dialog, which) -> {
+                .setNegativeButton(getString(R.string.no), (dialog, which) -> {
                 })
                 .show();
     }

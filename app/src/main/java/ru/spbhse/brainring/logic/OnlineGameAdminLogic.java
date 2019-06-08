@@ -100,18 +100,11 @@ public class OnlineGameAdminLogic {
 
     /** Reacts on one's false start. Can be called even after publishing */
     public void onFalseStart(@NonNull String userId) {
-        if (!published) {
-            getThisUser(userId).status.setAlreadyAnswered(true);
+        if (published && answeringUserId == null &&
+                getOtherUser(userId).status.getAlreadyAnswered()) {
+            showAnswer(null);
         } else {
-            if (answeringUserId != null) { // somebody is answering
-                getThisUser(userId).status.setAlreadyAnswered(true);
-            } else {
-                if (getOtherUser(userId).status.getAlreadyAnswered()) {
-                    showAnswer(null);
-                } else {
-                    getThisUser(userId).status.setAlreadyAnswered(true);
-                }
-            }
+            getThisUser(userId).status.setAlreadyAnswered(true);
         }
     }
 
@@ -254,7 +247,7 @@ public class OnlineGameAdminLogic {
                     .getString(R.string.nobody_answered);
         } else {
             questionMessage = OnlineController.NetworkController.getParticipantName(answeredUserId) +
-                    OnlineController.getOnlineGameActivity().getString(R.string.answered_right);
+                    " " + OnlineController.getOnlineGameActivity().getString(R.string.answered_right);
         }
         Log.d(Controller.APP_TAG, "Question message: " + questionMessage);
         readyUsers = 0;

@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:keepScreenOn="true"
-    tools:context=".ui.Judging">
+    tools:context=".ui.JudgingActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -27,7 +27,7 @@
             android:layout_marginBottom="15dp"
             android:layout_weight="1"
             android:background="@drawable/simple_button"
-            android:text="Принять\nответ"
+            android:text="@string/accept_answer"
             android:textSize="18sp" />
 
         <Button
@@ -39,22 +39,23 @@
             android:layout_marginBottom="15dp"
             android:layout_weight="1"
             android:background="@drawable/simple_button"
-            android:text="Отклонить\nответ"
+            android:text="@string/reject_answer"
             android:textSize="18sp" />
     </LinearLayout>
 
     <TextView
         android:id="@+id/answeringId"
-        android:layout_width="267dp"
-        android:layout_height="155dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="460dp"
+        android:layout_width="316dp"
+        android:layout_height="261dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="100dp"
+        android:layout_marginEnd="15dp"
+        android:layout_marginBottom="344dp"
         android:textAlignment="center"
-        android:textSize="40sp"
+        android:textSize="30sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.496"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.98" />
+        app:layout_constraintVertical_bias="0.0" />
 </android.support.constraint.ConstraintLayout>

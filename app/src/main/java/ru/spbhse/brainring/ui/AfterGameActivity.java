@@ -8,8 +8,10 @@ import android.widget.TextView;
 
 import ru.spbhse.brainring.R;
 
+/** This activity is shown when online game or training game is finished. Shows the score */
 public class AfterGameActivity extends AppCompatActivity {
 
+    /** {@inheritDoc} */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -24,8 +26,7 @@ public class AfterGameActivity extends AppCompatActivity {
         toGameStart.setOnClickListener(v -> finish());
     }
 
+    /** Back button can't be pressed in this activity */
     @Override
-    public void onBackPressed() {
-        // Disabled
-    }
+    public void onBackPressed() {}
 }

@@ -19,10 +19,14 @@ import ru.spbhse.brainring.files.ComplainedQuestion;
 import ru.spbhse.brainring.files.ComplainsFileHandler;
 import ru.spbhse.brainring.utils.MailSender;
 
+/**
+ *  This activity is shown when the user wants to complain on some questions, selected while playing.
+ *  Contains {@code ListView} with all complained questions
+ */
 public class ComplainActivity extends AppCompatActivity {
-
     private List<ComplainedQuestion> questions;
 
+    /** {@inheritDoc} */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,6 +66,7 @@ public class ComplainActivity extends AppCompatActivity {
         });
     }
 
+    /** {@inheritDoc} */
     @Override
     protected void onResume() {
         super.onResume();

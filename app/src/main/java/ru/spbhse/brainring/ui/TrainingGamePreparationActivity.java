@@ -6,7 +6,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
 import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.SeekBar;
@@ -19,15 +18,19 @@ import java.net.URL;
 import ru.spbhse.brainring.R;
 import ru.spbhse.brainring.logic.TrainingPlayerLogic;
 
+/** This activity is to prepare data, such as package and reading time, for conducting a training game */
 public class TrainingGamePreparationActivity extends AppCompatActivity {
-    private int counter = 10;
+    private static final int SEEK_BAR_STEP = 10;
+    private static final int SEEK_BAR_MIN = 10;
+    private int counter = TrainingPlayerLogic.DEFAULT_READING_TIME;
     private String packageAddress = null;
     private String basePackageAddress;
 
+    /** {@inheritDoc} */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_select_training_packages);
+        setContentView(R.layout.activity_training_game_prepare);
 
         TextView packagesInfo = findViewById(R.id.selectPackages);
         packagesInfo.setMovementMethod(LinkMovementMethod.getInstance());
@@ -63,7 +66,7 @@ public class TrainingGamePreparationActivity extends AppCompatActivity {
                     } catch (MalformedURLException e) {
                         urlEditor.getText().clear();
                         Toast.makeText(TrainingGamePreparationActivity.this,
-                                "Пакет по данной ссылке не найден, попробуйте ещё раз",
+                                getString(R.string.package_not_found),
                                 Toast.LENGTH_SHORT).show();
                     }
                 });
@@ -76,10 +79,12 @@ public class TrainingGamePreparationActivity extends AppCompatActivity {
 
         SeekBar timeCounterBar = findViewById(R.id.trainingCounterBar);
         TextView timeCounterValue = findViewById(R.id.trainingCounterValue);
+        timeCounterValue.setText(String.valueOf(counter));
+        timeCounterBar.setProgress(counter / SEEK_BAR_STEP - 1);
         timeCounterBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                counter = TrainingPlayerLogic.DEFAULT_READING_TIME + progress * 10;
+                counter = SEEK_BAR_MIN + progress * SEEK_BAR_STEP;
                 timeCounterValue.setText(String.valueOf(counter));
             }
 

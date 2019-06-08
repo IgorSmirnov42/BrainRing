@@ -8,12 +8,14 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import ru.spbhse.brainring.R;
+import ru.spbhse.brainring.logic.LocalGameAdminLogic;
 
+/** This activity is for selecting user role in local game mode, and selecting time spent on answer */
 public class SelectLocalGameModeActivity extends AppCompatActivity {
-
     private int firstValue = 20;
     private int secondValue = 20;
 
+    /** {@inheritDoc} */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,14 +66,14 @@ public class SelectLocalGameModeActivity extends AppCompatActivity {
         Button greenButton = findViewById(R.id.greenPlayerButton);
         greenButton.setOnClickListener(v -> {
             Intent intent = new Intent(SelectLocalGameModeActivity.this, PlayerActivity.class);
-            intent.putExtra("color", "green");
+            intent.putExtra("color", LocalGameAdminLogic.GREEN);
             startActivity(intent);
         });
 
         Button redButton = findViewById(R.id.redPlayerButton);
         redButton.setOnClickListener(v -> {
             Intent intent = new Intent(SelectLocalGameModeActivity.this, PlayerActivity.class);
-            intent.putExtra("color", "red");
+            intent.putExtra("color", LocalGameAdminLogic.RED);
             startActivity(intent);
         });
     }

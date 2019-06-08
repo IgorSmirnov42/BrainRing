@@ -8,7 +8,7 @@
 
 
     <TextView
-        android:id="@+id/textView3"
+        android:id="@+id/questionTitle"
         android:layout_width="159dp"
         android:layout_height="26dp"
         android:layout_marginTop="8dp"
@@ -34,11 +34,11 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.493"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView3"
+        app:layout_constraintTop_toBottomOf="@+id/questionTitle"
         app:layout_constraintVertical_bias="0.0" />
 
     <TextView
-        android:id="@+id/textView5"
+        android:id="@+id/answerTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:maxLines="100"
@@ -63,11 +63,11 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.625"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView5"
+        app:layout_constraintTop_toBottomOf="@+id/answerTitle"
         app:layout_constraintVertical_bias="0.034" />
 
     <TextView
-        android:id="@+id/textView9"
+        android:id="@+id/complainTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
@@ -86,7 +86,7 @@
         android:layout_width="286dp"
         android:layout_height="107dp"
         android:ems="10"
-        android:hint="Введите жалобу"
+        android:hint="@string/write_complain"
         android:inputType="textMultiLine"
         android:lines="5"
         android:textColor="@color/colorLightGray"
@@ -95,7 +95,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.464"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView9"
+        app:layout_constraintTop_toBottomOf="@+id/complainTitle"
         app:layout_constraintVertical_bias="0.063" />
 
     <LinearLayout
@@ -137,7 +137,7 @@
             android:layout_marginEnd="15dp"
             android:layout_weight="1"
             android:background="@drawable/simple_button"
-            android:text="Удалить жалобу"
+            android:text="@string/delete_complain"
             android:textSize="18sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

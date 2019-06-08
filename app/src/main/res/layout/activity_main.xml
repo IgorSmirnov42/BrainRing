@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="500dp"
+    android:layout_height="match_parent"
     android:orientation="vertical">
 
     <Button
@@ -69,7 +69,7 @@
         android:layout_marginBottom="10dp"
         android:layout_weight="1"
         android:background="@drawable/simple_button"
-        android:text="@string/settings"
+        android:text="@string/rating"
         android:textSize="18sp"
         tools:layout_editor_absoluteX="0dp"
         tools:layout_editor_absoluteY="382dp" />
@@ -87,5 +87,11 @@
         android:textSize="18sp"
         tools:layout_editor_absoluteX="0dp"
         tools:layout_editor_absoluteY="557dp" />
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="6"
+        android:src="@drawable/icon_with_suitable_background"/>
 
 </LinearLayout>

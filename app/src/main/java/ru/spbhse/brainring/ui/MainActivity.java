@@ -19,46 +19,48 @@ import com.google.android.gms.games.Games;
 import java.util.Objects;
 
 import ru.spbhse.brainring.R;
+import ru.spbhse.brainring.controllers.Controller;
 
+/** This activity contains menu fields */
 public class MainActivity extends AppCompatActivity {
-
     private static final int RC_SIGN_IN = 42;
     private static final int RC_LEADERBOARD_UI = 23;
 
+    /** {@inheritDoc} */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Button trainBtn = findViewById(R.id.trainButton);
-        trainBtn.setOnClickListener(v -> {
+        Button trainButton = findViewById(R.id.trainButton);
+        trainButton.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, TrainingGamePreparationActivity.class);
             startActivity(intent);
         });
 
-        Button netBtn = findViewById(R.id.netButton);
-        netBtn.setOnClickListener(v -> {
+        Button netButton = findViewById(R.id.netButton);
+        netButton.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, SelectOnlineOpponentActivity.class);
             startActivity(intent);
         });
 
-        Button localBtn = findViewById(R.id.localButton);
-        localBtn.setOnClickListener(v -> {
+        Button localButton = findViewById(R.id.localButton);
+        localButton.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, SelectLocalGameModeActivity.class);
             startActivity(intent);
         });
 
-        Button complainBtn = findViewById(R.id.complainButton);
-        complainBtn.setOnClickListener(v -> {
+        Button complainButton = findViewById(R.id.complainButton);
+        complainButton.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, ComplainActivity.class);
             startActivity(intent);
         });
 
-        Button ratingBtn = findViewById(R.id.ratingButton);
-        ratingBtn.setOnClickListener(v -> signIn());
+        Button ratingButton = findViewById(R.id.ratingButton);
+        ratingButton.setOnClickListener(v -> signIn());
 
-        Button infoBtn = findViewById(R.id.infoButton);
-        infoBtn.setOnClickListener(v -> {
+        Button infoButton = findViewById(R.id.infoButton);
+        infoButton.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, InfoActivity.class);
             startActivity(intent);
         });
@@ -71,6 +73,7 @@ public class MainActivity extends AppCompatActivity {
                 .addOnSuccessListener(intent -> startActivityForResult(intent, RC_LEADERBOARD_UI));
     }
 
+    /** Signs in to GooglePlay */
     public void signIn() {
         GoogleSignInOptions signInOptions = GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN;
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
@@ -84,6 +87,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -94,13 +98,13 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 String message = result.getStatus().getStatusMessage();
                 if (message == null || message.isEmpty()) {
-                    message = "Неизвестная ошибка. Убедитесь, что у Вас установлены Google Play игры и выполнен вход в аккаунт.";
+                    message = getString(R.string.login_fail);
                 }
                 new AlertDialog.Builder(this).setMessage(message)
                         .setNeutralButton(android.R.string.ok, null).show();
             }
         } else if (requestCode == RC_LEADERBOARD_UI) {
-            Log.d("BrainRing", "Showed leaderboard");
+            Log.d(Controller.APP_TAG, "Showed leaderboard");
         }
     }
 }

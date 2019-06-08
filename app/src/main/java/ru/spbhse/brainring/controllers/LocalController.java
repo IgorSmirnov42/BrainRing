@@ -21,20 +21,42 @@ public class LocalController extends Controller {
     private static WeakReference<JuryActivity> juryActivity;
     private static WeakReference<PlayerActivity> playerActivity;
 
+    /**
+     * Returns stored jury activity
+     *
+     * @return stored jury activity
+     */
+    @NonNull
     public static JuryActivity getJuryActivity() {
         return juryActivity.get();
     }
 
+    /**
+     * Returns stored player activity
+     *
+     * @return stored jury activity
+     */
+    @NonNull
     public static PlayerActivity getPlayerActivity() {
         return playerActivity.get();
     }
 
-    public static void setUI(@Nullable JuryActivity ui) {
-        juryActivity = new WeakReference<>(ui);
+    /**
+     * Stores new jury activity
+     *
+     * @param juryActivity jury activity to store
+     */
+    public static void setUI(@NonNull JuryActivity juryActivity) {
+        LocalController.juryActivity = new WeakReference<>(juryActivity);
     }
 
-    public static void setUI(@Nullable PlayerActivity ui) {
-        playerActivity = new WeakReference<>(ui);
+    /**
+     * Stores new player activity
+     *
+     * @param playerActivity player activity to store
+     */
+    public static void setUI(@NonNull PlayerActivity playerActivity) {
+        LocalController.playerActivity = new WeakReference<>(playerActivity);
     }
 
     /** Initializes admin logic in local game */
@@ -79,10 +101,22 @@ public class LocalController extends Controller {
             adminLogic.onHandshakeAccept(userId);
         }
 
+        /**
+         * Returns score of the green team
+         *
+         * @return score of the green team
+         */
+        @NonNull
         public static String getGreenScore() {
             return adminLogic.getGreenScore();
         }
 
+        /**
+         * Returns score of the red team
+         *
+         * @return score of the red team
+         */
+        @NonNull
         public static String getRedScore() {
             return adminLogic.getRedScore();
         }
@@ -99,6 +133,7 @@ public class LocalController extends Controller {
 
         /**
          * Called when jury pushes button to switch location
+         *
          * @return true if location was switched
          */
         public static boolean toNextState() {
@@ -152,7 +187,7 @@ public class LocalController extends Controller {
 
         /**
          * Sends message to server signalizing that team is ready to answer
-         * Called when team pushed the button
+         * Called when some team pushed the button
          */
         public static void answerButtonPushed() {
             playerLogic.answerButtonPushed();
@@ -161,26 +196,51 @@ public class LocalController extends Controller {
 
     /** Methods to interact with admin's UI */
     public static class LocalAdminUIController {
-        public static void redraw() {
+        static void redraw() {
             juryActivity.get().redrawLocation();
         }
 
+        /**
+         * Stores new {@code LocalGameLocation}
+         *
+         * @param location location to store
+         */
         public static void setLocation(@NonNull LocalGameLocation location) {
             juryActivity.get().setLocation(location);
         }
 
+        /**
+         * Asks stored jury activity to show {@code time}
+         *
+         * @param time time to show
+         */
         public static void showTime(long time) {
             juryActivity.get().showTime(time);
         }
 
+        /**
+         * Asks stored jury activity to react on answer of the team, specified by the color
+         *
+         * @param color color of the answering team. Must be {@literal red} or {@literal green}
+         */
         public static void onReceivingAnswer(@NonNull String color) {
             juryActivity.get().onReceivingAnswer(color);
         }
 
+        /**
+         * Asks stored jury activity to change green team status to the given one
+         *
+         * @param status new status
+         */
         public static void setGreenStatus(@NonNull String status) {
             juryActivity.get().setGreenStatus(status);
         }
 
+        /**
+         * Asks stored jury activity to change red team status to the given one
+         *
+         * @param status new status
+         */
         public static void setRedStatus(@NonNull String status) {
             juryActivity.get().setRedStatus(status);
         }
@@ -236,6 +296,7 @@ public class LocalController extends Controller {
             network.startQuickGame();
         }
 
+        /** Sends message to the user specified by {@code userId} */
         public static void sendMessageToConcreteUser(@NonNull String userId,
                                                      @NonNull byte[] message) {
             network.sendMessageToConcreteUser(userId, message);

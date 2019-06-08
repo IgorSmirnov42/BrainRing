@@ -11,26 +11,30 @@ import android.widget.TextView;
 import java.util.List;
 
 import ru.spbhse.brainring.R;
+import ru.spbhse.brainring.controllers.Controller;
 import ru.spbhse.brainring.files.ComplainedQuestion;
 import ru.spbhse.brainring.files.ComplainsFileHandler;
 import ru.spbhse.brainring.utils.MailSender;
 
+/**
+ * This activity is shown when user presses on some question in {@code ComplainActivity}
+ * Suggests user to submit concrete complain
+ */
 public class ConcreteComplain extends AppCompatActivity {
-
     private int indexInList;
     private boolean alreadyDeleted = false;
     private List<ComplainedQuestion> list;
 
+    /** {@inheritDoc} */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
         setContentView(R.layout.activity_concrete_complain);
         try {
             list = ComplainsFileHandler.getAllQuestionsFromFile(this);
         } catch (Exception e) {
             e.printStackTrace();
-            Log.wtf("BrainRing", "Cannot load list of questions");
+            Log.wtf(Controller.APP_TAG, "Cannot load list of questions");
             finish();
             return;
         }
@@ -66,13 +70,7 @@ public class ConcreteComplain extends AppCompatActivity {
         });
     }
 
-    private void saveWrittenText() {
-        if (!alreadyDeleted) {
-            EditText complain = findViewById(R.id.complainText);
-            list.get(indexInList).setComplainText(complain.getText().toString());
-        }
-    }
-
+    /** {@inheritDoc} */
     @Override
     protected void onPause() {
         super.onPause();
@@ -81,7 +79,15 @@ public class ConcreteComplain extends AppCompatActivity {
             ComplainsFileHandler.saveComplainsToFile(list, this);
         } catch (Exception e) {
             e.printStackTrace();
-            Log.wtf("BrainRing", "Error while writing to file");
+            Log.wtf(Controller.APP_TAG, "Error while writing to file");
+        }
+    }
+
+
+    private void saveWrittenText() {
+        if (!alreadyDeleted) {
+            EditText complain = findViewById(R.id.complainText);
+            list.get(indexInList).setComplainText(complain.getText().toString());
         }
     }
 }
