@@ -22,11 +22,13 @@ import ru.spbhse.brainring.database.DatabaseTable;
 import ru.spbhse.brainring.database.QuestionDatabase;
 import ru.spbhse.brainring.logic.TrainingPlayerLogic;
 
+/** This activity maintains training game */
 public class TrainingGameActivity extends GameActivity {
-    public QuestionDatabase dataBase;
+    private QuestionDatabase dataBase;
     private boolean toClear = false;
     private static DatabaseTable gameTable;
 
+    /** {@inheritDoc} */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,7 +36,7 @@ public class TrainingGameActivity extends GameActivity {
 
         TrainingController.setUI(TrainingGameActivity.this);
 
-        dataBase = new QuestionDatabase(TrainingGameActivity.this);
+        dataBase = QuestionDatabase.getInstance(TrainingGameActivity.this);
         DatabaseController.setDatabase(dataBase);
 
         String packageAddress = getIntent().getStringExtra(Intent.EXTRA_TITLE);
@@ -60,6 +62,7 @@ public class TrainingGameActivity extends GameActivity {
         new LoadPackageTask(this, spinner).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
+    /** {@inheritDoc} */
     @Override
     protected void onStop() {
         Log.d(Controller.APP_TAG, "Stop training game");
@@ -72,6 +75,7 @@ public class TrainingGameActivity extends GameActivity {
         finish();
     }
 
+    /** {@inheritDoc} */
     @Override
     public void onNewQuestion() {
         setOpponentAnswer("");
@@ -81,6 +85,7 @@ public class TrainingGameActivity extends GameActivity {
         findViewById(R.id.textView).setVisibility(View.GONE);
     }
 
+    /** {@inheritDoc} */
     @Override
     protected void drawLocation() {
         super.drawLocation();
@@ -97,19 +102,22 @@ public class TrainingGameActivity extends GameActivity {
         }
     }
 
-    public void setGameController(GameController newGameController) {
-        gameController = newGameController;
+    /** Sets GameController */
+    public void setGameController(GameController gameController) {
+        this.gameController = gameController;
     }
 
+    /** Reacts on finishing the game */
     public void onGameFinished() {
         Intent intent = new Intent(this, AfterGameActivity.class);
         String total = String.valueOf(Integer.parseInt(opponentScore) + Integer.parseInt(myScore));
-        String endGameMessage = getString(R.string.answered_right_on) + " " + myScore + " " + getString(R.string.questions_of) +
+        String endGameMessage = getString(R.string.answered_right_on) +
+                " " + myScore + " " +
+                getGrammarCorrect(myScore) +
                 " " + total + ".";
         intent.putExtra(Intent.EXTRA_TEXT, endGameMessage);
         startActivity(intent);
     }
-
 
     private static class LoadPackageTask extends AsyncTask<Void, Void, String> {
         private WeakReference<TrainingGameActivity> trainingGameActivity;
@@ -147,5 +155,32 @@ public class TrainingGameActivity extends GameActivity {
 
     private DatabaseTable getGameTable() {
         return gameTable;
+    }
+
+    private String getGrammarCorrect(String s) {
+        int number = Integer.parseInt(s);
+        number %= 100;
+        String question = "вопрос";
+        if (10 <= number && number <= 20 ) {
+            return question + "ов";
+        } else {
+            number %= 10;
+            switch (number) {
+                case 0:
+                case 5:
+                case 6:
+                case 7:
+                case 8:
+                case 9:
+                    return question + "ов";
+                case 1:
+                    return question;
+                case 2:
+                case 3:
+                case 4:
+                    return question + "а";
+            }
+        }
+        return question;
     }
 }

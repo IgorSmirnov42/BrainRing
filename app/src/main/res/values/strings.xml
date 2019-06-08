@@ -4,9 +4,8 @@
     <string name="net_title">Игра по сети</string>
     <string name="local_title">Локальная игра</string>
     <string name="make_complain">Пожаловаться на вопрос</string>
-    <string name="settings">Рейтинг</string>
+    <string name="rating">Рейтинг</string>
     <string name="info">О приложении</string>
-    <string name="packages">Мои пакеты вопросов</string>
     <string name="handInAnswer">Сдать ответ</string>
     <string name="license">Лицензия</string>
     <string name="send">Отправить</string>
@@ -67,7 +66,7 @@
     <string name="wrong_answer">Неверный ответ</string>
     <string name="clear_complain_list">Очистить список жалоб</string>
     <string name="question_list">Список вопросов</string>
-    <string name="send_all_compl">Отправить все жалобы</string>
+    <string name="send_all_complains">Отправить все жалобы</string>
     <string name="write_complain">Введите жалобу</string>
     <string name="delete_complain">Удалить жалобу</string>
     <string name="game_results">Результат игры</string>
@@ -80,7 +79,6 @@
     <string name="second_timer">Второй таймер</string>
     <string name="choose_role">Выберите свою роль</string>
     <string name="opponent_answering">Соперник отвечает</string>
-    <string name="press_on_ready">Нажмите при готовности ответа</string>
     <string name="start_searching">начать поиск оппонента</string>
     <string name="start_game">Начать игру</string>
     <string name="add_package">Добавить пакет</string>
@@ -89,8 +87,9 @@
     <string name="current_package">Текущий пакет:</string>
     <string name="count">Счёт</string>
     <string name="complain_on_question">Пожаловаться на вопрос</string>
-    <string name="comment_compl">Комментарий</string>
     <string name="continue_game">продолжить игру</string>
     <string name="opponents_answer">Ответ соперника:</string>
-    <string name="waiting_opponent">Ожидаем подключения соперника</string>поста
+    <string name="waiting_opponent">Ожидаем подключения соперника</string>
+    <string name="accept_answer">Принять ответ</string>
+    <string name="reject_answer">Отклонить ответ</string>
 </resources>

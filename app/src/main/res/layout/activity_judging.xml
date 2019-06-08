@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:keepScreenOn="true"
-    tools:context=".ui.Judging">
+    tools:context=".ui.JudgingActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -27,7 +27,7 @@
             android:layout_marginBottom="15dp"
             android:layout_weight="1"
             android:background="@drawable/simple_button"
-            android:text="Принять\nответ"
+            android:text="@string/accept_answer"
             android:textSize="18sp" />
 
         <Button
@@ -39,7 +39,7 @@
             android:layout_marginBottom="15dp"
             android:layout_weight="1"
             android:background="@drawable/simple_button"
-            android:text="Отклонить\nответ"
+            android:text="@string/reject_answer"
             android:textSize="18sp" />
     </LinearLayout>
 

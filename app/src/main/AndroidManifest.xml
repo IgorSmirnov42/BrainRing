@@ -27,7 +27,7 @@
             android:screenOrientation="portrait" />
 
         <activity
-            android:name=".ui.Judging"
+            android:name=".ui.JudgingActivity"
             android:screenOrientation="portrait" />
 
         <activity

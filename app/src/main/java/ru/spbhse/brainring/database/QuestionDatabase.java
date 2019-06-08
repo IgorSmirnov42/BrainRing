@@ -4,9 +4,10 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
-import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import org.jsoup.Jsoup;
@@ -25,34 +26,42 @@ import ru.spbhse.brainring.R;
 import ru.spbhse.brainring.controllers.Controller;
 import ru.spbhse.brainring.utils.Question;
 
+/** This class provides methods for managing database with questions */
 public class QuestionDatabase extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "Questions.db";
-    private final String DATABASE_PATH;
     private static int databaseVersion;
-    private DatabaseTable baseTable;
-    private DatabaseTable gameTable;
-    private DatabaseTable versionTable = new DatabaseTable("version");
+    private static QuestionDatabase database;
+    private static DatabaseTable baseTable;
+    private static DatabaseTable gameTable;
+    private static DatabaseTable versionTable = new DatabaseTable("version");
 
-    private SQLiteDatabase db;
+    private static SQLiteDatabase db;
 
-    public QuestionDatabase(Context context) {
+    /**
+     * Constructs a database, using given context
+     * Namely, checks whether the current database version,
+     * stored on device is equal to actual database, stored in resources, and if not,
+     * copies those questions to the device's database
+     */
+    private QuestionDatabase(Context context) {
         super(context, DATABASE_NAME, null, 1);
         Scanner versionScanner = new Scanner(
                 context.getResources().openRawResource(R.raw.database_version));
         try {
             databaseVersion = versionScanner.nextInt();
-        } catch(Exception e) {
-            Log.wtf(Controller.APP_TAG,"couldn't read version from its resource");
+        } catch (Exception e) {
+            Log.wtf(Controller.APP_TAG, "couldn't read version from its resource");
         }
+
         baseTable = new DatabaseTable("baseTable");
-        DATABASE_PATH = context.getDatabasePath(DATABASE_NAME).getPath();
+
         int newVersion = getVersion();
         if (!alreadyExists(baseTable) || newVersion != databaseVersion) {
             try {
-                createDatabase();
+                db = this.getWritableDatabase();
 
                 InputStream in = context.getAssets().open("Questions.db");
-                OutputStream out = new FileOutputStream(DATABASE_PATH);
+                OutputStream out = new FileOutputStream(context.getDatabasePath(DATABASE_NAME).getPath());
 
                 byte[] buffer = new byte[2048];
                 int written;
@@ -110,49 +119,35 @@ public class QuestionDatabase extends SQLiteOpenHelper {
         }
     }
 
-    private int getVersion() {
-        if (!alreadyExists(versionTable)) {
-            return -1;
+    /** Returns single instance of database, or constructs a new one, if there was no such */
+    public static QuestionDatabase getInstance(Context context) {
+        if (database == null) {
+            database = new QuestionDatabase(context);
         }
-        db = this.getReadableDatabase();
-
-        String selectAll = "SELECT * FROM " + versionTable.getTableName() + ";";
-
-        Cursor cursor = db.rawQuery(selectAll, null);
-        cursor.moveToFirst();
-        int version = cursor.getInt(cursor.getColumnIndex("version"));
-        cursor.close();
-        return version;
+        return database;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void onCreate(SQLiteDatabase db) {
 
     }
 
+    /** {@inheritDoc} */
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
     }
 
-    @Override
-    public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-
-    }
-
-    public void createDatabase() {
-        db = this.getWritableDatabase();
-
-    }
-
-    public void createTable(DatabaseTable table) {
+    /** Creates a new table in database, based on the given table */
+    public void createTable(@Nullable DatabaseTable table) {
         db = this.getWritableDatabase();
         if (table == null) {
             table = getBaseTable();
         }
 
         if (alreadyExists(table)) {
-            Log.d(Controller.APP_TAG, "Check successful");
+            Log.d(Controller.APP_TAG, "Table already exists");
             return;
         }
 
@@ -165,10 +160,17 @@ public class QuestionDatabase extends SQLiteOpenHelper {
         }
     }
 
-    private boolean alreadyExists(DatabaseTable table) {
+    /**
+     * Shows whether the database contains the given table
+     *
+     * @param table table to look up
+     * @return {@code true} if the database contains the table
+     */
+    private boolean alreadyExists(@NonNull DatabaseTable table) {
         db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery("SELECT DISTINCT tbl_name FROM sqlite_master WHERE tbl_name = "
-                + table.getTableName() + ";", null);
+        String queryTablesTitles = "SELECT DISTINCT tbl_name FROM sqlite_master WHERE tbl_name = "
+                + table.getTableName() + ";";
+        Cursor cursor = db.rawQuery(queryTablesTitles, null);
 
         if (cursor != null) {
             if (cursor.getCount() > 0) {
@@ -180,33 +182,27 @@ public class QuestionDatabase extends SQLiteOpenHelper {
         return false;
     }
 
-    private String createEntries(DatabaseTable table) {
-        return "CREATE TABLE IF NOT EXISTS " +
-                table.getTableName() + "(" +
-                DatabaseTable._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
-                DatabaseTable.COLUMN_QUESTION + " TEXT," +
-                DatabaseTable.COLUMN_ANSWER + " TEXT," +
-                DatabaseTable.COLUMN_COMMENT + " TEXT," +
-                DatabaseTable.COLUMN_PASS_CRITERIA + " TEXT);";
-    }
-
-    public void deleteEntries(DatabaseTable table) {
+    /** Removes the given table from the database */
+    public void deleteEntries(@NonNull DatabaseTable table) {
         db = this.getWritableDatabase();
         db.execSQL("DROP TABLE IF EXISTS " + table.getTableName() + ";");
     }
 
-    public void openDataBase() {
-        if (!checkDataBase()) {
-            createDatabase();
-        }
-    }
-
-    public long size(DatabaseTable table) {
+    /** Returns number of questions in specified table */
+    public long size(@NonNull DatabaseTable table) {
         db = this.getReadableDatabase();
         return DatabaseUtils.queryNumEntries(db, table.getTableName());
     }
 
-    public Question getQuestion(DatabaseTable table, int id) {
+    /**
+     * Selects a question from the table by its id
+     *
+     * @param table table to select from
+     * @param id {@code _ID} of the question, must be in range [0..size of the table)
+     * @return question
+     */
+    @NonNull
+    public Question getQuestion(@NonNull DatabaseTable table, int id) {
         db = this.getReadableDatabase();
         String selectQuestion = "SELECT * FROM " + table.getTableName() +
                 " WHERE " + DatabaseTable._ID + "=" + (id + 1) + ";";
@@ -241,23 +237,23 @@ public class QuestionDatabase extends SQLiteOpenHelper {
         return new Question(question, answer, passCriterion, comment, id);
     }
 
-    private boolean checkDataBase() {
-        SQLiteDatabase checkDB = null;
-        try {
-            checkDB = SQLiteDatabase.openDatabase(
-                    DATABASE_PATH, null, SQLiteDatabase.OPEN_READONLY);
-        } catch (SQLException e) {
-            Log.wtf(Controller.APP_TAG, "database not found");
-        }
-
-        if (checkDB != null) {
-            checkDB.close();
-        }
-        return checkDB != null;
-    }
-
+    /** Returns base table */
     public DatabaseTable getBaseTable() {
         return baseTable;
+    }
+
+    /** Returns current game table. If user hasn't selected any special package, returns base table */
+    public DatabaseTable getGameTable() {
+        if (gameTable == null) {
+            return baseTable;
+        } else {
+            return gameTable;
+        }
+    }
+
+    /** Sets the game table */
+    public void setGameTable(DatabaseTable table) {
+        gameTable = table;
     }
 
     private void loadQuestions(Document doc, DatabaseTable table) {
@@ -297,15 +293,28 @@ public class QuestionDatabase extends SQLiteOpenHelper {
         }
     }
 
-    public void setGameTable(DatabaseTable table) {
-        gameTable = table;
+    private int getVersion() {
+        if (!alreadyExists(versionTable)) {
+            return -1;
+        }
+        db = this.getReadableDatabase();
+
+        String selectAll = "SELECT * FROM " + versionTable.getTableName() + ";";
+
+        Cursor cursor = db.rawQuery(selectAll, null);
+        cursor.moveToFirst();
+        int version = cursor.getInt(cursor.getColumnIndex("version"));
+        cursor.close();
+        return version;
     }
 
-    public DatabaseTable getGameTable() {
-        if (gameTable == null) {
-            return baseTable;
-        } else {
-            return gameTable;
-        }
+    private String createEntries(DatabaseTable table) {
+        return "CREATE TABLE IF NOT EXISTS " +
+                table.getTableName() + "(" +
+                DatabaseTable._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+                DatabaseTable.COLUMN_QUESTION + " TEXT," +
+                DatabaseTable.COLUMN_ANSWER + " TEXT," +
+                DatabaseTable.COLUMN_COMMENT + " TEXT," +
+                DatabaseTable.COLUMN_PASS_CRITERIA + " TEXT);";
     }
 }

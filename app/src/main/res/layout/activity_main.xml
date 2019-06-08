@@ -69,7 +69,7 @@
         android:layout_marginBottom="10dp"
         android:layout_weight="1"
         android:background="@drawable/simple_button"
-        android:text="@string/settings"
+        android:text="@string/rating"
         android:textSize="18sp"
         tools:layout_editor_absoluteX="0dp"
         tools:layout_editor_absoluteY="382dp" />

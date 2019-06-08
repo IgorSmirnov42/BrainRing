@@ -122,7 +122,7 @@ public class OnlineGameUserLogic {
             player.setOnCompletionListener(MediaPlayer::release);
             player.start();
         }).start();
-        OnlineController.OnlineUIController.setButtonText(OnlineController.getOnlineGameActivity()
+        OnlineController.OnlineUIController.setAnswerButtonText(OnlineController.getOnlineGameActivity()
                 .getString(R.string.button_push_text));
         startQuestionTime = System.currentTimeMillis();
         timer = new CountDownTimer(FIRST_COUNTDOWN * SECOND,

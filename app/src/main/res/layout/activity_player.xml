@@ -11,7 +11,7 @@
         android:id="@+id/buttonPush"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="@string/press_on_ready"
+        android:text="@string/button_push_text"
         android:textAppearance="@style/GrayText"
         android:textSize="40sp"
         app:layout_constraintBottom_toBottomOf="parent"

@@ -19,18 +19,18 @@ import ru.spbhse.brainring.R;
 import ru.spbhse.brainring.controllers.LocalController;
 import ru.spbhse.brainring.logic.LocalGameAdminLogic;
 
+/** This activity is for maintaining player in local mode */
 public class PlayerActivity extends AppCompatActivity {
-
     private final static int RC_SIGN_IN = 42;
 
+    /** {@inheritDoc} */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_player);
+
         LocalController.initializeLocalPlayer();
-
         LocalController.setUI(this);
-
 
         Button button = findViewById(R.id.buttonPush);
         button.setOnClickListener(v -> LocalController.LocalPlayerLogicController.answerButtonPushed());
@@ -46,6 +46,7 @@ public class PlayerActivity extends AppCompatActivity {
 
     /* I know that this function is out of content here,
        but it is linked with onActivityResult that can be placed only here */
+    /** Signs in to GooglePlay */
     public void signIn() {
         GoogleSignInOptions signInOptions = GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN;
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
@@ -59,6 +60,7 @@ public class PlayerActivity extends AppCompatActivity {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -77,12 +79,14 @@ public class PlayerActivity extends AppCompatActivity {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     protected void onStop() {
         super.onStop();
         LocalController.finishLocalGame(false);
     }
 
+    /** When back button is pressed, asks if user is sure to leave the game and did not pressed it accidentally */
     @Override
     public void onBackPressed() {
         new AlertDialog.Builder(this).setTitle(getString(R.string.out_of_local))

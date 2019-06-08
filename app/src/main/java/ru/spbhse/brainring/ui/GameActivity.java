@@ -25,22 +25,26 @@ import static ru.spbhse.brainring.ui.GameActivityLocation.SHOW_ANSWER;
 import static ru.spbhse.brainring.ui.GameActivityLocation.SHOW_QUESTION;
 import static ru.spbhse.brainring.ui.GameActivityLocation.WRITE_ANSWER;
 
+/**
+ * This activity is used as main game activity.
+ * Contains all basic attributes, similar in online and training game
+ */
 abstract public class GameActivity extends AppCompatActivity {
     protected GameActivityLocation currentLocation = GAME_WAITING_START;
-
+    protected GameController gameController;
     protected String question = "";
-    protected String buttonText = "";
-    protected String timeLeft = "";
-    protected String opponentAnswer = "";
     protected String answer = "";
     protected String comment = "";
     protected String myScore = "0";
     protected String opponentScore = "0";
-    protected GameController gameController;
-    protected String opponentNick = "";
     protected String myNick = "";
+    protected String opponentAnswer = "";
+    protected String opponentNick = "";
+    protected String timeLeft = "";
+    protected String buttonText = "";
     protected String questionResult = "";
 
+    /** Main function. Based on current location, draws all needed components for this location. */
     protected void drawLocation() {
         if (currentLocation == GAME_WAITING_START) {
             setContentView(R.layout.activity_waiting_for_start);
@@ -50,7 +54,7 @@ abstract public class GameActivity extends AppCompatActivity {
         if (currentLocation == SHOW_QUESTION) {
             setContentView(R.layout.activity_showing_question);
 
-            setButtonText(buttonText);
+            setAnswerButtonText(buttonText);
 
             setQuestionText(question);
             makeScrollable(findViewById(R.id.questionText));
@@ -81,10 +85,10 @@ abstract public class GameActivity extends AppCompatActivity {
         if (currentLocation == SHOW_ANSWER) {
             setContentView(R.layout.activity_showing_answer);
 
-            setAnswer(answer);
+            setAnswerText(answer);
             makeScrollable(findViewById(R.id.rightAnswerTextField));
 
-            setComment(comment);
+            setCommentText(comment);
             makeScrollable(findViewById(R.id.commentField));
 
             setScore(myScore, opponentScore);
@@ -102,6 +106,7 @@ abstract public class GameActivity extends AppCompatActivity {
                     finish();
                     return;
                 }
+
                 Toast toast = Toast.makeText(GameActivity.this,
                         getString(R.string.added_complain),
                         Toast.LENGTH_LONG);
@@ -111,7 +116,6 @@ abstract public class GameActivity extends AppCompatActivity {
         }
         if (currentLocation == OPPONENT_IS_ANSWERING) {
             setContentView(R.layout.activity_opponent_answering);
-
             setQuestionText(question);
             makeScrollable(findViewById(R.id.questionText));
         }
@@ -121,12 +125,14 @@ abstract public class GameActivity extends AppCompatActivity {
         view.setMovementMethod(new ScrollingMovementMethod());
     }
 
+    /** Reacts on new question */
     public void onNewQuestion() {
         setOpponentAnswer("");
         setTime("");
-        setButtonText(getString(R.string.reading_question_btn));
+        setAnswerButtonText(getString(R.string.reading_question_btn));
     }
 
+    /** Sets opponent nickname */
     public void setOpponentNick(@NonNull String nick) {
         opponentNick = nick;
         TextView opponentNickView = findViewById(R.id.opponentNick);
@@ -135,6 +141,7 @@ abstract public class GameActivity extends AppCompatActivity {
         }
     }
 
+    /** Sets user nickname */
     public void setMyNick(@NonNull String nick) {
         myNick = nick;
         TextView myNickView = findViewById(R.id.myNick);
@@ -143,6 +150,7 @@ abstract public class GameActivity extends AppCompatActivity {
         }
     }
 
+    /** Sets questions result */
     public void setQuestionResult(@NonNull String result) {
         questionResult = result;
         TextView questionResultView = findViewById(R.id.questionResult);
@@ -151,7 +159,8 @@ abstract public class GameActivity extends AppCompatActivity {
         }
     }
 
-    public void setButtonText(@NonNull String text) {
+    /** Sets text on answer button */
+    public void setAnswerButtonText(@NonNull String text) {
         buttonText = text;
         Button button = findViewById(R.id.answerReadyButton);
         if (button != null) {
@@ -159,6 +168,7 @@ abstract public class GameActivity extends AppCompatActivity {
         }
     }
 
+    /** Sets time */
     public void setTime(@NonNull String time) {
         timeLeft = time;
         TextView timeLeftView = findViewById(R.id.timeLeft);
@@ -167,6 +177,7 @@ abstract public class GameActivity extends AppCompatActivity {
         }
     }
 
+    /** Sets opponent answer */
     public void setOpponentAnswer(@NonNull String answer) {
         opponentAnswer = answer;
         TextView opponentAnswer = findViewById(R.id.opponentAnswer);
@@ -175,6 +186,7 @@ abstract public class GameActivity extends AppCompatActivity {
         }
     }
 
+    /** Sets score */
     public void setScore(@NonNull String my, @NonNull String opponent) {
         myScore = my;
         opponentScore = opponent;
@@ -186,6 +198,7 @@ abstract public class GameActivity extends AppCompatActivity {
         }
     }
 
+    /** Sets question text */
     public void setQuestionText(@NonNull String question) {
         this.question = question;
         TextView questionTextField = findViewById(R.id.questionText);
@@ -194,7 +207,8 @@ abstract public class GameActivity extends AppCompatActivity {
         }
     }
 
-    public void setAnswer(@NonNull String answer) {
+    /** Sets question text */
+    public void setAnswerText(@NonNull String answer) {
         this.answer = answer;
         TextView rightAnswerTextField = findViewById(R.id.rightAnswerTextField);
         if (rightAnswerTextField != null) {
@@ -203,7 +217,8 @@ abstract public class GameActivity extends AppCompatActivity {
         }
     }
 
-    public void setComment(@NonNull String comment) {
+    /** Sets comment text */
+    public void setCommentText(@NonNull String comment) {
         this.comment = comment;
         TextView commentField = findViewById(R.id.commentField);
         if (commentField != null) {
@@ -215,11 +230,13 @@ abstract public class GameActivity extends AppCompatActivity {
         }
     }
 
+    /** Sets current location */
     public void setLocation(@NonNull GameActivityLocation location) {
         currentLocation = location;
         drawLocation();
     }
 
+    /** Gets what is written in edit answer field */
     public String getWhatWritten() {
         EditText answerEditor = findViewById(R.id.answerEditor);
         if (answerEditor != null) {

@@ -18,12 +18,17 @@ import java.util.Scanner;
 import ru.spbhse.brainring.R;
 import ru.spbhse.brainring.database.QuestionDatabase;
 
+/**
+ * This activity is activity for the launch. In case of correct work, this activity loads database
+ * on its first launch, and then it does nothing complicated, hence finishes almost immediately
+ */
 public class LaunchActivity extends AppCompatActivity {
     private static final int SECOND = 1000;
     private static final int TIME_FOR_ONE_STRING = 5;
     private static final int DOTS_REDRAW_INTERVAL = 300;
     private static List<String> launchStrings = new ArrayList<>();
 
+    /** {@inheritDoc} */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,7 +59,7 @@ public class LaunchActivity extends AppCompatActivity {
 
         @Override
         protected String doInBackground(Void... voids) {
-            dataBase = new QuestionDatabase(launchActivity.get());
+            dataBase = QuestionDatabase.getInstance(launchActivity.get());
             dataBase.createTable(dataBase.getBaseTable());
             return "finished";
         }

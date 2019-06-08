@@ -21,6 +21,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import ru.spbhse.brainring.R;
 import ru.spbhse.brainring.controllers.LocalController;
 
+/** This activity is for maintaining score of teams in local game */
 public class JuryActivity extends AppCompatActivity {
     private TextView statusText;
     private Button mainButton;
@@ -40,6 +41,7 @@ public class JuryActivity extends AppCompatActivity {
         toast.show();
     };
 
+    /** {@inheritDoc} */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -98,11 +100,13 @@ public class JuryActivity extends AppCompatActivity {
         LocalController.LocalNetworkAdminController.createLocalGame();
     }
 
+    /** Sets current location */
     public void setLocation(LocalGameLocation location) {
         currentLocation = location;
         redrawLocation();
     }
 
+    /** Redraws activity, based on current location */
     public void redrawLocation() {
         greenTeamScore.setText(LocalController.LocalAdminLogicController.getGreenScore());
         redTeamScore.setText(LocalController.LocalAdminLogicController.getRedScore());
@@ -130,26 +134,31 @@ public class JuryActivity extends AppCompatActivity {
         }
     }
 
+    /** Reacts on pressing the answer button from some team*/
     public void onReceivingAnswer(String color) {
-        Intent intent = new Intent(JuryActivity.this, Judging.class);
+        Intent intent = new Intent(JuryActivity.this, JudgingActivity.class);
         intent.putExtra("color", color);
         startActivity(intent);
     }
 
+    /** Sets green team status */
     public void setGreenStatus(String status) {
         greenStatus.setText(status);
     }
 
+    /** Sets red team status */
     public void setRedStatus(String status) {
         redStatus.setText(status);
     }
 
+    /** Sets remaining time */
     public void showTime(long time) {
         statusText.setText(String.valueOf(time));
     }
 
     /* I know that this function is out of content here,
        but it is linked with onActivityResult that can be placed only here */
+    /** Signs in to GooglePlay */
     public void signIn() {
         GoogleSignInOptions signInOptions = GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN;
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
@@ -163,6 +172,7 @@ public class JuryActivity extends AppCompatActivity {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -181,6 +191,8 @@ public class JuryActivity extends AppCompatActivity {
         }
     }
 
+    /** {@inheritDoc} */
+    @Override
     public void onBackPressed() {
         new AlertDialog.Builder(this).setTitle(getString(R.string.out_of_local))
                 .setMessage(getString(R.string.want_out))

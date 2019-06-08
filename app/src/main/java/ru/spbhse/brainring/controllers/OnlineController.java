@@ -17,14 +17,21 @@ import ru.spbhse.brainring.ui.OnlineGameActivity;
 
 /** Controller for online game (both for server and user) */
 public class OnlineController extends Controller {
-    static WeakReference<OnlineGameActivity> onlineGameActivity;
+    private static WeakReference<OnlineGameActivity> onlineGameActivity;
 
+    /**
+     * Returns stored online game activity
+     *
+     * @return stored online game activity
+     */
+    @NonNull
     public static OnlineGameActivity getOnlineGameActivity() {
         return onlineGameActivity.get();
     }
 
-    public static void setUI(@Nullable OnlineGameActivity ui) {
-        onlineGameActivity = new WeakReference<>(ui);
+    /** Sets new online game activity */
+    public static void setUI(@Nullable OnlineGameActivity onlineGameActivity) {
+        OnlineController.onlineGameActivity = new WeakReference<>(onlineGameActivity);
     }
 
     /**
@@ -201,56 +208,79 @@ public class OnlineController extends Controller {
         }
     }
 
+    /** Class for controlling user interface in online game */
     public static class OnlineUIController {
 
+        /** Asks stored activity to get what the user has written
+         *
+         * @return written text
+         */
+        @NonNull
         public static String getWhatWritten() {
             return onlineGameActivity.get().getWhatWritten();
         }
 
+        /** Sets current question text */
         public static void setQuestionText(@NonNull String question) {
             onlineGameActivity.get().setQuestionText(question);
         }
 
+        /** Sets current question result */
         public static void setQuestionResult(@NonNull String result) {
             onlineGameActivity.get().setQuestionResult(result);
         }
 
+        /** Sets nick of the device owner */
         public static void setMyNick(@NonNull String nick) {
             onlineGameActivity.get().setMyNick(nick);
         }
 
+        /** Sets nick of the opponent */
         public static void setOpponentNick(@NonNull String nick) {
             onlineGameActivity.get().setOpponentNick(nick);
         }
 
+        /** Reacts on new question */
         public static void onNewQuestion() {
             onlineGameActivity.get().onNewQuestion();
         }
 
-        public static void setButtonText(@NonNull String text) {
-            onlineGameActivity.get().setButtonText(text);
+        /** Sets the answer button text*/
+        public static void setAnswerButtonText(@NonNull String text) {
+            onlineGameActivity.get().setAnswerButtonText(text);
         }
 
+        /** Sets showed time */
         public static void setTime(@NonNull String time) {
             onlineGameActivity.get().setTime(time);
         }
 
+        /** Sets question's answer */
         public static void setAnswer(@NonNull String answer) {
-            onlineGameActivity.get().setAnswer(answer);
+            onlineGameActivity.get().setAnswerText(answer);
         }
 
+        /** Sets question's comment */
         public static void setComment(String comment) {
-            onlineGameActivity.get().setComment(comment);
+            onlineGameActivity.get().setCommentText(comment);
         }
 
+        /** Changes current location */
         public static void setLocation(@NonNull GameActivityLocation location) {
             onlineGameActivity.get().setLocation(location);
         }
 
+        /**
+         * Changes current game score
+         *
+         * @param my new device owner score
+         * @param opponent new score of the opponent
+         */
         public static void setScore(int my, int opponent) {
             onlineGameActivity.get().setScore(String.valueOf(my), String.valueOf(opponent));
         }
 
+        /** Sets opponent's answer */
         public static void setOpponentAnswer(@NonNull String answer) {
             onlineGameActivity.get().setOpponentAnswer(answer);
         }
@@ -267,6 +297,7 @@ public class OnlineController extends Controller {
 
         /**
          * Finishes game
+         *
          * @param message description of reason of finishing game
          */
         public static void finishImmediately(@NonNull String message) {

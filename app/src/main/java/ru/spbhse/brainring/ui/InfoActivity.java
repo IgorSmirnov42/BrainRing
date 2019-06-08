@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
+import android.text.method.LinkMovementMethod;
 import android.text.method.ScrollingMovementMethod;
 import android.view.View;
 import android.widget.ImageView;
@@ -14,6 +15,10 @@ import java.util.Scanner;
 
 import ru.spbhse.brainring.R;
 
+/**
+ * This activity is shown when user presses on info button in main menu.
+ * Contains all needed information for the game, such as rules, license, and
+ */
 public class InfoActivity extends AppCompatActivity {
     private View pressedCard = null;
     private String infoLicense;
@@ -23,6 +28,7 @@ public class InfoActivity extends AppCompatActivity {
     private String infoAuthors;
     private String infoGeneral;
 
+    /** {@inheritDoc} */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,7 +42,8 @@ public class InfoActivity extends AppCompatActivity {
         infoGeneral = loadText(getResources().openRawResource(R.raw.info_general));
 
         TextView infoText = findViewById(R.id.infoText1);
-        infoText.setMovementMethod(new ScrollingMovementMethod());
+        infoText.setMovementMethod(new LinkMovementMethod());
+        infoText.setTextIsSelectable(true);
 
         CardView cardGeneral = findViewById(R.id.cardViewGeneral);
         ImageView cardGeneralBackground = findViewById(R.id.cardGeneralBackground);
@@ -93,14 +100,6 @@ public class InfoActivity extends AppCompatActivity {
         }
     }
 
-    private void setHeight(View view, double height) {
-        if (view == null) {
-            return;
-        }
-        view.getLayoutParams().height = (int) height;
-        view.setLayoutParams(view.getLayoutParams());
-    }
-
     private void highlight(ImageView cardBackground) {
         if (cardBackground == pressedCard) {
             return;
@@ -110,9 +109,5 @@ public class InfoActivity extends AppCompatActivity {
         }
         cardBackground.setBackgroundColor(ContextCompat.getColor(this, R.color.colorVanilla));
         pressedCard = cardBackground;
-    }
-
-    private double pixelsFromDp(double dpValue) {
-        return dpValue * this.getResources().getDisplayMetrics().density;
     }
 }
