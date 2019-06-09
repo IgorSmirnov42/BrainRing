@@ -68,6 +68,7 @@ public class LaunchActivity extends AppCompatActivity {
         protected void onPostExecute(String result) {
             spinner.setVisibility(View.INVISIBLE);
             Intent intent = new Intent(launchActivity.get(), MainActivity.class);
+            dataBase.updateVersion(launchActivity.get());
             launchActivity.get().startActivity(intent);
             launchActivity.get().finish();
         }

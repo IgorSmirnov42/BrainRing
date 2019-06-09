@@ -46,18 +46,12 @@ public class QuestionDatabase extends SQLiteOpenHelper {
      */
     private QuestionDatabase(Context context) {
         super(context, DATABASE_NAME, null, 1);
-        Scanner versionScanner = new Scanner(
-                context.getResources().openRawResource(R.raw.database_version));
-        try {
-            databaseVersion = versionScanner.nextInt();
-        } catch (Exception e) {
-            Log.wtf(Controller.APP_TAG, "couldn't read version from its resource");
-        }
 
         baseTable = new DatabaseTable("baseTable");
+        int neededVersion = getNeededVersion(context);
+        int currentVersion = getCurrentVersion();
 
-        int newVersion = getVersion();
-        if (!alreadyExists(baseTable) || newVersion != databaseVersion) {
+        if (!alreadyExists(baseTable) || currentVersion != neededVersion) {
             try {
                 db = this.getWritableDatabase();
 
@@ -73,6 +67,9 @@ public class QuestionDatabase extends SQLiteOpenHelper {
 
                 DatabaseTable tmp = new DatabaseTable("tmp");
                 db.execSQL(createEntries(tmp));
+
+                String resetVersion = "UPDATE version SET version = -1;";
+                db.execSQL(resetVersion);
 
                 String selectAll = "SELECT " + DatabaseTable.COLUMN_QUESTION + ", " +
                         DatabaseTable.COLUMN_ANSWER + ", " +
@@ -110,7 +107,7 @@ public class QuestionDatabase extends SQLiteOpenHelper {
 
                 db.execSQL(deleteBaseTable);
                 db.execSQL(createNewBaseTable);
-                databaseVersion = newVersion;
+                databaseVersion = currentVersion;
 
                 out.close();
                 in.close();
@@ -118,6 +115,18 @@ public class QuestionDatabase extends SQLiteOpenHelper {
                 Log.wtf(Controller.APP_TAG, "failed to read database");
             }
         }
+    }
+
+    private int getNeededVersion(Context context) {
+        Scanner versionScanner = new Scanner(
+                context.getResources().openRawResource(R.raw.database_version));
+        int version = -1;
+        try {
+             version = versionScanner.nextInt();
+        } catch (Exception e) {
+            Log.wtf(Controller.APP_TAG, "couldn't read version from its resource");
+        }
+        return version;
     }
 
     /** Returns single instance of database, or constructs a new one, if there was no such */
@@ -303,7 +312,7 @@ public class QuestionDatabase extends SQLiteOpenHelper {
         }
     }
 
-    private int getVersion() {
+    private int getCurrentVersion() {
         if (!alreadyExists(versionTable)) {
             return -1;
         }
@@ -326,5 +335,11 @@ public class QuestionDatabase extends SQLiteOpenHelper {
                 DatabaseTable.COLUMN_ANSWER + " TEXT," +
                 DatabaseTable.COLUMN_COMMENT + " TEXT," +
                 DatabaseTable.COLUMN_PASS_CRITERIA + " TEXT);";
+    }
+
+    public void updateVersion(Context context) {
+        int newVersion = getNeededVersion(context);
+        String updateVersion = "UPDATE version SET version = " + newVersion + ";";
+        db.execSQL(updateVersion);
     }
 }
