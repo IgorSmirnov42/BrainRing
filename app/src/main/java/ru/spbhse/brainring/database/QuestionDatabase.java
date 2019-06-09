@@ -71,7 +71,7 @@ public class QuestionDatabase extends SQLiteOpenHelper {
                 }
                 out.flush();
 
-                /*DatabaseTable tmp = new DatabaseTable("tmp");
+                DatabaseTable tmp = new DatabaseTable("tmp");
                 db.execSQL(createEntries(tmp));
 
                 String selectAll = "SELECT " + DatabaseTable.COLUMN_QUESTION + ", " +
@@ -109,7 +109,7 @@ public class QuestionDatabase extends SQLiteOpenHelper {
                         " RENAME TO " + baseTable.getTableName() + ";";
 
                 db.execSQL(deleteBaseTable);
-                db.execSQL(createNewBaseTable);*/
+                db.execSQL(createNewBaseTable);
                 databaseVersion = newVersion;
 
                 out.close();
