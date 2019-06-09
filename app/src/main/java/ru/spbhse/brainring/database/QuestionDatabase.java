@@ -46,21 +46,17 @@ public class QuestionDatabase extends SQLiteOpenHelper {
      */
     private QuestionDatabase(Context context) {
         super(context, DATABASE_NAME, null, 1);
-        Scanner versionScanner = new Scanner(
-                context.getResources().openRawResource(R.raw.database_version));
-        try {
-            databaseVersion = versionScanner.nextInt();
-        } catch (Exception e) {
-            Log.wtf(Controller.APP_TAG, "couldn't read version from its resource");
-        }
 
         baseTable = new DatabaseTable("baseTable");
+        if (db == null) {
+            db = this.getWritableDatabase();
+        }
+        int neededVersion = getNeededVersion(context);
+        int currentVersion = getCurrentVersion();
 
-        int newVersion = getVersion();
-        if (!alreadyExists(baseTable) || newVersion != databaseVersion) {
+
+        if (!alreadyExists(baseTable) || currentVersion != neededVersion) {
             try {
-                db = this.getWritableDatabase();
-
                 InputStream in = context.getAssets().open("Questions.db");
                 OutputStream out = new FileOutputStream(context.getDatabasePath(DATABASE_NAME).getPath());
 
@@ -73,6 +69,9 @@ public class QuestionDatabase extends SQLiteOpenHelper {
 
                 DatabaseTable tmp = new DatabaseTable("tmp");
                 db.execSQL(createEntries(tmp));
+
+                String resetVersion = "UPDATE version SET version = -1;";
+                db.execSQL(resetVersion);
 
                 String selectAll = "SELECT " + DatabaseTable.COLUMN_QUESTION + ", " +
                         DatabaseTable.COLUMN_ANSWER + ", " +
@@ -110,7 +109,8 @@ public class QuestionDatabase extends SQLiteOpenHelper {
 
                 db.execSQL(deleteBaseTable);
                 db.execSQL(createNewBaseTable);
-                databaseVersion = newVersion;
+                databaseVersion = currentVersion;
+                updateVersion(context);
 
                 out.close();
                 in.close();
@@ -118,6 +118,18 @@ public class QuestionDatabase extends SQLiteOpenHelper {
                 Log.wtf(Controller.APP_TAG, "failed to read database");
             }
         }
+    }
+
+    private int getNeededVersion(Context context) {
+        Scanner versionScanner = new Scanner(
+                context.getResources().openRawResource(R.raw.database_version));
+        int version = -1;
+        try {
+             version = versionScanner.nextInt();
+        } catch (Exception e) {
+            Log.wtf(Controller.APP_TAG, "couldn't read version from its resource");
+        }
+        return version;
     }
 
     /** Returns single instance of database, or constructs a new one, if there was no such */
@@ -148,7 +160,6 @@ public class QuestionDatabase extends SQLiteOpenHelper {
 
     /** Creates a new table in database, based on the given table */
     public void createTable(@Nullable DatabaseTable table) {
-        db = this.getWritableDatabase();
         if (table == null) {
             table = getBaseTable();
         }
@@ -168,13 +179,23 @@ public class QuestionDatabase extends SQLiteOpenHelper {
     }
 
     /**
+     * Updates database's version to a new one, written in res/raw/database_version.
+     *
+     * @param context context used to get the new version from resources
+     */
+    public void updateVersion(Context context) {
+        int newVersion = getNeededVersion(context);
+        String updateVersion = "UPDATE version SET version = " + newVersion + ";";
+        db.execSQL(updateVersion);
+    }
+
+    /**
      * Shows whether the database contains the given table
      *
      * @param table table to look up
      * @return {@code true} if the database contains the table
      */
     private boolean alreadyExists(@NonNull DatabaseTable table) {
-        db = this.getReadableDatabase();
         String queryTablesTitles = "SELECT DISTINCT tbl_name FROM sqlite_master WHERE tbl_name = "
                 + table.getTableName() + ";";
         Cursor cursor = db.rawQuery(queryTablesTitles, null);
@@ -191,13 +212,11 @@ public class QuestionDatabase extends SQLiteOpenHelper {
 
     /** Removes the given table from the database */
     public void deleteEntries(@NonNull DatabaseTable table) {
-        db = this.getWritableDatabase();
         db.execSQL("DROP TABLE IF EXISTS " + table.getTableName() + ";");
     }
 
     /** Returns number of questions in specified table */
     public long size(@NonNull DatabaseTable table) {
-        db = this.getReadableDatabase();
         return DatabaseUtils.queryNumEntries(db, table.getTableName());
     }
 
@@ -210,7 +229,6 @@ public class QuestionDatabase extends SQLiteOpenHelper {
      */
     @NonNull
     public Question getQuestion(@NonNull DatabaseTable table, int id) {
-        db = this.getReadableDatabase();
         String selectQuestion = "SELECT * FROM " + table.getTableName() +
                 " WHERE " + DatabaseTable._ID + "=" + (id + 1) + ";";
         Cursor cursor = db.rawQuery(selectQuestion, null);
@@ -267,7 +285,6 @@ public class QuestionDatabase extends SQLiteOpenHelper {
     }
 
     private void loadQuestions(Document doc, DatabaseTable table) {
-        db = this.getWritableDatabase();
         Elements elements = doc.select("div.question");
         ArrayList<String> questions = new ArrayList<>();
         ArrayList<String> answers = new ArrayList<>();
@@ -303,14 +320,11 @@ public class QuestionDatabase extends SQLiteOpenHelper {
         }
     }
 
-    private int getVersion() {
+    private int getCurrentVersion() {
         if (!alreadyExists(versionTable)) {
             return -1;
         }
-        db = this.getReadableDatabase();
-
         String selectAll = "SELECT * FROM " + versionTable.getTableName() + ";";
-
         Cursor cursor = db.rawQuery(selectAll, null);
         cursor.moveToFirst();
         int version = cursor.getInt(cursor.getColumnIndex("version"));
