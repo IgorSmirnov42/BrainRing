@@ -1,7 +1,6 @@
 package ru.spbhse.brainring.controllers;
 
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 
@@ -12,6 +11,7 @@ import ru.spbhse.brainring.logic.LocalGamePlayerLogic;
 import ru.spbhse.brainring.network.LocalNetwork;
 import ru.spbhse.brainring.network.LocalNetworkAdmin;
 import ru.spbhse.brainring.network.LocalNetworkPlayer;
+import ru.spbhse.brainring.network.messages.Message;
 import ru.spbhse.brainring.ui.JuryActivity;
 import ru.spbhse.brainring.ui.LocalGameLocation;
 import ru.spbhse.brainring.ui.PlayerActivity;
@@ -267,11 +267,23 @@ public class LocalController extends Controller {
         public static void handshake() {
             network.regularHandshake();
         }
+
+        public static void setRedPlayer(@NonNull String userId) {
+            network.setRedPlayer(userId);
+        }
+
+        public static void setGreenPlayer(@NonNull String userId) {
+            network.setGreenPlayer(userId);
+        }
     }
 
     /** Methods to interact with player's part of network */
     public static class LocalNetworkPlayerController {
         private static LocalNetworkPlayer network;
+
+        public static void doInitialHandshake(@NonNull String serverId) {
+            network.doInitialHandshake(serverId);
+        }
 
         /** Initializes network and loges in */
         public static void createLocalGame(@NonNull String color) {
@@ -281,7 +293,7 @@ public class LocalController extends Controller {
         }
 
         /** Sends message directly to server */
-        public static void sendMessageToServer(@NonNull byte[] message) {
+        public static void sendMessageToServer(@NonNull Message message) {
             network.sendMessageToServer(message);
         }
     }
@@ -298,12 +310,12 @@ public class LocalController extends Controller {
 
         /** Sends message to the user specified by {@code userId} */
         public static void sendMessageToConcreteUser(@NonNull String userId,
-                                                     @NonNull byte[] message) {
+                                                     @NonNull Message message) {
             network.sendMessageToConcreteUser(userId, message);
         }
 
         /** Sends message to everybody in a room except itself */
-        public static void sendMessageToOthers(@NonNull byte[] message) {
+        public static void sendMessageToOthers(@NonNull Message message) {
             network.sendMessageToOthers(message);
         }
     }

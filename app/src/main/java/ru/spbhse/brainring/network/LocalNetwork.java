@@ -17,6 +17,7 @@ import java.util.List;
 
 import ru.spbhse.brainring.controllers.Controller;
 import ru.spbhse.brainring.controllers.LocalController;
+import ru.spbhse.brainring.network.messages.Message;
 
 /** Class for interaction with network in local network mode */
 public abstract class LocalNetwork {
@@ -152,7 +153,7 @@ public abstract class LocalNetwork {
      * If there was no success, panics
      * CANNOT send message to itself
      */
-    public void sendMessageToConcreteUser(@NonNull String userId, @NonNull byte[] message) {
+    public void sendMessageToConcreteUser(@NonNull String userId, @NonNull Message message) {
         Log.d(Controller.APP_TAG, "Start sending message to " + userId);
         sendMessageToConcreteUserNTimes(userId, message, TIMES_TO_SEND);
     }
@@ -163,7 +164,7 @@ public abstract class LocalNetwork {
      * If there was no success, panics
      * CANNOT send message to itself
      */
-    private void sendMessageToConcreteUserNTimes(@NonNull String userId, @NonNull byte[] message,
+    private void sendMessageToConcreteUserNTimes(@NonNull String userId, @NonNull Message message,
                                                  int timesToSend) {
         if (gameIsFinished) {
             return;
@@ -173,10 +174,11 @@ public abstract class LocalNetwork {
             LocalController.finishLocalGame(true);
             return;
         }
-        mRealTimeMultiplayerClient.sendReliableMessage(message, room.getRoomId(), userId, (i, i1, s) -> {
+        mRealTimeMultiplayerClient.sendReliableMessage(message.toByteArray(), room.getRoomId(),
+                userId, (i, i1, s) -> {
             if (i != GamesCallbackStatusCodes.OK) {
-                Log.e(Controller.APP_TAG, "Failed to send message. Left " + timesToSend + " tries\n" +
-                        "Error is " + GamesCallbackStatusCodes.getStatusCodeString(i));
+                Log.e(Controller.APP_TAG, "Failed to send message. Left " + timesToSend +
+                        " tries\n" + "Error is " + GamesCallbackStatusCodes.getStatusCodeString(i));
                 sendMessageToConcreteUserNTimes(userId, message, timesToSend - 1);
             } else {
                 Log.d(Controller.APP_TAG, "Message to " + userId + " is delivered. Took " +
@@ -208,7 +210,7 @@ public abstract class LocalNetwork {
     }
 
     /** Sends message to all users in a room except itself */
-    public void sendMessageToOthers(@NonNull byte[] message) {
+    public void sendMessageToOthers(@NonNull Message message) {
         for (String participantId : room.getParticipantIds()) {
             if (!participantId.equals(myParticipantId)) {
                 sendMessageToConcreteUser(participantId, message);

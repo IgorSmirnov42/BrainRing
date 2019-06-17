@@ -6,18 +6,12 @@ import android.widget.Toast;
 import ru.spbhse.brainring.R;
 import ru.spbhse.brainring.controllers.LocalController;
 import ru.spbhse.brainring.network.messages.Message;
-import ru.spbhse.brainring.network.messages.MessageGenerator;
+import ru.spbhse.brainring.network.messages.messageTypes.AnswerReadyMessage;
 
 /** Class realizing player's logic in local network mode */
 public class LocalGamePlayerLogic {
 
-    private static byte[] PUSHED_BUTTON;
-
-    static {
-        PUSHED_BUTTON = MessageGenerator.create()
-                .writeInt(Message.ANSWER_IS_READY)
-                .toByteArray();
-    }
+    private static Message PUSHED_BUTTON = new AnswerReadyMessage(0);
 
     /** Shows toast with forbiddance to answer */
     public void onForbiddenToAnswer() {

@@ -13,8 +13,16 @@ import ru.spbhse.brainring.controllers.Controller;
 import ru.spbhse.brainring.controllers.DatabaseController;
 import ru.spbhse.brainring.controllers.OnlineController;
 import ru.spbhse.brainring.network.messages.Message;
-import ru.spbhse.brainring.network.messages.MessageGenerator;
 import ru.spbhse.brainring.network.messages.OnlineFinishCodes;
+import ru.spbhse.brainring.network.messages.messageTypes.AllowedToAnswerMessage;
+import ru.spbhse.brainring.network.messages.messageTypes.CorrectAnswerAndScoreMessage;
+import ru.spbhse.brainring.network.messages.messageTypes.CorrectAnswerMessage;
+import ru.spbhse.brainring.network.messages.messageTypes.FinishMessage;
+import ru.spbhse.brainring.network.messages.messageTypes.ForbiddenToAnswerMessage;
+import ru.spbhse.brainring.network.messages.messageTypes.IncorrectOpponentAnswerMessage;
+import ru.spbhse.brainring.network.messages.messageTypes.OpponentIsAnsweringMessage;
+import ru.spbhse.brainring.network.messages.messageTypes.QuestionMessage;
+import ru.spbhse.brainring.network.messages.messageTypes.TimeStartMessage;
 import ru.spbhse.brainring.utils.Question;
 
 /** Realizes admin's logic in online mode */
@@ -42,29 +50,11 @@ public class OnlineGameAdminLogic {
     /** Users that pushed a button and now in queue to determine who was first */
     private List<AnswerTime> waitingAnswer= new ArrayList<>();
 
-    private static final byte[] ALLOW_ANSWER;
-    private static final byte[] FORBID_ANSWER;
-    private static final byte[] OPPONENT_ANSWERING;
-    private static final byte[] TIME_START;
-    private static final byte[] CORRECT_ANSWER;
-
-    static {
-        ALLOW_ANSWER = MessageGenerator.create()
-                .writeInt(Message.ALLOWED_TO_ANSWER)
-                .toByteArray();
-        FORBID_ANSWER = MessageGenerator.create()
-                .writeInt(Message.FORBIDDEN_TO_ANSWER)
-                .toByteArray();
-        TIME_START = MessageGenerator.create()
-                .writeInt(Message.TIME_START)
-                .toByteArray();
-        CORRECT_ANSWER = MessageGenerator.create()
-                .writeInt(Message.CORRECT_ANSWER)
-                .toByteArray();
-        OPPONENT_ANSWERING = MessageGenerator.create()
-                .writeInt(Message.OPPONENT_IS_ANSWERING)
-                .toByteArray();
-    }
+    private static final Message ALLOW_ANSWER = new AllowedToAnswerMessage();
+    private static final Message FORBID_ANSWER = new ForbiddenToAnswerMessage();
+    private static final Message OPPONENT_ANSWERING = new OpponentIsAnsweringMessage();
+    private static final Message TIME_START = new TimeStartMessage();
+    private static final Message CORRECT_ANSWER = new CorrectAnswerMessage();
 
     /**
      * Minimal number of rounds in a game. It can be bigger if after {@code QUESTION_NUMBER_MIN}
@@ -208,11 +198,7 @@ public class OnlineGameAdminLogic {
         }
         OnlineController.NetworkController.sendMessageToConcreteUser(
                 getOtherUser(previousUserId).status.getParticipantId(),
-                MessageGenerator.create()
-                        .writeInt(Message.SENDING_INCORRECT_OPPONENT_ANSWER)
-                        .writeString(previousAnswer)
-                        .toByteArray()
-        );
+                new IncorrectOpponentAnswerMessage(previousAnswer));
     }
 
     /** Rejects or accepts answer written by user */
@@ -252,15 +238,11 @@ public class OnlineGameAdminLogic {
         Log.d(Controller.APP_TAG, "Question message: " + questionMessage);
         readyUsers = 0;
         OnlineController.NetworkController.sendMessageToAll(
-                MessageGenerator.create()
-                        .writeInt(Message.SENDING_CORRECT_ANSWER_AND_SCORE)
-                        .writeString(currentQuestion.getAllAnswers())
-                        .writeString(currentQuestion.getComment())
-                        .writeInt(user1.score)
-                        .writeInt(user2.score)
-                        .writeString(questionMessage)
-                        .toByteArray()
-        );
+                new CorrectAnswerAndScoreMessage(currentQuestion.getAllAnswers(),
+                        currentQuestion.getComment(),
+                        user1.score,
+                        user2.score,
+                        questionMessage));
     }
 
     /** Sends results of the finished game to users */
@@ -277,19 +259,11 @@ public class OnlineGameAdminLogic {
         // The order of sending here is important!
         OnlineController.NetworkController.sendMessageToConcreteUser(
                 user2.status.getParticipantId(),
-                MessageGenerator.create()
-                        .writeInt(Message.FINISH)
-                        .writeInt(user2Code)
-                        .toByteArray()
-        );
+                new FinishMessage(user2Code));
         new Handler().postDelayed(() -> {
             OnlineController.NetworkController.sendMessageToConcreteUser(
                     user1.status.getParticipantId(),
-                    MessageGenerator.create()
-                            .writeInt(Message.FINISH)
-                            .writeInt(user1Code)
-                            .toByteArray()
-            );
+                    new FinishMessage(user1Code));
         }, TIME_TO_SEND);
     }
 
@@ -305,12 +279,8 @@ public class OnlineGameAdminLogic {
         user2.status.onNewQuestion();
 
         currentQuestion = DatabaseController.getRandomQuestion();
-        byte[] message = MessageGenerator.create()
-                .writeInt(Message.SENDING_QUESTION)
-                .writeInt(currentQuestion.getId())
-                .writeString(currentQuestion.getQuestion())
-                .toByteArray();
-        OnlineController.NetworkController.sendQuestion(message);
+        OnlineController.NetworkController.sendQuestion(new QuestionMessage(currentQuestion.getId(),
+                currentQuestion.getQuestion()));
         currentRound = 1;
         ++questionNumber;
     }

@@ -11,14 +11,14 @@ import com.google.android.gms.games.multiplayer.realtime.Room;
 import com.google.android.gms.games.multiplayer.realtime.RoomConfig;
 import com.google.android.gms.games.multiplayer.realtime.RoomUpdateCallback;
 
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
 import java.io.IOException;
 
 import ru.spbhse.brainring.controllers.Controller;
 import ru.spbhse.brainring.controllers.LocalController;
+import ru.spbhse.brainring.messageProcessing.LocalPlayerMessageProcessing;
 import ru.spbhse.brainring.network.messages.Message;
-import ru.spbhse.brainring.network.messages.MessageGenerator;
+import ru.spbhse.brainring.network.messages.messageTypes.IAmGreenMessage;
+import ru.spbhse.brainring.network.messages.messageTypes.IAmRedMessage;
 
 /**
  * Class with methods to interact with network
@@ -91,55 +91,25 @@ public class LocalNetworkPlayer extends LocalNetwork {
         }
         Log.d(Controller.APP_TAG,"RECEIVED MESSAGE AS PLAYER!");
 
-        try (DataInputStream is = new DataInputStream(new ByteArrayInputStream(buf))) {
-            int identifier = is.readInt();
-            Log.d(Controller.APP_TAG,"Identifier is " + identifier);
-
-            switch (identifier) {
-                case Message.INITIAL_HANDSHAKE:
-                    doInitialHandshake(userId);
-                    break;
-                case Message.FORBIDDEN_TO_ANSWER:
-                    LocalController.LocalPlayerLogicController.onForbiddenToAnswer();
-                    break;
-                case Message.ALLOWED_TO_ANSWER:
-                    LocalController.LocalPlayerLogicController.onAllowedToAnswer();
-                    break;
-                case Message.FALSE_START:
-                    LocalController.LocalPlayerLogicController.onFalseStart();
-                    break;
-                case Message.TIME_START:
-                    LocalController.LocalPlayerLogicController.onTimeStart();
-                    break;
-                case Message.HANDSHAKE:
-                    sendMessageToConcreteUser(userId, buf);
-                    break;
-                default:
-                    Log.wtf(Controller.APP_TAG, "Unexpected message received");
-            }
-
+        try {
+            Message message = Message.readMessage(buf);
+            LocalPlayerMessageProcessing.process(message, userId);
         } catch (IOException e) {
+            Log.e(Controller.APP_TAG, "Error while reading message");
             e.printStackTrace();
         }
+
     }
 
-    private void doInitialHandshake(@NonNull String serverId) {
+    public void doInitialHandshake(@NonNull String serverId) {
         this.serverId = serverId;
         handshaked = true;
         if (myColor == ROLE_GREEN) {
             Log.d(Controller.APP_TAG, "I am green");
-            sendMessageToConcreteUser(serverId,
-                    MessageGenerator.create()
-                    .writeInt(Message.I_AM_GREEN)
-                    .toByteArray()
-            );
+            sendMessageToConcreteUser(serverId, new IAmGreenMessage());
         } else {
             Log.d(Controller.APP_TAG, "I am red");
-            sendMessageToConcreteUser(serverId,
-                    MessageGenerator.create()
-                            .writeInt(Message.I_AM_RED)
-                            .toByteArray()
-            );
+            sendMessageToConcreteUser(serverId, new IAmRedMessage());
         }
     }
 
@@ -167,7 +137,7 @@ public class LocalNetworkPlayer extends LocalNetwork {
      * Sends message to server
      * If server is not known, does nothing
      */
-    public void sendMessageToServer(@NonNull byte[] message) {
+    public void sendMessageToServer(@NonNull Message message) {
         if (serverId == null) {
             Log.d(Controller.APP_TAG, "Sending message before handshake");
         } else {

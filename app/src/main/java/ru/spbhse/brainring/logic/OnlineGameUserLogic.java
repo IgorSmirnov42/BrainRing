@@ -11,7 +11,12 @@ import ru.spbhse.brainring.controllers.Controller;
 import ru.spbhse.brainring.controllers.OnlineController;
 import ru.spbhse.brainring.files.ComplainedQuestion;
 import ru.spbhse.brainring.network.messages.Message;
-import ru.spbhse.brainring.network.messages.MessageGenerator;
+import ru.spbhse.brainring.network.messages.messageTypes.AnswerReadyMessage;
+import ru.spbhse.brainring.network.messages.messageTypes.AnswerWrittenMessage;
+import ru.spbhse.brainring.network.messages.messageTypes.FalseStartMessage;
+import ru.spbhse.brainring.network.messages.messageTypes.HandshakeMessage;
+import ru.spbhse.brainring.network.messages.messageTypes.ReadyForQuestionMessage;
+import ru.spbhse.brainring.network.messages.messageTypes.TimeLimitMessage;
 import ru.spbhse.brainring.ui.GameActivityLocation;
 
 /**
@@ -49,21 +54,9 @@ public class OnlineGameUserLogic {
     private static final int SENDING_COUNTDOWN = 5;
     private static final int SECOND = 1000;
 
-    private static final byte[] FALSE_START;
-    private static final byte[] HANDSHAKE;
-    private static final byte[] READY_FOR_QUESTION;
-
-    static {
-        HANDSHAKE = MessageGenerator.create()
-                .writeInt(Message.HANDSHAKE)
-                .toByteArray();
-        FALSE_START = MessageGenerator.create()
-                .writeInt(Message.FALSE_START)
-                .toByteArray();
-        READY_FOR_QUESTION = MessageGenerator.create()
-                .writeInt(Message.READY_FOR_QUESTION)
-                .toByteArray();
-    }
+    private static final Message FALSE_START = new FalseStartMessage();
+    private static final Message HANDSHAKE = new HandshakeMessage();
+    private static final Message READY_FOR_QUESTION = new ReadyForQuestionMessage();
 
     private CountDownTimer timer;
 
@@ -234,12 +227,7 @@ public class OnlineGameUserLogic {
 
     /** Signalizes server that user haven't pushed the button */
     private void sendTimeLimitedAnswer(int roundNumber) {
-        OnlineController.NetworkController.sendMessageToServer(
-                MessageGenerator.create()
-                        .writeInt(Message.TIME_LIMIT)
-                        .writeInt(roundNumber)
-                        .toByteArray()
-        );
+        OnlineController.NetworkController.sendMessageToServer(new TimeLimitMessage(roundNumber));
     }
 
     /** Shows answer and score on the screen, plays sound */
@@ -318,12 +306,7 @@ public class OnlineGameUserLogic {
             timer = null;
         }
         long time = System.currentTimeMillis() - startQuestionTime;
-        OnlineController.NetworkController.sendMessageToServer(
-                MessageGenerator.create()
-                        .writeInt(Message.ANSWER_IS_READY)
-                        .writeLong(time)
-                        .toByteArray()
-        );
+        OnlineController.NetworkController.sendMessageToServer(new AnswerReadyMessage(time));
     }
 
     /** Sends written answer to server */
@@ -334,12 +317,7 @@ public class OnlineGameUserLogic {
         }
         OnlineController.OnlineUIController.setTime("");
         OnlineController.OnlineUIController.setLocation(GameActivityLocation.SHOW_QUESTION);
-        OnlineController.NetworkController.sendMessageToServer(
-                MessageGenerator.create()
-                        .writeInt(Message.ANSWER_IS_WRITTEN)
-                        .writeString(answer)
-                        .toByteArray()
-        );
+        OnlineController.NetworkController.sendMessageToServer(new AnswerWrittenMessage(answer));
     }
 
     /** Finishes user-logic part of game. Cancels all timers */

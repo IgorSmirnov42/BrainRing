@@ -12,14 +12,14 @@ import com.google.android.gms.games.multiplayer.realtime.Room;
 import com.google.android.gms.games.multiplayer.realtime.RoomConfig;
 import com.google.android.gms.games.multiplayer.realtime.RoomUpdateCallback;
 
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
 import java.io.IOException;
 
 import ru.spbhse.brainring.controllers.Controller;
 import ru.spbhse.brainring.controllers.LocalController;
+import ru.spbhse.brainring.messageProcessing.LocalAdminMessageProcessing;
 import ru.spbhse.brainring.network.messages.Message;
-import ru.spbhse.brainring.network.messages.MessageGenerator;
+import ru.spbhse.brainring.network.messages.messageTypes.HandshakeMessage;
+import ru.spbhse.brainring.network.messages.messageTypes.InitialHandshakeMessage;
 
 /**
  * Class with methods to interact with network
@@ -28,14 +28,8 @@ import ru.spbhse.brainring.network.messages.MessageGenerator;
 public class LocalNetworkAdmin extends LocalNetwork {
     private String redId;
     private String greenId;
-    private static final byte[] HANDSHAKE;
+    private static final Message HANDSHAKE = new HandshakeMessage();
     private static final int HANDSHAKE_DELAY = 1000;
-
-    static {
-        HANDSHAKE = MessageGenerator.create()
-                .writeInt(Message.HANDSHAKE)
-                .toByteArray();
-    }
 
     /**
      * Creates new instance. Fills {@code mRoomUpdateCallback} with an instance that
@@ -98,31 +92,17 @@ public class LocalNetworkAdmin extends LocalNetwork {
             return;
         }
         Log.d(Controller.APP_TAG, "Received message as admin!");
-        try (DataInputStream is = new DataInputStream(new ByteArrayInputStream(buf))) {
-            int identifier = is.readInt();
-            Log.d(Controller.APP_TAG, "Identifier is " + identifier);
-
-            switch(identifier) {
-                case Message.I_AM_GREEN:
-                    setGreenPlayer(userId);
-                    break;
-                case Message.I_AM_RED:
-                    setRedPlayer(userId);
-                    break;
-                case Message.ANSWER_IS_READY:
-                    LocalController.LocalAdminLogicController.onAnswerIsReady(userId);
-                    break;
-                case Message.HANDSHAKE:
-                    LocalController.LocalAdminLogicController.onHandshakeAccept(userId);
-                    break;
-            }
+        try {
+            Message message = Message.readMessage(buf);
+            LocalAdminMessageProcessing.process(message, userId);
         } catch (IOException e) {
+            Log.e(Controller.APP_TAG, "Error while reading message");
             e.printStackTrace();
         }
     }
 
     /** Sets green player id. If both players shared their ids starts game cycle */
-    private void setGreenPlayer(@NonNull String userId) {
+    public void setGreenPlayer(@NonNull String userId) {
         if (handshaked) {
             Log.d(Controller.APP_TAG, "Handshake is done");
             return;
@@ -135,7 +115,7 @@ public class LocalNetworkAdmin extends LocalNetwork {
     }
 
     /** Sets red player id. If both players shared their ids starts game cycle */
-    private void setRedPlayer(@NonNull String userId) {
+    public void setRedPlayer(@NonNull String userId) {
         if (handshaked) {
             Log.d(Controller.APP_TAG, "Handshake is done");
             return;
@@ -177,10 +157,7 @@ public class LocalNetworkAdmin extends LocalNetwork {
             return;
         }
         Log.d(Controller.APP_TAG, "Start handshake");
-        byte[] message = MessageGenerator.create()
-                .writeInt(Message.INITIAL_HANDSHAKE)
-                .toByteArray();
-        sendMessageToOthers(message);
+        sendMessageToOthers(new InitialHandshakeMessage());
         // Sometimes first message doesn't reach opponent for some reason
         // so we have to send it one more time
         new Handler().postDelayed(this::handshake, HANDSHAKE_DELAY);

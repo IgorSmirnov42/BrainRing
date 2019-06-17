@@ -20,8 +20,6 @@ import com.google.android.gms.games.multiplayer.realtime.RoomConfig;
 import com.google.android.gms.games.multiplayer.realtime.RoomStatusUpdateCallback;
 import com.google.android.gms.games.multiplayer.realtime.RoomUpdateCallback;
 
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
@@ -29,9 +27,11 @@ import java.util.List;
 import ru.spbhse.brainring.R;
 import ru.spbhse.brainring.controllers.Controller;
 import ru.spbhse.brainring.controllers.OnlineController;
+import ru.spbhse.brainring.messageProcessing.OnlineMessageProcessing;
 import ru.spbhse.brainring.network.messages.Message;
-import ru.spbhse.brainring.network.messages.MessageGenerator;
 import ru.spbhse.brainring.network.messages.OnlineFinishCodes;
+import ru.spbhse.brainring.network.messages.messageTypes.FinishMessage;
+import ru.spbhse.brainring.network.messages.messageTypes.QuestionMessage;
 
 import static com.google.android.gms.games.leaderboard.LeaderboardVariant.COLLECTION_PUBLIC;
 import static com.google.android.gms.games.leaderboard.LeaderboardVariant.TIME_SPAN_ALL_TIME;
@@ -242,11 +242,29 @@ public class Network {
                     });
         }
     };
-    /** Sends received message to {@code onMessageReceived} */
+    /**
+     * Parses message and starts message processing
+     * Reloads timer if needed
+     */
     private OnRealTimeMessageReceivedListener mOnRealTimeMessageReceivedListener = realTimeMessage -> {
         Log.d(Controller.APP_TAG,"Received message");
         byte[] buf = realTimeMessage.getMessageData();
-        onMessageReceived(buf, realTimeMessage.getSenderParticipantId());
+        String userId = realTimeMessage.getSenderParticipantId();
+        if (gameIsFinished) {
+            Log.e(Controller.APP_TAG, "received message but game is over");
+            return;
+        }
+        if (timer != null && !userId.equals(myParticipantId)) {
+            timer.cancel();
+            startNewTimer();
+        }
+        try {
+            Message message = Message.readMessage(buf);
+            OnlineMessageProcessing.process(message, userId);
+        } catch (IOException e) {
+            Log.e(Controller.APP_TAG, "Error during reading message");
+            e.printStackTrace();
+        }
     };
 
     /** Prints all room members' names, sets nicknames to score counter */
@@ -274,6 +292,10 @@ public class Network {
         }
     }
 
+    public void updateScore() {
+        ++scoreSum;
+    }
+
     /**
      * Finishes network part of online game
      * Cancels all timers, leaves room, updates rating
@@ -293,113 +315,6 @@ public class Network {
         }
         leaveRoom();
         updateRating();
-    }
-
-    /**
-     * Reacts on received message
-     * Reloads {@code timer} if message if from another user
-     */
-    private void onMessageReceived(@NonNull byte[] buf, @NonNull String userId) {
-        if (gameIsFinished) {
-            Log.e(Controller.APP_TAG, "received message but game is over");
-            return;
-        }
-        if (timer != null && !userId.equals(myParticipantId)) {
-            timer.cancel();
-            startNewTimer();
-        }
-        Log.d(Controller.APP_TAG,"Received message! User id is " + userId);
-        try (DataInputStream is = new DataInputStream(new ByteArrayInputStream(buf))) {
-            int identifier = is.readInt();
-            Log.d(Controller.APP_TAG,"Identifier is " + identifier);
-
-            switch (identifier) {
-                case Message.ANSWER_IS_READY:
-                    long time = is.readLong();
-                    OnlineController.OnlineAdminLogicController.onAnswerIsReady(userId, time);
-                    break;
-                case Message.ANSWER_IS_WRITTEN:
-                    String answer = is.readUTF();
-                    OnlineController.OnlineAdminLogicController.onAnswerIsWritten(answer, userId);
-                    break;
-                case Message.FORBIDDEN_TO_ANSWER:
-                    OnlineController.OnlineUserLogicController.onForbiddenToAnswer();
-                    break;
-                case Message.ALLOWED_TO_ANSWER:
-                    OnlineController.OnlineUserLogicController.onAllowedToAnswer();
-                    break;
-                case Message.SENDING_QUESTION:
-                    int questionId = is.readInt();
-                    String question = is.readUTF();
-                    OnlineController.OnlineUserLogicController
-                            .onReceivingQuestion(questionId, question);
-                    break;
-                case Message.SENDING_INCORRECT_OPPONENT_ANSWER:
-                    String opponentAnswer = is.readUTF();
-                    OnlineController.OnlineUserLogicController
-                            .onIncorrectOpponentAnswer(opponentAnswer);
-                    break;
-                case Message.SENDING_CORRECT_ANSWER_AND_SCORE:
-                    String correctAnswer = is.readUTF();
-                    String comment = is.readUTF();
-                    int firstUserScore = is.readInt();
-                    int secondUserScore = is.readInt();
-                    String questionMessage = is.readUTF();
-                    OnlineController.OnlineUserLogicController.onReceivingAnswer(firstUserScore,
-                            secondUserScore, correctAnswer, comment, questionMessage);
-                    break;
-                case Message.OPPONENT_IS_ANSWERING:
-                    OnlineController.OnlineUserLogicController.onOpponentIsAnswering();
-                    break;
-                case Message.TIME_START:
-                    OnlineController.OnlineUserLogicController.onTimeStart();
-                    break;
-                case Message.FALSE_START:
-                    OnlineController.OnlineAdminLogicController.onFalseStart(userId);
-                    break;
-                case Message.HANDSHAKE:
-                    continueGame();
-                    break;
-                case Message.TIME_LIMIT:
-                    int roundNumber = is.readInt();
-                    OnlineController.OnlineAdminLogicController.onTimeLimit(roundNumber, userId);
-                    break;
-                case Message.FINISH:
-                    int finishCode = is.readInt();
-                    String message;
-                    switch (finishCode) {
-                        case OnlineFinishCodes.UNSUCCESSFUL_HANDSHAKE:
-                            message = OnlineController.getOnlineGameActivity()
-                                    .getString(R.string.slow_connection);
-                            break;
-                        case OnlineFinishCodes.SERVER_TIMER_TIMEOUT:
-                            message = OnlineController.getOnlineGameActivity()
-                                    .getString(R.string.timeout);
-                            break;
-                        case OnlineFinishCodes.GAME_FINISHED_CORRECTLY_LOST:
-                            message = OnlineController.getOnlineGameActivity()
-                                    .getString(R.string.lost);
-                            break;
-                        case OnlineFinishCodes.GAME_FINISHED_CORRECTLY_WON:
-                            message = OnlineController.getOnlineGameActivity()
-                                    .getString(R.string.win);
-                            break;
-                        default:
-                            message = OnlineController.getOnlineGameActivity()
-                                    .getString(R.string.unknown_error);
-                    }
-                    finishImmediately(message);
-                    break;
-                case Message.CORRECT_ANSWER:
-                    ++scoreSum;
-                    break;
-                case Message.READY_FOR_QUESTION:
-                    OnlineController.OnlineAdminLogicController.onReadyForQuestion(userId);
-                    break;
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     /** Send immediate update o\to rating */
@@ -426,11 +341,7 @@ public class Network {
                         finishImmediately(OnlineController.getOnlineGameActivity()
                                 .getString(R.string.opponent_not_found));
                     } else {
-                        sendMessageToAll(MessageGenerator.create()
-                                .writeInt(Message.FINISH)
-                                .writeInt(OnlineFinishCodes.SERVER_TIMER_TIMEOUT)
-                                .toByteArray()
-                        );
+                        sendMessageToAll(new FinishMessage(OnlineFinishCodes.SERVER_TIMER_TIMEOUT));
                     }
                 }
             }
@@ -439,7 +350,7 @@ public class Network {
     }
 
     /** Continues game cycle after successful handshake */
-    private void continueGame() {
+    public void continueGame() {
         if (handshakeTimer != null) {
             handshakeTimer.cancel();
             handshakeTimer = null;
@@ -515,12 +426,12 @@ public class Network {
     }
 
     /** Sends message to all users in a room (and to itself) */
-    public void sendMessageToAll(@NonNull byte[] message) {
+    public void sendMessageToAll(@NonNull Message message) {
         // The order of sending is critical!
         if (getOpponentParticipantId() != null) {
             sendMessageToConcreteUser(getOpponentParticipantId(), message);
         }
-        onMessageReceived(message, myParticipantId);
+        OnlineMessageProcessing.process(message, myParticipantId);
     }
 
     /**
@@ -529,14 +440,14 @@ public class Network {
      * If there was no success, panics
      * Can send message to itself
      */
-    public void sendMessageToConcreteUser(@NonNull String userId, @NonNull byte[] message) {
+    public void sendMessageToConcreteUser(@NonNull String userId, @NonNull Message message) {
         if (myParticipantId == null || room == null) {
             Log.e(Controller.APP_TAG, "Cannot send message before initialization");
             return;
         }
         if (userId.equals(myParticipantId)) {
             Log.d(Controller.APP_TAG, "Sending message to myself");
-            onMessageReceived(message, myParticipantId);
+            OnlineMessageProcessing.process(message, myParticipantId);
         } else {
             Log.d(Controller.APP_TAG, "Start sending message to " + userId);
             sendMessageToConcreteUserNTimes(userId, message, TIMES_TO_SEND);
@@ -548,7 +459,7 @@ public class Network {
      * If sending is unsuccessful repeats it {@code timesToSend} times until success
      * If there was no success, panics
      */
-    private void sendMessageToConcreteUserNTimes(@NonNull String userId, @NonNull byte[] message,
+    private void sendMessageToConcreteUserNTimes(@NonNull String userId, @NonNull Message message,
                                           int timesToSend) {
         if (gameIsFinished) {
             return;
@@ -559,7 +470,8 @@ public class Network {
                     .getString(R.string.default_error));
             return;
         }
-        mRealTimeMultiplayerClient.sendReliableMessage(message, room.getRoomId(), userId, (i, i1, s) -> {
+        mRealTimeMultiplayerClient.sendReliableMessage(message.toByteArray(), room.getRoomId(),
+                userId, (i, i1, s) -> {
             if (i != GamesCallbackStatusCodes.OK) {
 
                 Log.e(Controller.APP_TAG, "Failed to send message. Left " + timesToSend + " tries\n" +
@@ -573,7 +485,7 @@ public class Network {
     }
 
     /** Sends question. Starts {@code handshakeTimer} */
-    public void sendQuestion(@NonNull byte[] message) {
+    public void sendQuestion(@NonNull QuestionMessage message) {
         sendMessageToAll(message);
         int handshakeTime = HANDSHAKE_TIME;
         if (firstMessage) {
@@ -590,11 +502,7 @@ public class Network {
                 // check in case message was delivered right before finish
                 if (handshakeTimer == this) {
                     Log.wtf(Controller.APP_TAG, "Unsuccessful handshake");
-                    sendMessageToAll(MessageGenerator.create()
-                            .writeInt(Message.FINISH)
-                            .writeInt(OnlineFinishCodes.UNSUCCESSFUL_HANDSHAKE)
-                            .toByteArray()
-                    );
+                    sendMessageToAll(new FinishMessage(OnlineFinishCodes.UNSUCCESSFUL_HANDSHAKE));
                 }
             }
         };
@@ -613,9 +521,9 @@ public class Network {
     }
 
     /** Sends message directly to server */
-    public void sendMessageToServer(@NonNull byte[] message) {
+    public void sendMessageToServer(@NonNull Message message) {
         if (isServer) {
-            onMessageReceived(message, myParticipantId);
+            OnlineMessageProcessing.process(message, myParticipantId);
         } else {
             sendMessageToConcreteUser(serverId, message);
         }

@@ -12,6 +12,8 @@ import ru.spbhse.brainring.files.ComplainedQuestion;
 import ru.spbhse.brainring.logic.OnlineGameAdminLogic;
 import ru.spbhse.brainring.logic.OnlineGameUserLogic;
 import ru.spbhse.brainring.network.Network;
+import ru.spbhse.brainring.network.messages.Message;
+import ru.spbhse.brainring.network.messages.messageTypes.QuestionMessage;
 import ru.spbhse.brainring.ui.GameActivityLocation;
 import ru.spbhse.brainring.ui.OnlineGameActivity;
 
@@ -295,6 +297,10 @@ public class OnlineController extends Controller {
             return network.getParticipantName(userId);
         }
 
+        public static void continueGame() {
+            network.continueGame();
+        }
+
         /**
          * Finishes game
          *
@@ -312,8 +318,12 @@ public class OnlineController extends Controller {
             onlineGameActivity.get().signIn();
         }
 
+        public static void updateScore() {
+            network.updateScore();
+        }
+
         /** Sends question. Starts {@code handshakeTimer} */
-        public static void sendQuestion(@NonNull byte[] message) {
+        public static void sendQuestion(@NonNull QuestionMessage message) {
             network.sendQuestion(message);
         }
 
@@ -341,7 +351,7 @@ public class OnlineController extends Controller {
         }
 
         /** Sends message directly to server */
-        public static void sendMessageToServer(@NonNull byte[] message) {
+        public static void sendMessageToServer(@NonNull Message message) {
             network.sendMessageToServer(message);
         }
 
@@ -363,12 +373,12 @@ public class OnlineController extends Controller {
          * If there was no success, panics
          * Can send message to itself
          */
-        public static void sendMessageToConcreteUser(@NonNull String userId, @NonNull byte[] message) {
+        public static void sendMessageToConcreteUser(@NonNull String userId, @NonNull Message message) {
             network.sendMessageToConcreteUser(userId, message);
         }
 
         /** Sends message to all users in a room (and to itself) */
-        public static void sendMessageToAll(@NonNull byte[] message) {
+        public static void sendMessageToAll(@NonNull Message message) {
             network.sendMessageToAll(message);
         }
     }

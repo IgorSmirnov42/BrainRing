@@ -11,6 +11,10 @@ import ru.spbhse.brainring.controllers.Controller;
 import ru.spbhse.brainring.controllers.LocalController;
 import ru.spbhse.brainring.network.messages.Message;
 import ru.spbhse.brainring.network.messages.MessageGenerator;
+import ru.spbhse.brainring.network.messages.messageTypes.AllowedToAnswerMessage;
+import ru.spbhse.brainring.network.messages.messageTypes.FalseStartMessage;
+import ru.spbhse.brainring.network.messages.messageTypes.ForbiddenToAnswerMessage;
+import ru.spbhse.brainring.network.messages.messageTypes.TimeStartMessage;
 import ru.spbhse.brainring.ui.LocalGameLocation;
 
 import static java.lang.Math.max;
@@ -26,17 +30,10 @@ public class LocalGameAdminLogic {
     private String answeringUserId;
     private int handshakeAccepted = 0;
 
-    private static final byte[] ALLOW_ANSWER;
-    private static final byte[] FORBID_ANSWER;
-    private static final byte[] FALSE_START;
-    private static final byte[] TIME_START;
-
-    static {
-        ALLOW_ANSWER = MessageGenerator.create().writeInt(Message.ALLOWED_TO_ANSWER).toByteArray();
-        FORBID_ANSWER = MessageGenerator.create().writeInt(Message.FORBIDDEN_TO_ANSWER).toByteArray();
-        FALSE_START = MessageGenerator.create().writeInt(Message.FALSE_START).toByteArray();
-        TIME_START = MessageGenerator.create().writeInt(Message.TIME_START).toByteArray();
-    }
+    private static final Message ALLOW_ANSWER = new AllowedToAnswerMessage();
+    private static final Message FORBID_ANSWER = new ForbiddenToAnswerMessage();
+    private static final Message FALSE_START = new FalseStartMessage();
+    private static final Message TIME_START = new TimeStartMessage();
 
     /** Same as {@code FIRST_COUNTDOWN} in online mode, but editable here */
     private final int firstCountdown;
