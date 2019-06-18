@@ -66,6 +66,7 @@ public class OnlineGameUserLogic implements PlayerLogic {
     }
 
     /** Returns question data in format that is comfortable for complaining */
+    @NonNull
     @Override
     public ComplainedQuestion getCurrentQuestionData() {
         return new ComplainedQuestion(currentQuestionText,
