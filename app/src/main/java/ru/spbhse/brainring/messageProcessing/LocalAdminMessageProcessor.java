@@ -6,7 +6,7 @@ import ru.spbhse.brainring.controllers.LocalController;
 import ru.spbhse.brainring.network.messages.Message;
 import ru.spbhse.brainring.network.messages.MessageCodes;
 
-public class LocalAdminMessageProcessing {
+public class LocalAdminMessageProcessor {
     public static void process(@NonNull Message message, @NonNull String senderId) {
         switch(message.getMessageCode()) {
             case MessageCodes.I_AM_GREEN:

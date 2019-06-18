@@ -16,7 +16,7 @@ import java.io.IOException;
 
 import ru.spbhse.brainring.controllers.Controller;
 import ru.spbhse.brainring.controllers.LocalController;
-import ru.spbhse.brainring.messageProcessing.LocalAdminMessageProcessing;
+import ru.spbhse.brainring.messageProcessing.LocalAdminMessageProcessor;
 import ru.spbhse.brainring.network.messages.Message;
 import ru.spbhse.brainring.network.messages.messageTypes.HandshakeMessage;
 import ru.spbhse.brainring.network.messages.messageTypes.InitialHandshakeMessage;
@@ -94,7 +94,7 @@ public class LocalNetworkAdmin extends LocalNetwork {
         Log.d(Controller.APP_TAG, "Received message as admin!");
         try {
             Message message = Message.readMessage(buf);
-            LocalAdminMessageProcessing.process(message, userId);
+            LocalAdminMessageProcessor.process(message, userId);
         } catch (IOException e) {
             Log.e(Controller.APP_TAG, "Error while reading message");
             e.printStackTrace();

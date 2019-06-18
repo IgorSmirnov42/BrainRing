@@ -26,8 +26,7 @@ import java.util.List;
 
 import ru.spbhse.brainring.R;
 import ru.spbhse.brainring.controllers.Controller;
-import ru.spbhse.brainring.controllers.OnlineController;
-import ru.spbhse.brainring.messageProcessing.OnlineMessageProcessing;
+import ru.spbhse.brainring.managers.OnlineGameManager;
 import ru.spbhse.brainring.network.messages.Message;
 import ru.spbhse.brainring.network.messages.OnlineFinishCodes;
 import ru.spbhse.brainring.network.messages.messageTypes.FinishMessage;
@@ -38,6 +37,7 @@ import static com.google.android.gms.games.leaderboard.LeaderboardVariant.TIME_S
 
 /** Class for working with network in online mode */
 public class Network {
+    private OnlineGameManager manager;
     private RoomConfig mRoomConfig;
     private Room room;
     private boolean isServer;
@@ -174,7 +174,7 @@ public class Network {
             Log.d(Controller.APP_TAG, "onP2PConnected " + s);
             ++counterOfConnections;
             if (counterOfConnections == 2 && isServer) {
-                OnlineController.startOnlineGame();
+                manager.startOnlineGame();
             }
         }
 
@@ -225,7 +225,7 @@ public class Network {
             }
             serverId = Collections.min(room.getParticipantIds());
 
-            Games.getPlayersClient(OnlineController.getOnlineGameActivity(), googleSignInAccount)
+            Games.getPlayersClient(manager.getActivity(), googleSignInAccount)
                     .getCurrentPlayerId()
                     .addOnSuccessListener(myPlayerId -> {
                         myParticipantId = room.getParticipantId(myPlayerId);
@@ -236,7 +236,7 @@ public class Network {
                             Log.d(Controller.APP_TAG, "I am server");
                             ++counterOfConnections;
                             if (counterOfConnections == 2) {
-                                OnlineController.startOnlineGame();
+                                manager.startOnlineGame();
                             }
                         }
                     });
@@ -260,12 +260,16 @@ public class Network {
         }
         try {
             Message message = Message.readMessage(buf);
-            OnlineMessageProcessing.process(message, userId);
+            manager.getMessageProcessor().process(message, userId);
         } catch (IOException e) {
             Log.e(Controller.APP_TAG, "Error during reading message");
             e.printStackTrace();
         }
     };
+
+    public Network(OnlineGameManager onlineGameManager) {
+        manager = onlineGameManager;
+    }
 
     /** Prints all room members' names, sets nicknames to score counter */
     private void walkRoomMembers() {
@@ -273,9 +277,9 @@ public class Network {
         if (room != null) {
             for (Participant participant : room.getParticipants()) {
                 if (participant.getParticipantId().equals(myParticipantId)) {
-                    OnlineController.OnlineUIController.setMyNick(participant.getDisplayName());
+                   manager.getActivity().setMyNick(participant.getDisplayName());
                 } else {
-                    OnlineController.OnlineUIController.setOpponentNick(participant.getDisplayName());
+                    manager.getActivity().setOpponentNick(participant.getDisplayName());
                 }
                 Log.d(Controller.APP_TAG, participant.getDisplayName());
             }
@@ -285,11 +289,10 @@ public class Network {
 
     /** Closes connection to room */
     private void leaveRoom() {
-        if (room != null) {
-            Games.getRealTimeMultiplayerClient(OnlineController.getOnlineGameActivity(),
-                    googleSignInAccount).leave(mRoomConfig, room.getRoomId());
-            room = null;
+        if (room != null && mRealTimeMultiplayerClient != null) {
+            mRealTimeMultiplayerClient.leave(mRoomConfig, room.getRoomId());
         }
+        room = null;
     }
 
     public void updateScore() {
@@ -323,8 +326,8 @@ public class Network {
             return;
         }
         Log.d(Controller.APP_TAG, "Updating rating");
-        leaderboardsClient.submitScoreImmediate(
-                OnlineController.getOnlineGameActivity().getString(R.string.leaderboard), scoreSum);
+        leaderboardsClient.submitScoreImmediate(manager.getActivity()
+                .getString(R.string.leaderboard), scoreSum);
     }
 
     /** Reloads {@code timer} */
@@ -338,7 +341,7 @@ public class Network {
             public void onFinish() {
                 if (timer == this) {
                     if (counterOfConnections == 0) {
-                        finishImmediately(OnlineController.getOnlineGameActivity()
+                        finishImmediately(manager.getActivity()
                                 .getString(R.string.opponent_not_found));
                     } else {
                         sendMessageToAll(new FinishMessage(OnlineFinishCodes.SERVER_TIMER_TIMEOUT));
@@ -356,7 +359,7 @@ public class Network {
             handshakeTimer = null;
             Log.d(Controller.APP_TAG, "Successful handshake. Took "
                     + (System.currentTimeMillis() - handshakeStartTime) + "ms");
-            OnlineController.OnlineAdminLogicController.publishing();
+            manager.getAdminLogic().publishing();
         }
     }
 
@@ -364,12 +367,12 @@ public class Network {
     public void onSignedIn(@NonNull GoogleSignInAccount signInAccount) {
         Log.d(Controller.APP_TAG, "Logged in");
         googleSignInAccount = signInAccount;
-        mRealTimeMultiplayerClient = Games.getRealTimeMultiplayerClient(
-                OnlineController.getOnlineGameActivity(), googleSignInAccount);
-        leaderboardsClient = Games.getLeaderboardsClient(OnlineController.getOnlineGameActivity(),
+        mRealTimeMultiplayerClient = Games.getRealTimeMultiplayerClient(manager.getActivity(),
+                googleSignInAccount);
+        leaderboardsClient = Games.getLeaderboardsClient(manager.getActivity(),
                 googleSignInAccount);
         leaderboardsClient.loadCurrentPlayerLeaderboardScore(
-                OnlineController.getOnlineGameActivity().getString(R.string.leaderboard),
+                manager.getActivity().getString(R.string.leaderboard),
                 TIME_SPAN_ALL_TIME, COLLECTION_PUBLIC).addOnSuccessListener(
                         leaderboardScoreAnnotatedData -> {
                             Log.d(Controller.APP_TAG, "Got score");
@@ -380,7 +383,7 @@ public class Network {
                                 scoreSum = 0;
                             }
                             Log.d(Controller.APP_TAG, "Score is " + scoreSum);
-                            OnlineController.NetworkController.startGame();
+                            startQuickGame();
                         });
     }
 
@@ -408,8 +411,7 @@ public class Network {
             return;
         }
         new Handler().postDelayed(() ->
-                finishImmediately(OnlineController.getOnlineGameActivity()
-                        .getString(R.string.default_error)),
+                finishImmediately(manager.getActivity().getString(R.string.default_error)),
                 WAIT_FOR_MESSAGE);
     }
 
@@ -421,8 +423,8 @@ public class Network {
         if (gameIsFinished) {
             return;
         }
-        OnlineController.finishOnlineGame();
-        OnlineController.showGameFinishedActivity(message);
+        manager.finishOnlineGame();
+        manager.getActivity().showGameFinishedActivity(message);
     }
 
     /** Sends message to all users in a room (and to itself) */
@@ -431,7 +433,7 @@ public class Network {
         if (getOpponentParticipantId() != null) {
             sendMessageToConcreteUser(getOpponentParticipantId(), message);
         }
-        OnlineMessageProcessing.process(message, myParticipantId);
+        manager.getMessageProcessor().process(message, myParticipantId);
     }
 
     /**
@@ -447,7 +449,7 @@ public class Network {
         }
         if (userId.equals(myParticipantId)) {
             Log.d(Controller.APP_TAG, "Sending message to myself");
-            OnlineMessageProcessing.process(message, myParticipantId);
+            manager.getMessageProcessor().process(message, myParticipantId);
         } else {
             Log.d(Controller.APP_TAG, "Start sending message to " + userId);
             sendMessageToConcreteUserNTimes(userId, message, TIMES_TO_SEND);
@@ -466,8 +468,7 @@ public class Network {
         }
         if (timesToSend < 0) {
             Log.wtf(Controller.APP_TAG, "Failed to send message too many times. Finish game");
-            finishImmediately(OnlineController.getOnlineGameActivity()
-                    .getString(R.string.default_error));
+            finishImmediately(manager.getActivity().getString(R.string.default_error));
             return;
         }
         mRealTimeMultiplayerClient.sendReliableMessage(message.toByteArray(), room.getRoomId(),
@@ -523,7 +524,7 @@ public class Network {
     /** Sends message directly to server */
     public void sendMessageToServer(@NonNull Message message) {
         if (isServer) {
-            OnlineMessageProcessing.process(message, myParticipantId);
+            manager.getMessageProcessor().process(message, myParticipantId);
         } else {
             sendMessageToConcreteUser(serverId, message);
         }

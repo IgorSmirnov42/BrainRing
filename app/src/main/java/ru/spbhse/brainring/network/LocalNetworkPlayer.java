@@ -15,7 +15,7 @@ import java.io.IOException;
 
 import ru.spbhse.brainring.controllers.Controller;
 import ru.spbhse.brainring.controllers.LocalController;
-import ru.spbhse.brainring.messageProcessing.LocalPlayerMessageProcessing;
+import ru.spbhse.brainring.messageProcessing.LocalPlayerMessageProcessor;
 import ru.spbhse.brainring.network.messages.Message;
 import ru.spbhse.brainring.network.messages.messageTypes.IAmGreenMessage;
 import ru.spbhse.brainring.network.messages.messageTypes.IAmRedMessage;
@@ -93,7 +93,7 @@ public class LocalNetworkPlayer extends LocalNetwork {
 
         try {
             Message message = Message.readMessage(buf);
-            LocalPlayerMessageProcessing.process(message, userId);
+            LocalPlayerMessageProcessor.process(message, userId);
         } catch (IOException e) {
             Log.e(Controller.APP_TAG, "Error while reading message");
             e.printStackTrace();

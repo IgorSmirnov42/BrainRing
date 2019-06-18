@@ -3,7 +3,6 @@ package ru.spbhse.brainring.ui;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.StrictMode;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -20,27 +19,29 @@ import com.google.android.gms.games.GamesActivityResultCodes;
 import ru.spbhse.brainring.R;
 import ru.spbhse.brainring.controllers.Controller;
 import ru.spbhse.brainring.controllers.DatabaseController;
-import ru.spbhse.brainring.controllers.OnlineController;
 import ru.spbhse.brainring.database.QuestionDatabase;
-import ru.spbhse.brainring.utils.Question;
+import ru.spbhse.brainring.files.ComplainedQuestion;
+import ru.spbhse.brainring.managers.OnlineGameManager;
 
 /** This activity maintains online game */
 public class OnlineGameActivity extends GameActivity {
     private static final int RC_SIGN_IN = 42;
+    private OnlineGameManager manager;
 
     /** {@inheritDoc} */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        OnlineController.setUI(OnlineGameActivity.this);
+        manager = new OnlineGameManager(this);
+
         QuestionDatabase dataBase = QuestionDatabase.getInstance(this);
         DatabaseController.setDatabase(dataBase);
-        gameController = OnlineController.OnlineUserLogicController.getInstance();
 
         drawLocation();
 
-        OnlineController.NetworkController.createOnlineGame();
+        DatabaseController.generateNewSequence();
+        signIn();
     }
 
     /* I know that this function is out of content here,
@@ -51,7 +52,7 @@ public class OnlineGameActivity extends GameActivity {
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
         if (GoogleSignIn.hasPermissions(account, signInOptions.getScopeArray())) {
             Log.d(Controller.APP_TAG, "Already logged in");
-            OnlineController.NetworkController.loggedIn(account);
+            manager.getNetwork().onSignedIn(account);
         } else {
             GoogleSignInClient signInClient = GoogleSignIn.getClient(this,
                     GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN);
@@ -66,8 +67,8 @@ public class OnlineGameActivity extends GameActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == RC_SIGN_IN) {
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
-            if (result.isSuccess()) {
-                OnlineController.NetworkController.loggedIn(result.getSignInAccount());
+            if (result.isSuccess() && result.getSignInAccount() != null) {
+                manager.getNetwork().onSignedIn(result.getSignInAccount());
             } else {
                 String message = result.getStatus().getStatusMessage();
                 if (message == null || message.isEmpty()) {
@@ -78,9 +79,7 @@ public class OnlineGameActivity extends GameActivity {
             }
         } else if (requestCode == GamesActivityResultCodes.RESULT_LEFT_ROOM) {
             Log.d(Controller.APP_TAG, "Left room from activity");
-            OnlineController.finishOnlineGame();
-            OnlineController.NetworkController.finishImmediately(getString(R.string.default_error));
-            finish();
+            manager.getNetwork().finishImmediately(getString(R.string.default_error));
         } else if (requestCode == GamesActivityResultCodes.RESULT_SEND_REQUEST_FAILED) {
             Log.d(Controller.APP_TAG, "Send request failed");
         } else if (requestCode == GamesActivityResultCodes.RESULT_NETWORK_FAILURE) {
@@ -114,8 +113,23 @@ public class OnlineGameActivity extends GameActivity {
         if (currentLocation == GameActivityLocation.SHOW_ANSWER) {
             Button continueGameButton = findViewById(R.id.continueGameButton);
             continueGameButton.setOnClickListener(v ->
-                    OnlineController.OnlineUserLogicController.readyForQuestion());
+                    manager.getUserLogic().readyForQuestion());
         }
+    }
+
+    @Override
+    protected void handleWrittenAnswer(String writtenAnswer) {
+        manager.getUserLogic().answerIsWritten(writtenAnswer);
+    }
+
+    @Override
+    protected ComplainedQuestion getCurrentQuestionData() {
+        return manager.getUserLogic().getQuestionData();
+    }
+
+    @Override
+    protected void handleAnswerButtonPushed() {
+        manager.getUserLogic().answerButtonPushed();
     }
 
     /** {@inheritDoc} */
@@ -123,6 +137,6 @@ public class OnlineGameActivity extends GameActivity {
     protected void onStop() {
         Log.d(Controller.APP_TAG, "Stopping activity. Leaving room");
         super.onStop();
-        OnlineController.finishOnlineGame();
+        manager.finishOnlineGame();
     }
 }

@@ -16,14 +16,16 @@ import java.net.URL;
 import ru.spbhse.brainring.R;
 import ru.spbhse.brainring.controllers.Controller;
 import ru.spbhse.brainring.controllers.DatabaseController;
-import ru.spbhse.brainring.controllers.GameController;
 import ru.spbhse.brainring.controllers.TrainingController;
 import ru.spbhse.brainring.database.DatabaseTable;
 import ru.spbhse.brainring.database.QuestionDatabase;
+import ru.spbhse.brainring.files.ComplainedQuestion;
 import ru.spbhse.brainring.logic.TrainingPlayerLogic;
+import ru.spbhse.brainring.managers.TrainingGameManager;
 
 /** This activity maintains training game */
 public class TrainingGameActivity extends GameActivity {
+    private TrainingGameManager manager;
     private QuestionDatabase dataBase;
     private boolean toClear = false;
     private static DatabaseTable gameTable;
@@ -54,8 +56,6 @@ public class TrainingGameActivity extends GameActivity {
         if (spinner == null) {
             throw new IllegalStateException();
         }
-        GameController gameController = TrainingController.TrainingLogicController.getInstance();
-        setGameController(gameController);
         setMyNick(getString(R.string.right_answers));
         setOpponentNick(getString(R.string.wrong_answers));
 
@@ -102,9 +102,19 @@ public class TrainingGameActivity extends GameActivity {
         }
     }
 
-    /** Sets GameController */
-    public void setGameController(GameController gameController) {
-        this.gameController = gameController;
+    @Override
+    protected void handleWrittenAnswer(String writtenAnswer) {
+
+    }
+
+    @Override
+    protected ComplainedQuestion getCurrentQuestionData() {
+        return null;
+    }
+
+    @Override
+    protected void handleAnswerButtonPushed() {
+
     }
 
     /** Reacts on finishing the game */
