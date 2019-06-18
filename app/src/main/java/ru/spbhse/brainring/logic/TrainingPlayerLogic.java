@@ -8,12 +8,12 @@ import android.util.Log;
 import ru.spbhse.brainring.R;
 import ru.spbhse.brainring.controllers.Controller;
 import ru.spbhse.brainring.controllers.DatabaseController;
-import ru.spbhse.brainring.controllers.TrainingController;
 import ru.spbhse.brainring.files.ComplainedQuestion;
 import ru.spbhse.brainring.ui.GameActivityLocation;
+import ru.spbhse.brainring.ui.TrainingGameActivity;
 import ru.spbhse.brainring.utils.Question;
 
-public class TrainingPlayerLogic {
+public class TrainingPlayerLogic implements PlayerLogic {
     private static final int TIME_TO_WRITE_ANSWER = 20;
     private static final int SECOND = 1000;
     public static final int DEFAULT_READING_TIME = 20;
@@ -22,6 +22,11 @@ public class TrainingPlayerLogic {
     private int wrongAnswers = 0;
     private int readingTime = DEFAULT_READING_TIME;
     private CountDownTimer timer;
+    private TrainingGameActivity activity;
+
+    public TrainingPlayerLogic(TrainingGameActivity activity) {
+        this.activity = activity;
+    }
 
     /**
      * Returns current question data
@@ -29,6 +34,7 @@ public class TrainingPlayerLogic {
      * @return current question data as {@code ComplainedQuestions}
      */
     @NonNull
+    @Override
     public ComplainedQuestion getCurrentQuestionData() {
         return new ComplainedQuestion(currentQuestion.getQuestion(),
                 currentQuestion.getAllAnswers(), currentQuestion.getId());
@@ -44,17 +50,17 @@ public class TrainingPlayerLogic {
             timer = null;
         }
         if (DatabaseController.getNumberOfRemainingQuestions() == 0) {
-            TrainingController.TrainingUIController.onGameFinished();
+            activity.onGameFinished();
             return;
         }
         currentQuestion = DatabaseController.getRandomQuestion();
 
-        TrainingController.TrainingUIController.setLocation(GameActivityLocation.SHOW_QUESTION);
-        TrainingController.TrainingUIController.setQuestionText(currentQuestion.getQuestion());
-        TrainingController.TrainingUIController.setTime("");
-        TrainingController.TrainingUIController.setAnswer(currentQuestion.getAllAnswers());
-        TrainingController.TrainingUIController.setComment(currentQuestion.getComment());
-        TrainingController.TrainingUIController.onNewQuestion();
+        activity.setLocation(GameActivityLocation.SHOW_QUESTION);
+        activity.setQuestionText(currentQuestion.getQuestion());
+        activity.setTime("");
+        activity.setAnswerText(currentQuestion.getAllAnswers());
+        activity.setCommentText(currentQuestion.getComment());
+        activity.onNewQuestion();
 
         Log.d(Controller.APP_TAG, "New question");
 
@@ -64,7 +70,7 @@ public class TrainingPlayerLogic {
                 if (timer == this) {
                     if (millisUntilFinished <= readingTime * SECOND) {
                         long secondsLeft = millisUntilFinished / SECOND;
-                        TrainingController.TrainingUIController.setTime(String.valueOf(secondsLeft));
+                        activity.setTime(String.valueOf(secondsLeft));
                         Log.d(Controller.APP_TAG, "TICK" + secondsLeft);
                     }
                 }
@@ -78,7 +84,11 @@ public class TrainingPlayerLogic {
         timer.start();
     }
 
-    /** Reacts on pushing the answer button, cancels the timer and suggests user to answer the question */
+    /**
+     * Reacts on pushing the answer button, cancels the timer and suggests user to answer
+     * the question
+     */
+    @Override
     public void answerButtonPushed() {
         if (timer != null) {
             timer.cancel();
@@ -102,24 +112,23 @@ public class TrainingPlayerLogic {
     }
 
     /** Reacts on writing the answer */
+    @Override
     public void answerIsWritten(@NonNull String answer) {
         if (timer != null) {
             timer.cancel();
             timer = null;
         }
-        TrainingController.TrainingUIController.setTime("");
+        activity.setTime("");
         Log.d(Controller.APP_TAG, "Checking answer " + answer);
         if (currentQuestion.checkAnswer(answer)) {
-            TrainingController.TrainingUIController.setQuestionResult(
-                    TrainingController.getTrainingGameActivity().getString(R.string.right_answer));
+            activity.setQuestionResult(activity.getString(R.string.right_answer));
             correctAnswers++;
         } else {
-            TrainingController.TrainingUIController.setQuestionResult(
-                    TrainingController.getTrainingGameActivity().getString(R.string.wrong_answer));
+            activity.setQuestionResult(activity.getString(R.string.wrong_answer));
             wrongAnswers++;
         }
-        TrainingController.TrainingUIController.setScore(correctAnswers, wrongAnswers);
-        TrainingController.TrainingUIController.setLocation(GameActivityLocation.SHOW_ANSWER);
+        activity.setScore(String.valueOf(correctAnswers), String.valueOf(wrongAnswers));
+        activity.setLocation(GameActivityLocation.SHOW_ANSWER);
     }
 
     private void startAnswer() {
@@ -127,7 +136,7 @@ public class TrainingPlayerLogic {
             timer.cancel();
             timer = null;
         }
-        TrainingController.TrainingUIController.setLocation(GameActivityLocation.WRITE_ANSWER);
+        activity.setLocation(GameActivityLocation.WRITE_ANSWER);
 
         timer = new CountDownTimer(TIME_TO_WRITE_ANSWER * SECOND, SECOND) {
             @Override
@@ -141,7 +150,7 @@ public class TrainingPlayerLogic {
 
             @Override
             public void onFinish() {
-                answerIsWritten(TrainingController.TrainingUIController.getWhatWritten());
+                answerIsWritten(activity.getWhatWritten());
             }
         };
         timer.start();
@@ -149,8 +158,7 @@ public class TrainingPlayerLogic {
 
     private void onReceivingTick(long secondsLeft) {
         new Thread(() -> {
-            MediaPlayer player = MediaPlayer.create(TrainingController.getTrainingGameActivity(),
-                    R.raw.countdown);
+            MediaPlayer player = MediaPlayer.create(activity, R.raw.countdown);
             player.setOnCompletionListener(MediaPlayer::release);
             player.start();
         }).start();

@@ -17,6 +17,7 @@ import ru.spbhse.brainring.R;
 import ru.spbhse.brainring.controllers.Controller;
 import ru.spbhse.brainring.files.ComplainedQuestion;
 import ru.spbhse.brainring.files.ComplainsFileHandler;
+import ru.spbhse.brainring.logic.PlayerLogic;
 
 import static ru.spbhse.brainring.ui.GameActivityLocation.GAME_WAITING_START;
 import static ru.spbhse.brainring.ui.GameActivityLocation.OPPONENT_IS_ANSWERING;
@@ -41,6 +42,7 @@ abstract public class GameActivity extends AppCompatActivity {
     protected String timeLeft = "";
     protected String buttonText = "";
     protected String questionResult = "";
+    protected PlayerLogic playerLogic;
 
     /** Main function. Based on current location, draws all needed components for this location. */
     protected void drawLocation() {
@@ -62,7 +64,7 @@ abstract public class GameActivity extends AppCompatActivity {
             setTime(timeLeft);
 
             Button answerButton = findViewById(R.id.answerReadyButton);
-            answerButton.setOnClickListener(v -> handleAnswerButtonPushed());
+            answerButton.setOnClickListener(v -> playerLogic.answerButtonPushed());
         }
         if (currentLocation == WRITE_ANSWER) {
             setContentView(R.layout.activity_writing_answer);
@@ -77,7 +79,7 @@ abstract public class GameActivity extends AppCompatActivity {
 
             Button answerWrittenButton = findViewById(R.id.answerWrittenButton);
             answerWrittenButton.setOnClickListener(
-                    v -> handleWrittenAnswer(answerEditor.getText().toString()));
+                    v -> playerLogic.answerIsWritten(answerEditor.getText().toString()));
         }
         if (currentLocation == SHOW_ANSWER) {
             setContentView(R.layout.activity_showing_answer);
@@ -95,7 +97,7 @@ abstract public class GameActivity extends AppCompatActivity {
 
             Button complainButton = findViewById(R.id.complainButton);
             complainButton.setOnClickListener(v -> {
-                ComplainedQuestion question = getCurrentQuestionData();
+                ComplainedQuestion question = playerLogic.getCurrentQuestionData();
                 try {
                     ComplainsFileHandler.appendComplain(question, this);
                 } catch (Exception e) {
@@ -117,12 +119,6 @@ abstract public class GameActivity extends AppCompatActivity {
             makeScrollable(findViewById(R.id.questionText));
         }
     }
-
-    protected abstract void handleWrittenAnswer(String writtenAnswer);
-
-    protected abstract ComplainedQuestion getCurrentQuestionData();
-
-    protected abstract void handleAnswerButtonPushed();
 
     private void makeScrollable(@NonNull TextView view) {
         view.setMovementMethod(new ScrollingMovementMethod());

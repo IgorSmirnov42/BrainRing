@@ -25,7 +25,7 @@ import ru.spbhse.brainring.ui.GameActivityLocation;
  * timer to show answer, timer on thinking)
  * Depends on user actions (pushed buttons) and server commands (answering opponent, new question etc)
  */
-public class OnlineGameUserLogic {
+public class OnlineGameUserLogic implements PlayerLogic {
     private OnlineGameManager manager;
     private String currentQuestionText;
     /** Id of question from database. Need for complaining */
@@ -66,7 +66,8 @@ public class OnlineGameUserLogic {
     }
 
     /** Returns question data in format that is comfortable for complaining */
-    public ComplainedQuestion getQuestionData() {
+    @Override
+    public ComplainedQuestion getCurrentQuestionData() {
         return new ComplainedQuestion(currentQuestionText,
                 currentQuestionAnswer, currentQuestionId);
     }
@@ -298,6 +299,7 @@ public class OnlineGameUserLogic {
      * Sends request to server trying to answer
      * Blocked in case of false start and if already answered
      */
+    @Override
     public void answerButtonPushed() {
         if (questionReceived && !timeStarted) {
             onFalseStart();
@@ -316,6 +318,7 @@ public class OnlineGameUserLogic {
     }
 
     /** Sends written answer to server */
+    @Override
     public void answerIsWritten(@NonNull String answer) {
         if (timer != null) {
             timer.cancel();

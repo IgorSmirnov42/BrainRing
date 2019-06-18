@@ -20,7 +20,6 @@ import ru.spbhse.brainring.R;
 import ru.spbhse.brainring.controllers.Controller;
 import ru.spbhse.brainring.controllers.DatabaseController;
 import ru.spbhse.brainring.database.QuestionDatabase;
-import ru.spbhse.brainring.files.ComplainedQuestion;
 import ru.spbhse.brainring.managers.OnlineGameManager;
 
 /** This activity maintains online game */
@@ -34,6 +33,7 @@ public class OnlineGameActivity extends GameActivity {
         super.onCreate(savedInstanceState);
 
         manager = new OnlineGameManager(this);
+        playerLogic = manager.getUserLogic();
 
         QuestionDatabase dataBase = QuestionDatabase.getInstance(this);
         DatabaseController.setDatabase(dataBase);
@@ -115,21 +115,6 @@ public class OnlineGameActivity extends GameActivity {
             continueGameButton.setOnClickListener(v ->
                     manager.getUserLogic().readyForQuestion());
         }
-    }
-
-    @Override
-    protected void handleWrittenAnswer(String writtenAnswer) {
-        manager.getUserLogic().answerIsWritten(writtenAnswer);
-    }
-
-    @Override
-    protected ComplainedQuestion getCurrentQuestionData() {
-        return manager.getUserLogic().getQuestionData();
-    }
-
-    @Override
-    protected void handleAnswerButtonPushed() {
-        manager.getUserLogic().answerButtonPushed();
     }
 
     /** {@inheritDoc} */
