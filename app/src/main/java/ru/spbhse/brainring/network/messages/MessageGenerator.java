@@ -68,23 +68,26 @@ public class MessageGenerator {
         return this;
     }
 
-    /** Transforms output stream to byte array. Closes output streams */
-    @NonNull
-    public byte[] toByteArray() {
-        try {
-            outputStream.flush();
-            byteArrayOutputStream.flush();
-        } catch (IOException e) {
-            Log.wtf(Controller.APP_TAG, "Error on flushing");
-            e.printStackTrace();
-        }
-        byte[] result = byteArrayOutputStream.toByteArray();
+    private void close() {
         try {
             outputStream.close();
         } catch (IOException e) {
             Log.wtf(Controller.APP_TAG, "Error on closing");
             e.printStackTrace();
         }
+    }
+
+    /** Transforms output stream to byte array. Closes output streams */
+    @NonNull
+    public byte[] toByteArray() {
+        try {
+            outputStream.flush();
+        } catch (IOException e) {
+            Log.wtf(Controller.APP_TAG, "Error on flushing");
+            e.printStackTrace();
+        }
+        byte[] result = byteArrayOutputStream.toByteArray();
+        close();
         return result;
     }
 }
