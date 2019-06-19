@@ -1,6 +1,5 @@
 package ru.spbhse.brainring.logic;
 
-import android.media.MediaPlayer;
 import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -21,6 +20,7 @@ import ru.spbhse.brainring.network.messages.messageTypes.HandshakeMessage;
 import ru.spbhse.brainring.network.messages.messageTypes.ReadyForQuestionMessage;
 import ru.spbhse.brainring.network.messages.messageTypes.TimeLimitMessage;
 import ru.spbhse.brainring.ui.GameActivityLocation;
+import ru.spbhse.brainring.utils.SoundPlayer;
 
 /**
  * Realizing user logic in online mode.
@@ -30,6 +30,7 @@ import ru.spbhse.brainring.ui.GameActivityLocation;
  */
 public class OnlineGameUserLogic implements PlayerLogic {
     private OnlineGameManager manager;
+    private SoundPlayer player = new SoundPlayer();
     private String currentQuestionText;
     /** Id of question from database. Need for complaining */
     private int currentQuestionId;
@@ -117,12 +118,7 @@ public class OnlineGameUserLogic implements PlayerLogic {
      */
     public void onTimeStart() {
         timeStarted = true;
-        new Thread(() -> {
-            MediaPlayer player = MediaPlayer.create(manager.getActivity(),
-                    R.raw.start);
-            player.setOnCompletionListener(MediaPlayer::release);
-            player.start();
-        }).start();
+        player.play(manager.getActivity(), R.raw.start);
         manager.getActivity().setAnswerButtonText(manager.getActivity()
                 .getString(R.string.button_push_text));
         startQuestionTime = System.currentTimeMillis();
@@ -135,12 +131,7 @@ public class OnlineGameUserLogic implements PlayerLogic {
      * Plays sound, shows time on a screen
      */
     public void onReceivingTick(long secondsLeft) {
-        new Thread(() -> {
-            MediaPlayer player = MediaPlayer.create(manager.getActivity(),
-                    R.raw.countdown);
-            player.setOnCompletionListener(MediaPlayer::release);
-            player.start();
-        }).start();
+        player.play(manager.getActivity(), R.raw.countdown);
         manager.getActivity().setTime(String.valueOf(secondsLeft));
     }
 
@@ -206,11 +197,7 @@ public class OnlineGameUserLogic implements PlayerLogic {
         }
         currentQuestionAnswer = correctAnswer;
 
-        new Thread(() -> {
-            MediaPlayer player = MediaPlayer.create(manager.getActivity(), R.raw.beep);
-            player.setOnCompletionListener(MediaPlayer::release);
-            player.start();
-        }).start();
+        player.play(manager.getActivity(), R.raw.beep);
 
         if (manager.getNetwork().iAmServer()) {
             manager.getActivity().setScore(String.valueOf(firstUserScore),
@@ -280,6 +267,7 @@ public class OnlineGameUserLogic implements PlayerLogic {
         }
         currentQuestionAnswer = null;
         currentQuestionText = null;
+        player.finish();
     }
 
     public CountDownTimer getTimer() {

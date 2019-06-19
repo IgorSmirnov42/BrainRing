@@ -1,6 +1,5 @@
 package ru.spbhse.brainring.logic;
 
-import android.media.MediaPlayer;
 import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -14,10 +13,12 @@ import ru.spbhse.brainring.logic.timers.TrainingWritingTimer;
 import ru.spbhse.brainring.ui.GameActivityLocation;
 import ru.spbhse.brainring.ui.TrainingGameActivity;
 import ru.spbhse.brainring.utils.Question;
+import ru.spbhse.brainring.utils.SoundPlayer;
 
 public class TrainingPlayerLogic implements PlayerLogic {
     private static final int TIME_TO_WRITE_ANSWER = 20;
     public static final int DEFAULT_READING_TIME = 20;
+    private SoundPlayer player = new SoundPlayer();
     private Question currentQuestion;
     private int correctAnswers = 0;
     private int wrongAnswers = 0;
@@ -89,6 +90,7 @@ public class TrainingPlayerLogic implements PlayerLogic {
             timer = null;
         }
         DatabaseController.setGameTable(null);
+        player.finish();
     }
 
     /** Sets the reading time */
@@ -128,11 +130,7 @@ public class TrainingPlayerLogic implements PlayerLogic {
     }
 
     public void onReceivingTick(long secondsLeft) {
-        new Thread(() -> {
-            MediaPlayer player = MediaPlayer.create(activity, R.raw.countdown);
-            player.setOnCompletionListener(MediaPlayer::release);
-            player.start();
-        }).start();
+        player.play(activity, R.raw.countdown);
     }
 
     public CountDownTimer getTimer() {

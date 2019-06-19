@@ -36,5 +36,6 @@ public class LocalPlayerGameManager implements Manager {
 
     public void finishGame() {
         network.finish();
+        logic.finish();
     }
 }

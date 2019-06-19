@@ -1,16 +1,17 @@
 package ru.spbhse.brainring.logic;
 
-import android.media.MediaPlayer;
 import android.widget.Toast;
 
 import ru.spbhse.brainring.R;
 import ru.spbhse.brainring.managers.LocalPlayerGameManager;
 import ru.spbhse.brainring.network.messages.Message;
 import ru.spbhse.brainring.network.messages.messageTypes.AnswerReadyMessage;
+import ru.spbhse.brainring.utils.SoundPlayer;
 
 /** Class realizing player's logic in local network mode */
 public class LocalGamePlayerLogic {
     private LocalPlayerGameManager manager;
+    private SoundPlayer player = new SoundPlayer();
     private static final Message PUSHED_BUTTON = new AnswerReadyMessage(0);
 
     public LocalGamePlayerLogic(LocalPlayerGameManager manager) {
@@ -40,11 +41,11 @@ public class LocalGamePlayerLogic {
 
     /** Plays sound of time start */
     public void onTimeStart() {
-        new Thread(() -> {
-            MediaPlayer player = MediaPlayer.create(manager.getActivity(), R.raw.start);
-            player.setOnCompletionListener(MediaPlayer::release);
-            player.start();
-        }).start();
+        player.play(manager.getActivity(), R.raw.start);
+    }
+
+    public void finish() {
+        player.finish();
     }
 
     /**
