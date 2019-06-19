@@ -29,6 +29,7 @@ import ru.spbhse.brainring.network.messages.Message;
 import ru.spbhse.brainring.network.messages.messageTypes.QuestionMessage;
 import ru.spbhse.brainring.network.timers.HandshakeTimer;
 import ru.spbhse.brainring.network.timers.TimeoutTimer;
+import ru.spbhse.brainring.utils.Constants;
 
 import static com.google.android.gms.games.leaderboard.LeaderboardVariant.COLLECTION_PUBLIC;
 import static com.google.android.gms.games.leaderboard.LeaderboardVariant.TIME_SPAN_ALL_TIME;
@@ -64,12 +65,12 @@ public class Network {
      * Reasonably to make it {@code DELIVERING_FAULT_MILLIS} (from {@code OnlineGameAdminLogic})
      *          multiplied by 2
      */
-    private static final int HANDSHAKE_TIME = 2000;
+    private static final int HANDSHAKE_TIME = 2;
     /**
      * First message takes much longer time if server and client are connected in different networks
      * So time for first handshake should be longer too
      */
-    private static final int FIRST_HANDSHAKE_TIME = 5000; // first message may take longer time
+    private static final int FIRST_HANDSHAKE_TIME = 5; // first message may take longer time
     /**
      * Timer that checks if last message from opponent was too much time ago
      * Also determines whether online opponent was not found
@@ -81,6 +82,12 @@ public class Network {
      * This is the counter to determine if both of them were called
      */
     private int counterOfConnections = 0;
+    /**
+     * If server doesn't receive any messages during that time it panics and finishes game
+     * This time is bigger than a longest time without messages from concrete user, so if timer
+     *      panics then definitely something gone wrong
+     */
+    private static final int MAXIMUM_TIME_WITHOUT_MESSAGES = 80;
     /** Number of tries that should be done to deliver a message that was failed to deliver */
     private static final int TIMES_TO_SEND = 100;
     /**
@@ -89,7 +96,7 @@ public class Network {
      * So we have to wait {@code WAIT_FOR_MESSAGE} to check whether a message with cause of finish
      *      was sent
      */
-    private static final int WAIT_FOR_MESSAGE = 2000;
+    private static final int WAIT_FOR_MESSAGE = 2;
     /** Time when last handshake started to determine time it takes */
     private long handshakeStartTime;
 
@@ -122,8 +129,8 @@ public class Network {
 
     public Network(OnlineGameManager onlineGameManager) {
         manager = onlineGameManager;
-        mRoomStatusUpdateCallback = new OnlineRoomStatusUpdateCallback(this, manager);
-        mRoomUpdateCallback = new OnlineRoomUpdateCallback(this, manager);
+        mRoomStatusUpdateCallback = new OnlineRoomStatusUpdateCallback(this);
+        mRoomUpdateCallback = new OnlineRoomUpdateCallback(this);
     }
 
     /** Prints all room members' names, sets nicknames to score counter */
@@ -187,7 +194,7 @@ public class Network {
 
     /** Reloads {@code timer} */
     public void startNewTimer() {
-        timer = new TimeoutTimer(this, manager);
+        timer = new TimeoutTimer(MAXIMUM_TIME_WITHOUT_MESSAGES, this);
         timer.start();
     }
 
@@ -251,7 +258,7 @@ public class Network {
         }
         new Handler().postDelayed(() ->
                 finishImmediately(manager.getActivity().getString(R.string.default_error)),
-                WAIT_FOR_MESSAGE);
+                WAIT_FOR_MESSAGE * Constants.SECOND);
     }
 
     /**
@@ -332,7 +339,7 @@ public class Network {
             handshakeTime = FIRST_HANDSHAKE_TIME;
             firstMessage = false;
         }
-        handshakeTimer = new HandshakeTimer(this, handshakeTime);
+        handshakeTimer = new HandshakeTimer(handshakeTime, this);
         handshakeStartTime = System.currentTimeMillis();
         handshakeTimer.start();
     }
@@ -420,5 +427,9 @@ public class Network {
 
     public HandshakeTimer getHandshakeTimer() {
         return handshakeTimer;
+    }
+
+    public OnlineGameManager getManager() {
+        return manager;
     }
 }

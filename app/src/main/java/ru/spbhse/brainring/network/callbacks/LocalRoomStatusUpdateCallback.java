@@ -10,15 +10,12 @@ import com.google.android.gms.games.multiplayer.realtime.RoomStatusUpdateCallbac
 import java.util.List;
 
 import ru.spbhse.brainring.controllers.Controller;
-import ru.spbhse.brainring.managers.Manager;
 import ru.spbhse.brainring.network.LocalNetwork;
 
 public class LocalRoomStatusUpdateCallback extends RoomStatusUpdateCallback {
-    private Manager manager;
     private LocalNetwork network;
 
-    public LocalRoomStatusUpdateCallback(LocalNetwork network, Manager manager) {
-        this.manager = manager;
+    public LocalRoomStatusUpdateCallback(LocalNetwork network) {
         this.network = network;
     }
 
@@ -57,8 +54,8 @@ public class LocalRoomStatusUpdateCallback extends RoomStatusUpdateCallback {
         Log.d(Controller.APP_TAG, "onPeerLeft");
         network.setRoom(room);
         if (!network.gameIsFinished()) {
-            manager.finishGame();
-            manager.getActivity().finish();
+            network.getManager().finishGame();
+            network.getManager().getActivity().finish();
         }
     }
 
@@ -73,8 +70,8 @@ public class LocalRoomStatusUpdateCallback extends RoomStatusUpdateCallback {
         Log.d(Controller.APP_TAG, "onDisconnectedFromRoom");
         network.setRoom(room);
         if (!network.gameIsFinished()) {
-            manager.finishGame();
-            manager.getActivity().finish();
+            network.getManager().finishGame();
+            network.getManager().getActivity().finish();
         }
     }
 
@@ -89,8 +86,8 @@ public class LocalRoomStatusUpdateCallback extends RoomStatusUpdateCallback {
         Log.d(Controller.APP_TAG, "onPeersDisconnected");
         network.setRoom(room);
         if (!network.gameIsFinished()) {
-            manager.finishGame();
-            manager.getActivity().finish();
+            network.getManager().finishGame();
+            network.getManager().getActivity().finish();
         }
     }
 
@@ -109,8 +106,8 @@ public class LocalRoomStatusUpdateCallback extends RoomStatusUpdateCallback {
         Log.d(Controller.APP_TAG, "onP2PDisconnected");
         network.minusP2PConnected();
         if (!network.gameIsFinished()) {
-            manager.finishGame();
-            manager.getActivity().finish();
+            network.getManager().finishGame();
+            network.getManager().getActivity().finish();
         }
     }
 }

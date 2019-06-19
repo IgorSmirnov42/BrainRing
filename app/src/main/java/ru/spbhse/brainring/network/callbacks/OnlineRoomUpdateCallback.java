@@ -12,16 +12,13 @@ import com.google.android.gms.games.multiplayer.realtime.RoomUpdateCallback;
 import java.util.Collections;
 
 import ru.spbhse.brainring.controllers.Controller;
-import ru.spbhse.brainring.managers.OnlineGameManager;
 import ru.spbhse.brainring.network.Network;
 
 public class OnlineRoomUpdateCallback extends RoomUpdateCallback {
     private Network network;
-    private OnlineGameManager manager;
 
-    public OnlineRoomUpdateCallback(Network network, OnlineGameManager manager) {
+    public OnlineRoomUpdateCallback(Network network) {
         this.network = network;
-        this.manager = manager;
     }
 
     @Override
@@ -64,7 +61,7 @@ public class OnlineRoomUpdateCallback extends RoomUpdateCallback {
         }
         network.setServerId(Collections.min(room.getParticipantIds()));
 
-        Games.getPlayersClient(manager.getActivity(), network.getSignInAccount())
+        Games.getPlayersClient(network.getManager().getActivity(), network.getSignInAccount())
                 .getCurrentPlayerId()
                 .addOnSuccessListener(myPlayerId -> {
                     network.setMyParticipantId(room.getParticipantId(myPlayerId));
@@ -75,7 +72,7 @@ public class OnlineRoomUpdateCallback extends RoomUpdateCallback {
                         Log.d(Controller.APP_TAG, "I am server");
                         network.plusConnection();
                         if (network.getConnections() == 2) {
-                            manager.startOnlineGame();
+                            network.getManager().startOnlineGame();
                         }
                     }
                 });

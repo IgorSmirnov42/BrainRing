@@ -10,16 +10,13 @@ import com.google.android.gms.games.multiplayer.realtime.RoomStatusUpdateCallbac
 import java.util.List;
 
 import ru.spbhse.brainring.controllers.Controller;
-import ru.spbhse.brainring.managers.OnlineGameManager;
 import ru.spbhse.brainring.network.Network;
 
 public class OnlineRoomStatusUpdateCallback extends RoomStatusUpdateCallback {
     private Network network;
-    private OnlineGameManager manager;
 
-    public OnlineRoomStatusUpdateCallback(Network network, OnlineGameManager manager) {
+    public OnlineRoomStatusUpdateCallback(Network network) {
         this.network = network;
-        this.manager = manager;
     }
 
     @Override
@@ -94,7 +91,7 @@ public class OnlineRoomStatusUpdateCallback extends RoomStatusUpdateCallback {
         Log.d(Controller.APP_TAG, "onP2PConnected " + s);
         network.plusConnection();
         if (network.getConnections() == 2 && network.iAmServer()) {
-            manager.startOnlineGame();
+            network.getManager().startOnlineGame();
         }
     }
 

@@ -4,16 +4,17 @@ import android.os.CountDownTimer;
 import android.util.Log;
 
 import ru.spbhse.brainring.controllers.Controller;
-import ru.spbhse.brainring.managers.OnlineGameManager;
 import ru.spbhse.brainring.network.Network;
 import ru.spbhse.brainring.network.messages.OnlineFinishCodes;
 import ru.spbhse.brainring.network.messages.messageTypes.FinishMessage;
+import ru.spbhse.brainring.utils.Constants;
 
 public class HandshakeTimer extends CountDownTimer {
     private Network network;
 
-    public HandshakeTimer(Network network, int time) {
-        super(time, time);
+    public HandshakeTimer(int handshakeTimeSec, Network network) {
+        super(handshakeTimeSec * Constants.SECOND,
+                handshakeTimeSec * Constants.SECOND);
         this.network = network;
     }
 

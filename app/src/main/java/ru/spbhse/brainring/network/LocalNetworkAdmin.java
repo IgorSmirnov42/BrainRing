@@ -35,7 +35,7 @@ public class LocalNetworkAdmin extends LocalNetwork {
     public LocalNetworkAdmin(LocalAdminGameManager manager) {
         super(manager);
         this.manager = manager;
-        mRoomUpdateCallback = new LocalAdminRoomUpdateCallback(this, manager);
+        mRoomUpdateCallback = new LocalAdminRoomUpdateCallback(this);
     }
 
     /** Decodes byte message received by server and calls needed functions in LocalController */
@@ -135,5 +135,9 @@ public class LocalNetworkAdmin extends LocalNetwork {
 
     public void serverRoomIsConnected() {
         serverRoomConnected = true;
+    }
+
+    public LocalAdminGameManager getManager() {
+        return manager;
     }
 }

@@ -10,16 +10,13 @@ import com.google.android.gms.games.multiplayer.realtime.Room;
 import com.google.android.gms.games.multiplayer.realtime.RoomUpdateCallback;
 
 import ru.spbhse.brainring.controllers.Controller;
-import ru.spbhse.brainring.managers.LocalAdminGameManager;
 import ru.spbhse.brainring.network.LocalNetworkAdmin;
 
 public class LocalAdminRoomUpdateCallback extends RoomUpdateCallback {
     private LocalNetworkAdmin network;
-    private LocalAdminGameManager manager;
 
-    public LocalAdminRoomUpdateCallback(LocalNetworkAdmin network, LocalAdminGameManager manager) {
+    public LocalAdminRoomUpdateCallback(LocalNetworkAdmin network) {
         this.network = network;
-        this.manager = manager;
     }
 
     @Override
@@ -38,8 +35,8 @@ public class LocalAdminRoomUpdateCallback extends RoomUpdateCallback {
     public void onLeftRoom(int i, @NonNull String s) {
         Log.d(Controller.APP_TAG, "Left room");
         if (!network.gameIsFinished()) {
-            manager.finishGame();
-            manager.getActivity().finish();
+            network.getManager().finishGame();
+            network.getManager().getActivity().finish();
         }
     }
 
@@ -57,7 +54,7 @@ public class LocalAdminRoomUpdateCallback extends RoomUpdateCallback {
         } else {
             Log.d(Controller.APP_TAG, "Connecting error");
         }
-        Games.getPlayersClient(manager.getActivity(), network.getSignInAccount())
+        Games.getPlayersClient(network.getManager().getActivity(), network.getSignInAccount())
                 .getCurrentPlayerId()
                 .addOnSuccessListener(myPlayerId -> {
                     network.setMyParticipantId(room.getParticipantId(myPlayerId));

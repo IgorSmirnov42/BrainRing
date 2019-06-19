@@ -48,7 +48,7 @@ public abstract class LocalNetwork {
 
     protected LocalNetwork(Manager manager) {
         this.manager = manager;
-        mRoomStatusUpdateCallback = new LocalRoomStatusUpdateCallback(this, manager);
+        mRoomStatusUpdateCallback = new LocalRoomStatusUpdateCallback(this);
     }
 
     public GoogleSignInAccount getSignInAccount() {
@@ -166,4 +166,6 @@ public abstract class LocalNetwork {
             }
         }
     }
+
+    public abstract Manager getManager();
 }

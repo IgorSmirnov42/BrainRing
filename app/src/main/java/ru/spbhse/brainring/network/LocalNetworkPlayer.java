@@ -11,6 +11,7 @@ import java.io.IOException;
 
 import ru.spbhse.brainring.controllers.Controller;
 import ru.spbhse.brainring.managers.LocalPlayerGameManager;
+import ru.spbhse.brainring.managers.Manager;
 import ru.spbhse.brainring.network.callbacks.LocalPlayerRoomUpdateCallback;
 import ru.spbhse.brainring.network.messages.Message;
 import ru.spbhse.brainring.network.messages.messageTypes.IAmGreenMessage;
@@ -41,7 +42,7 @@ public class LocalNetworkPlayer extends LocalNetwork {
             this.myColor = ROLE_RED;
         }
 
-        mRoomUpdateCallback = new LocalPlayerRoomUpdateCallback(this, manager);
+        mRoomUpdateCallback = new LocalPlayerRoomUpdateCallback(this);
     }
 
     /**
@@ -120,5 +121,10 @@ public class LocalNetworkPlayer extends LocalNetwork {
     @Override
     public void handshake() {
         Log.wtf(Controller.APP_TAG, "Handshake was called for player");
+    }
+
+    @Override
+    public Manager getManager() {
+        return manager;
     }
 }

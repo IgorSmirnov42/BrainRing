@@ -9,16 +9,13 @@ import com.google.android.gms.games.multiplayer.realtime.Room;
 import com.google.android.gms.games.multiplayer.realtime.RoomUpdateCallback;
 
 import ru.spbhse.brainring.controllers.Controller;
-import ru.spbhse.brainring.managers.LocalPlayerGameManager;
 import ru.spbhse.brainring.network.LocalNetworkPlayer;
 
 public class LocalPlayerRoomUpdateCallback extends RoomUpdateCallback {
     private LocalNetworkPlayer network;
-    private LocalPlayerGameManager manager;
 
-    public LocalPlayerRoomUpdateCallback(LocalNetworkPlayer network, LocalPlayerGameManager manager) {
+    public LocalPlayerRoomUpdateCallback(LocalNetworkPlayer network) {
         this.network = network;
-        this.manager = manager;
     }
 
     @Override
@@ -37,8 +34,8 @@ public class LocalPlayerRoomUpdateCallback extends RoomUpdateCallback {
     public void onLeftRoom(int i, @NonNull String s) {
         Log.d(Controller.APP_TAG, "Left room");
         if (!network.gameIsFinished()) {
-            manager.finishGame();
-            manager.getActivity().finish();
+            network.getManager().finishGame();
+            network.getManager().getActivity().finish();
         }
     }
 

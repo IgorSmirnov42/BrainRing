@@ -1,13 +1,11 @@
 package ru.spbhse.brainring.logic;
 
 import android.media.MediaPlayer;
-import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
-import android.util.Log;
 import android.widget.Toast;
 
 import ru.spbhse.brainring.R;
-import ru.spbhse.brainring.controllers.Controller;
+import ru.spbhse.brainring.logic.timers.LocalTimer;
 import ru.spbhse.brainring.managers.LocalAdminGameManager;
 import ru.spbhse.brainring.network.messages.Message;
 import ru.spbhse.brainring.network.messages.messageTypes.AllowedToAnswerMessage;
@@ -15,8 +13,6 @@ import ru.spbhse.brainring.network.messages.messageTypes.FalseStartMessage;
 import ru.spbhse.brainring.network.messages.messageTypes.ForbiddenToAnswerMessage;
 import ru.spbhse.brainring.network.messages.messageTypes.TimeStartMessage;
 import ru.spbhse.brainring.ui.LocalGameLocation;
-
-import static java.lang.Math.max;
 
 /** Class realizing admin's logic (counting time, switching locations etc) in local mode */
 public class LocalGameAdminLogic {
@@ -39,18 +35,17 @@ public class LocalGameAdminLogic {
     private final int firstCountdown;
     /** Same as {@code SECOND_COUNTDOWN} in online mode, but editable here */
     private final int secondCountdown;
-    private static final int SECOND = 1000;
     /** Time when timer starts showing left time to think */
     private static final int SENDING_COUNTDOWN = 5;
     /** Time on delivering fault */
     private static final int FAULT = 1000;
 
     /** Timer on firstCountdown * SECOND + FAULT ms */
-    private final CountDownTimer firstGameTimer;
+    private final LocalTimer firstGameTimer;
     /** Timer on secondCountdown * SECOND + FAULT ms */
-    private final CountDownTimer secondGameTimer;
+    private final LocalTimer secondGameTimer;
     /** Current timer */
-    private CountDownTimer timer;
+    private LocalTimer timer;
 
     /** Creates new instance of LocalGameAdminLogic. Initializes timers */
     public LocalGameAdminLogic(int firstCountdown, int secondCountdown,
@@ -59,69 +54,8 @@ public class LocalGameAdminLogic {
         this.secondCountdown = secondCountdown;
         this.manager = manager;
 
-        firstGameTimer = new CountDownTimer(firstCountdown * SECOND + FAULT,
-                SECOND) {
-            @Override
-            public void onTick(long millisUntilFinished) {
-                if (timer == this) {
-                    manager.getActivity().showTime(max((millisUntilFinished - FAULT) / SECOND, 0));
-
-                    if (millisUntilFinished - FAULT <= SENDING_COUNTDOWN * SECOND) {
-                        new Thread(() -> {
-                            MediaPlayer player = MediaPlayer.create(manager.getActivity(),
-                                    R.raw.countdown);
-                            player.setOnCompletionListener(MediaPlayer::release);
-                            player.start();
-                        }).start();
-                    }
-                }
-            }
-
-            @Override
-            public void onFinish() {
-                Log.d(Controller.APP_TAG, "Finish first timer");
-                if (timer == this) {
-                    new Thread(() -> {
-                        MediaPlayer player = MediaPlayer.create(manager.getActivity(), R.raw.beep);
-                        player.setOnCompletionListener(MediaPlayer::release);
-                        player.start();
-                    }).start();
-                    newQuestion();
-                }
-            }
-        };
-
-        secondGameTimer = new CountDownTimer(secondCountdown * SECOND + FAULT,
-                SECOND) {
-            @Override
-            public void onTick(long millisUntilFinished) {
-                if (timer == this) {
-                    manager.getActivity().showTime(max((millisUntilFinished - FAULT) / SECOND, 0));
-
-                    if (millisUntilFinished - FAULT <= SENDING_COUNTDOWN * SECOND) {
-                        new Thread(() -> {
-                            MediaPlayer player = MediaPlayer.create(manager.getActivity(),
-                                    R.raw.countdown);
-                            player.setOnCompletionListener(MediaPlayer::release);
-                            player.start();
-                        }).start();
-                    }
-                }
-            }
-
-            @Override
-            public void onFinish() {
-                Log.d(Controller.APP_TAG, "Finish second timer");
-                if (timer == this) {
-                    new Thread(() -> {
-                        MediaPlayer player = MediaPlayer.create(manager.getActivity(), R.raw.beep);
-                        player.setOnCompletionListener(MediaPlayer::release);
-                        player.start();
-                    }).start();
-                    newQuestion();
-                }
-            }
-        };
+        firstGameTimer = new LocalTimer(firstCountdown, FAULT, SENDING_COUNTDOWN, this);
+        secondGameTimer = new LocalTimer(secondCountdown, FAULT, SENDING_COUNTDOWN, this);
     }
 
     /** Changes location here and on a screen */
@@ -277,7 +211,7 @@ public class LocalGameAdminLogic {
     }
 
     /** Clears all information about previous question */
-    private void newQuestion() {
+    public void newQuestion() {
         if (timer != null) {
             timer.cancel();
             timer = null;
@@ -358,6 +292,14 @@ public class LocalGameAdminLogic {
             timer.cancel();
             timer = null;
         }
+    }
+
+    public LocalTimer getTimer() {
+        return timer;
+    }
+
+    public LocalAdminGameManager getManager() {
+        return manager;
     }
 
     /** Class to store current score and status of user */
