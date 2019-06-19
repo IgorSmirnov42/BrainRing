@@ -2,24 +2,30 @@ package ru.spbhse.brainring.messageProcessing;
 
 import android.support.annotation.NonNull;
 
-import ru.spbhse.brainring.controllers.LocalController;
+import ru.spbhse.brainring.managers.LocalAdminGameManager;
 import ru.spbhse.brainring.network.messages.Message;
 import ru.spbhse.brainring.network.messages.MessageCodes;
 
 public class LocalAdminMessageProcessor {
-    public static void process(@NonNull Message message, @NonNull String senderId) {
+    private LocalAdminGameManager manager;
+
+    public LocalAdminMessageProcessor(LocalAdminGameManager gameManager) {
+        manager = gameManager;
+    }
+
+    public void process(@NonNull Message message, @NonNull String senderId) {
         switch(message.getMessageCode()) {
             case MessageCodes.I_AM_GREEN:
-                LocalController.LocalNetworkAdminController.setGreenPlayer(senderId);
+                manager.getNetwork().setGreenPlayer(senderId);
                 break;
             case MessageCodes.I_AM_RED:
-                LocalController.LocalNetworkAdminController.setRedPlayer(senderId);
+                manager.getNetwork().setRedPlayer(senderId);
                 break;
             case MessageCodes.ANSWER_IS_READY:
-                LocalController.LocalAdminLogicController.onAnswerIsReady(senderId);
+                manager.getLogic().onAnswerIsReady(senderId);
                 break;
             case MessageCodes.HANDSHAKE:
-                LocalController.LocalAdminLogicController.onHandshakeAccept(senderId);
+                manager.getLogic().onHandshakeAccept(senderId);
                 break;
         }
     }

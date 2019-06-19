@@ -9,7 +9,7 @@ import ru.spbhse.brainring.messageProcessing.OnlineMessageProcessor;
 import ru.spbhse.brainring.network.Network;
 import ru.spbhse.brainring.ui.OnlineGameActivity;
 
-public class OnlineGameManager {
+public class OnlineGameManager implements Manager {
     private Network network;
     private OnlineGameAdminLogic adminLogic;
     private OnlineGameUserLogic userLogic;
@@ -49,7 +49,7 @@ public class OnlineGameManager {
     }
 
     /** Finishes current game */
-    public void finishOnlineGame() {
+    public void finishGame() {
         if (adminLogic != null) {
             Log.d(Controller.APP_TAG,"Clearing admin logic");
             adminLogic.finishGame();

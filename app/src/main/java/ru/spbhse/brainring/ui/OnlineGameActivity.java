@@ -122,6 +122,6 @@ public class OnlineGameActivity extends GameActivity {
     protected void onStop() {
         Log.d(Controller.APP_TAG, "Stopping activity. Leaving room");
         super.onStop();
-        manager.finishOnlineGame();
+        manager.finishGame();
     }
 }

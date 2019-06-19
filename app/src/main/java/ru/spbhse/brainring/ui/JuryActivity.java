@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
@@ -19,7 +20,8 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 
 import ru.spbhse.brainring.R;
-import ru.spbhse.brainring.controllers.LocalController;
+import ru.spbhse.brainring.controllers.Controller;
+import ru.spbhse.brainring.managers.LocalAdminGameManager;
 
 /** This activity is for maintaining score of teams in local game */
 public class JuryActivity extends AppCompatActivity {
@@ -29,10 +31,12 @@ public class JuryActivity extends AppCompatActivity {
     private TextView greenTeamScore;
     private TextView greenStatus;
     private TextView redStatus;
+    private LocalAdminGameManager manager;
 
     private LocalGameLocation currentLocation = LocalGameLocation.GAME_WAITING_START;
 
     private static final int RC_SIGN_IN = 42;
+    private static final int RC_ANSWER_JUDGED = 43;
 
     private final View.OnClickListener longerClick = v -> {
         Toast toast = Toast.makeText(JuryActivity.this, getString(R.string.press_longer),
@@ -46,13 +50,14 @@ public class JuryActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_jury);
-        LocalController.setUI(this);
-        LocalController.initializeLocalGame(getIntent().getIntExtra("firstTimer", 20),
-                getIntent().getIntExtra("secondTimer", 20));
+        int firstTimer = getIntent().getIntExtra("firstTimer", 20);
+        int secondTimer = getIntent().getIntExtra("secondTimer", 20);
+        manager = new LocalAdminGameManager(this, firstTimer, secondTimer);
+
         statusText = findViewById(R.id.gameStatusInfo);
         mainButton = findViewById(R.id.mainButton);
         mainButton.setOnLongClickListener(v -> {
-            if (!LocalController.LocalAdminLogicController.toNextState()) {
+            if (!manager.getLogic().toNextState()) {
                 Toast.makeText(JuryActivity.this, getString(R.string.cannot_switch),
                         Toast.LENGTH_LONG).show();
             }
@@ -62,28 +67,28 @@ public class JuryActivity extends AppCompatActivity {
 
         Button minusGreenButton = findViewById(R.id.minusGreenTeamButton);
         minusGreenButton.setOnLongClickListener(v -> {
-            LocalController.LocalAdminLogicController.minusPoint(1);
+            manager.getLogic().minusPoint(1);
             return true;
         });
         minusGreenButton.setOnClickListener(longerClick);
 
         Button plusGreenButton = findViewById(R.id.plusGreenTeamButton);
         plusGreenButton.setOnLongClickListener(v -> {
-            LocalController.LocalAdminLogicController.plusPoint(1);
+            manager.getLogic().plusPoint(1);
             return true;
         });
         plusGreenButton.setOnClickListener(longerClick);
 
         Button minusRedButton = findViewById(R.id.minusRedTeamButton);
         minusRedButton.setOnLongClickListener(v -> {
-            LocalController.LocalAdminLogicController.minusPoint(2);
+            manager.getLogic().minusPoint(2);
             return true;
         });
         minusRedButton.setOnClickListener(longerClick);
 
         Button plusRedButton = findViewById(R.id.plusRedTeamButton);
         plusRedButton.setOnLongClickListener(v -> {
-            LocalController.LocalAdminLogicController.plusPoint(2);
+            manager.getLogic().plusPoint(2);
             return true;
         });
         plusRedButton.setOnClickListener(longerClick);
@@ -97,7 +102,7 @@ public class JuryActivity extends AppCompatActivity {
         redrawLocation();
         statusText.setText(getString(R.string.waiting_connection));
 
-        LocalController.LocalNetworkAdminController.createLocalGame();
+        signIn();
     }
 
     /** Sets current location */
@@ -108,8 +113,8 @@ public class JuryActivity extends AppCompatActivity {
 
     /** Redraws activity, based on current location */
     public void redrawLocation() {
-        greenTeamScore.setText(LocalController.LocalAdminLogicController.getGreenScore());
-        redTeamScore.setText(LocalController.LocalAdminLogicController.getRedScore());
+        greenTeamScore.setText(manager.getLogic().getGreenScore());
+        redTeamScore.setText(manager.getLogic().getRedScore());
         if (currentLocation == LocalGameLocation.GAME_WAITING_START) {
             statusText.setText(getString(R.string.check_connection));
             mainButton.setVisibility(View.GONE);
@@ -138,7 +143,7 @@ public class JuryActivity extends AppCompatActivity {
     public void onReceivingAnswer(String color) {
         Intent intent = new Intent(JuryActivity.this, JudgingActivity.class);
         intent.putExtra("color", color);
-        startActivity(intent);
+        startActivityForResult(intent, RC_ANSWER_JUDGED);
     }
 
     /** Sets green team status */
@@ -163,7 +168,8 @@ public class JuryActivity extends AppCompatActivity {
         GoogleSignInOptions signInOptions = GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN;
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
         if (GoogleSignIn.hasPermissions(account, signInOptions.getScopeArray())) {
-            LocalController.LocalNetworkController.loggedIn(account);
+            manager.getNetwork().signedIn(account);
+            manager.getNetwork().startQuickGame();
         } else {
             GoogleSignInClient signInClient = GoogleSignIn.getClient(this,
                     GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN);
@@ -179,7 +185,8 @@ public class JuryActivity extends AppCompatActivity {
         if (requestCode == RC_SIGN_IN) {
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
             if (result.isSuccess()) {
-                LocalController.LocalNetworkController.loggedIn(result.getSignInAccount());
+                manager.getNetwork().signedIn(result.getSignInAccount());
+                manager.getNetwork().startQuickGame();
             } else {
                 String message = result.getStatus().getStatusMessage();
                 if (message == null || message.isEmpty()) {
@@ -187,6 +194,14 @@ public class JuryActivity extends AppCompatActivity {
                 }
                 new AlertDialog.Builder(this).setMessage(message)
                         .setNeutralButton(android.R.string.ok, null).show();
+            }
+        } else if (requestCode == RC_ANSWER_JUDGED) {
+            if (resultCode == JudgingActivity.RESULT_REJECTED) {
+                manager.getLogic().onRejectAnswer();
+            } else if (resultCode == JudgingActivity.RESULT_ACCEPTED) {
+                manager.getLogic().onAcceptAnswer();
+            } else {
+                Log.wtf(Controller.APP_TAG, "Unexpected result code");
             }
         }
     }
@@ -197,8 +212,8 @@ public class JuryActivity extends AppCompatActivity {
         new AlertDialog.Builder(this).setTitle(getString(R.string.out_of_local))
                 .setMessage(getString(R.string.want_out))
                 .setPositiveButton(getString(R.string.yes), (dialog, which) -> {
-                    LocalController.finishLocalGame(false);
-                    super.onBackPressed();
+                    manager.finishGame();
+                    finish();
                 })
                 .setNegativeButton(getString(R.string.no), (dialog, which) -> {
                 })

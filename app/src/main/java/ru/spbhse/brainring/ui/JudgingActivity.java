@@ -7,7 +7,6 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import ru.spbhse.brainring.R;
-import ru.spbhse.brainring.controllers.LocalController;
 import ru.spbhse.brainring.logic.LocalGameAdminLogic;
 
 /**
@@ -15,6 +14,9 @@ import ru.spbhse.brainring.logic.LocalGameAdminLogic;
  * Contains info about who is answering now, and suggests judge to accept or reject the answer
  */
 public class JudgingActivity extends AppCompatActivity {
+    public static final int RESULT_ACCEPTED = 1;
+    public static final int RESULT_REJECTED = 0;
+
     /** {@inheritDoc} */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,13 +40,13 @@ public class JudgingActivity extends AppCompatActivity {
 
         Button acceptButton = findViewById(R.id.acceptButton);
         acceptButton.setOnClickListener(v -> {
-            LocalController.LocalAdminLogicController.onAcceptAnswer();
+            setResult(RESULT_ACCEPTED);
             JudgingActivity.this.finish();
         });
 
         Button rejectButton = findViewById(R.id.rejectButton);
         rejectButton.setOnClickListener(v -> {
-            LocalController.LocalAdminLogicController.onRejectAnswer();
+            setResult(RESULT_REJECTED);
             JudgingActivity.this.finish();
         });
     }

@@ -4,30 +4,36 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 
 import ru.spbhse.brainring.controllers.Controller;
-import ru.spbhse.brainring.controllers.LocalController;
+import ru.spbhse.brainring.managers.LocalPlayerGameManager;
 import ru.spbhse.brainring.network.messages.Message;
 import ru.spbhse.brainring.network.messages.MessageCodes;
 
 public class LocalPlayerMessageProcessor {
-    public static void process(@NonNull Message message, @NonNull String senderId) {
+    private LocalPlayerGameManager manager;
+
+    public LocalPlayerMessageProcessor(LocalPlayerGameManager manager) {
+        this.manager = manager;
+    }
+
+    public void process(@NonNull Message message, @NonNull String senderId) {
         switch (message.getMessageCode()) {
             case MessageCodes.INITIAL_HANDSHAKE:
-                LocalController.LocalNetworkPlayerController.doInitialHandshake(senderId);
+                manager.getNetwork().doInitialHandshake(senderId);
                 break;
             case MessageCodes.FORBIDDEN_TO_ANSWER:
-                LocalController.LocalPlayerLogicController.onForbiddenToAnswer();
+                manager.getLogic().onForbiddenToAnswer();
                 break;
             case MessageCodes.ALLOWED_TO_ANSWER:
-                LocalController.LocalPlayerLogicController.onAllowedToAnswer();
+                manager.getLogic().onAllowedToAnswer();
                 break;
             case MessageCodes.FALSE_START:
-                LocalController.LocalPlayerLogicController.onFalseStart();
+                manager.getLogic().onFalseStart();
                 break;
             case MessageCodes.TIME_START:
-                LocalController.LocalPlayerLogicController.onTimeStart();
+                manager.getLogic().onTimeStart();
                 break;
             case MessageCodes.HANDSHAKE:
-                LocalController.LocalNetworkController.sendMessageToConcreteUser(senderId, message);
+                manager.getNetwork().sendMessageToConcreteUser(senderId, message);
                 break;
             default:
                 Log.wtf(Controller.APP_TAG, "Unexpected message received");

@@ -8,9 +8,8 @@ import android.widget.Toast;
 
 import ru.spbhse.brainring.R;
 import ru.spbhse.brainring.controllers.Controller;
-import ru.spbhse.brainring.controllers.LocalController;
+import ru.spbhse.brainring.managers.LocalAdminGameManager;
 import ru.spbhse.brainring.network.messages.Message;
-import ru.spbhse.brainring.network.messages.MessageGenerator;
 import ru.spbhse.brainring.network.messages.messageTypes.AllowedToAnswerMessage;
 import ru.spbhse.brainring.network.messages.messageTypes.FalseStartMessage;
 import ru.spbhse.brainring.network.messages.messageTypes.ForbiddenToAnswerMessage;
@@ -23,6 +22,7 @@ import static java.lang.Math.max;
 public class LocalGameAdminLogic {
     public static final String GREEN = "green";
     public static final String RED = "red";
+    private LocalAdminGameManager manager;
     private LocalGameLocation location = LocalGameLocation.GAME_WAITING_START;
     private UserScore green;
     private UserScore red;
@@ -53,21 +53,22 @@ public class LocalGameAdminLogic {
     private CountDownTimer timer;
 
     /** Creates new instance of LocalGameAdminLogic. Initializes timers */
-    public LocalGameAdminLogic(int firstCountdown, int secondCountdown) {
+    public LocalGameAdminLogic(int firstCountdown, int secondCountdown,
+                               LocalAdminGameManager manager) {
         this.firstCountdown = firstCountdown;
         this.secondCountdown = secondCountdown;
+        this.manager = manager;
 
         firstGameTimer = new CountDownTimer(firstCountdown * SECOND + FAULT,
                 SECOND) {
             @Override
             public void onTick(long millisUntilFinished) {
                 if (timer == this) {
-                    LocalController.LocalAdminUIController.showTime(
-                            max((millisUntilFinished - FAULT) / SECOND, 0));
+                    manager.getActivity().showTime(max((millisUntilFinished - FAULT) / SECOND, 0));
 
                     if (millisUntilFinished - FAULT <= SENDING_COUNTDOWN * SECOND) {
                         new Thread(() -> {
-                            MediaPlayer player = MediaPlayer.create(LocalController.getJuryActivity(),
+                            MediaPlayer player = MediaPlayer.create(manager.getActivity(),
                                     R.raw.countdown);
                             player.setOnCompletionListener(MediaPlayer::release);
                             player.start();
@@ -81,8 +82,7 @@ public class LocalGameAdminLogic {
                 Log.d(Controller.APP_TAG, "Finish first timer");
                 if (timer == this) {
                     new Thread(() -> {
-                        MediaPlayer player = MediaPlayer.create(LocalController.getJuryActivity(),
-                                R.raw.beep);
+                        MediaPlayer player = MediaPlayer.create(manager.getActivity(), R.raw.beep);
                         player.setOnCompletionListener(MediaPlayer::release);
                         player.start();
                     }).start();
@@ -96,12 +96,11 @@ public class LocalGameAdminLogic {
             @Override
             public void onTick(long millisUntilFinished) {
                 if (timer == this) {
-                    LocalController.LocalAdminUIController.showTime(
-                            max((millisUntilFinished - FAULT) / SECOND, 0));
+                    manager.getActivity().showTime(max((millisUntilFinished - FAULT) / SECOND, 0));
 
                     if (millisUntilFinished - FAULT <= SENDING_COUNTDOWN * SECOND) {
                         new Thread(() -> {
-                            MediaPlayer player = MediaPlayer.create(LocalController.getJuryActivity(),
+                            MediaPlayer player = MediaPlayer.create(manager.getActivity(),
                                     R.raw.countdown);
                             player.setOnCompletionListener(MediaPlayer::release);
                             player.start();
@@ -115,8 +114,7 @@ public class LocalGameAdminLogic {
                 Log.d(Controller.APP_TAG, "Finish second timer");
                 if (timer == this) {
                     new Thread(() -> {
-                        MediaPlayer player = MediaPlayer.create(LocalController.getJuryActivity(), 
-                                R.raw.beep);
+                        MediaPlayer player = MediaPlayer.create(manager.getActivity(), R.raw.beep);
                         player.setOnCompletionListener(MediaPlayer::release);
                         player.start();
                     }).start();
@@ -129,7 +127,7 @@ public class LocalGameAdminLogic {
     /** Changes location here and on a screen */
     private void toLocation(@NonNull LocalGameLocation newLocation) {
         location = newLocation;
-        LocalController.LocalAdminUIController.setLocation(location);
+        manager.getActivity().setLocation(location);
     }
 
     /** Called when jury accepts answer */
@@ -142,15 +140,13 @@ public class LocalGameAdminLogic {
     public void onRejectAnswer() {
         UserScore other = getOtherUser(answeringUserId);
         if (isGreen(answeringUserId)) {
-            LocalController.LocalAdminUIController.setGreenStatus(
-                    LocalController.getJuryActivity().getString(R.string.answered));
+            manager.getActivity().setGreenStatus(manager.getActivity().getString(R.string.answered));
         } else {
-            LocalController.LocalAdminUIController.setRedStatus(
-                    LocalController.getJuryActivity().getString(R.string.answered));
+            manager.getActivity().setRedStatus(manager.getActivity().getString(R.string.answered));
         }
         answeringUserId = null;
         if (!other.status.getAlreadyAnswered()) {
-            LocalController.LocalAdminUIController.showTime(secondCountdown);
+            manager.getActivity().showTime(secondCountdown);
             toLocation(LocalGameLocation.COUNTDOWN);
             timer = secondGameTimer;
             timer.start();
@@ -179,17 +175,16 @@ public class LocalGameAdminLogic {
         }
         // Switching to timer
         if (location == LocalGameLocation.READING_QUESTION) {
-            LocalController.LocalAdminUIController.showTime(firstCountdown);
+            manager.getActivity().showTime(firstCountdown);
             toLocation(LocalGameLocation.COUNTDOWN);
             timer = firstGameTimer;
             timer.start();
             new Thread(() -> {
-                MediaPlayer player = MediaPlayer.create(LocalController.getJuryActivity(), 
-                        R.raw.start);
+                MediaPlayer player = MediaPlayer.create(manager.getActivity(), R.raw.start);
                 player.setOnCompletionListener(MediaPlayer::release);
                 player.start();
             }).start();
-            LocalController.LocalNetworkController.sendMessageToOthers(TIME_START);
+            manager.getNetwork().sendMessageToOthers(TIME_START);
             return true;
         }
         // Start of a new round
@@ -236,13 +231,13 @@ public class LocalGameAdminLogic {
         UserScore user = getThisUser(userId);
         if (location == LocalGameLocation.READING_QUESTION) {
             user.status.setAlreadyAnswered(true);
-            LocalController.LocalNetworkController.sendMessageToConcreteUser(userId, FALSE_START);
+            manager.getNetwork().sendMessageToConcreteUser(userId, FALSE_START);
             if (isGreen(userId)) {
-                LocalController.LocalAdminUIController.setGreenStatus(
-                        LocalController.getJuryActivity().getString(R.string.false_start));
+                manager.getActivity().setGreenStatus(
+                        manager.getActivity().getString(R.string.false_start));
             } else {
-                LocalController.LocalAdminUIController.setRedStatus(
-                        LocalController.getJuryActivity().getString(R.string.false_start));
+                manager.getActivity().setRedStatus(
+                        manager.getActivity().getString(R.string.false_start));
             }
             if (bothAnswered()) {
                 newQuestion();
@@ -250,18 +245,17 @@ public class LocalGameAdminLogic {
             return;
         }
         if (user.status.getAlreadyAnswered() || location != LocalGameLocation.COUNTDOWN) {
-            LocalController.LocalNetworkController.sendMessageToConcreteUser(userId, FORBID_ANSWER);
+            manager.getNetwork().sendMessageToConcreteUser(userId, FORBID_ANSWER);
         } else {
             user.status.setAlreadyAnswered(true);
             answeringUserId = userId;
             new Thread(() -> {
-                MediaPlayer player = MediaPlayer.create(LocalController.getJuryActivity(),
-                        R.raw.answering);
+                MediaPlayer player = MediaPlayer.create(manager.getActivity(), R.raw.answering);
                 player.setOnCompletionListener(MediaPlayer::release);
                 player.start();
             }).start();
-            LocalController.LocalNetworkController.sendMessageToConcreteUser(userId, ALLOW_ANSWER);
-            LocalController.LocalAdminUIController.onReceivingAnswer(getColor(userId));
+            manager.getNetwork().sendMessageToConcreteUser(userId, ALLOW_ANSWER);
+            manager.getActivity().onReceivingAnswer(getColor(userId));
             location = LocalGameLocation.ONE_IS_ANSWERING;
         }
     }
@@ -275,8 +269,8 @@ public class LocalGameAdminLogic {
         }
     }
 
-    /** Creates UserScore Objects for users */
-    public void addUsers(@NonNull String green, @NonNull String red) {
+    /** Creates UserScore Objects for users and starts game */
+    public void startGameCycle(@NonNull String green, @NonNull String red) {
         this.green = new UserScore(green);
         this.red = new UserScore(red);
         newQuestion();
@@ -288,31 +282,29 @@ public class LocalGameAdminLogic {
             timer.cancel();
             timer = null;
         }
-        LocalController.LocalAdminUIController.setGreenStatus("");
-        LocalController.LocalAdminUIController.setRedStatus("");
+        manager.getActivity().setGreenStatus("");
+        manager.getActivity().setRedStatus("");
         answeringUserId = null;
         green.status.onNewQuestion();
         red.status.onNewQuestion();
         toLocation(LocalGameLocation.GAME_WAITING_START);
         handshakeAccepted = 0;
-        LocalController.LocalNetworkAdminController.handshake();
+        manager.getNetwork().regularHandshake();
     }
 
     /** Changes user's information when he/she answers on handshake */
     public void onHandshakeAccept(@NonNull String userId) {
         ++handshakeAccepted;
         if (handshakeAccepted == 2) {
-            LocalController.LocalAdminUIController.setGreenStatus("");
-            LocalController.LocalAdminUIController.setRedStatus("");
+            manager.getActivity().setGreenStatus("");
+            manager.getActivity().setRedStatus("");
             toLocation(LocalGameLocation.NOT_STARTED);
             return;
         }
         if (getColor(userId).equals("red")) {
-            LocalController.LocalAdminUIController.setRedStatus(
-                    LocalController.getJuryActivity().getString(R.string.connected));
+            manager.getActivity().setRedStatus(manager.getActivity().getString(R.string.connected));
         } else {
-            LocalController.LocalAdminUIController.setGreenStatus(
-                    LocalController.getJuryActivity().getString(R.string.connected));
+            manager.getActivity().setGreenStatus(manager.getActivity().getString(R.string.connected));
         }
     }
 
@@ -339,8 +331,8 @@ public class LocalGameAdminLogic {
         if (location == LocalGameLocation.NOT_STARTED && red != null && green != null) {
             return true;
         } else {
-            Toast.makeText(LocalController.getJuryActivity(),
-                    LocalController.getJuryActivity().getString(R.string.cannot_change_score),
+            Toast.makeText(manager.getActivity(),
+                    manager.getActivity().getString(R.string.cannot_change_score),
                     Toast.LENGTH_LONG).show();
             return false;
         }

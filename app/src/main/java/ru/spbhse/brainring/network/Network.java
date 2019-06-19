@@ -423,7 +423,7 @@ public class Network {
         if (gameIsFinished) {
             return;
         }
-        manager.finishOnlineGame();
+        manager.finishGame();
         manager.getActivity().showGameFinishedActivity(message);
     }
 

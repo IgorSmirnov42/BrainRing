@@ -15,8 +15,7 @@ import com.google.android.gms.games.multiplayer.realtime.RoomUpdateCallback;
 import java.io.IOException;
 
 import ru.spbhse.brainring.controllers.Controller;
-import ru.spbhse.brainring.controllers.LocalController;
-import ru.spbhse.brainring.messageProcessing.LocalAdminMessageProcessor;
+import ru.spbhse.brainring.managers.LocalAdminGameManager;
 import ru.spbhse.brainring.network.messages.Message;
 import ru.spbhse.brainring.network.messages.messageTypes.HandshakeMessage;
 import ru.spbhse.brainring.network.messages.messageTypes.InitialHandshakeMessage;
@@ -26,6 +25,7 @@ import ru.spbhse.brainring.network.messages.messageTypes.InitialHandshakeMessage
  * Used by admin in a local network mode
  */
 public class LocalNetworkAdmin extends LocalNetwork {
+    private LocalAdminGameManager manager;
     private String redId;
     private String greenId;
     private static final Message HANDSHAKE = new HandshakeMessage();
@@ -35,8 +35,9 @@ public class LocalNetworkAdmin extends LocalNetwork {
      * Creates new instance. Fills {@code mRoomUpdateCallback} with an instance that
      *      on connected room starts game
      */
-    public LocalNetworkAdmin() {
-        super();
+    public LocalNetworkAdmin(LocalAdminGameManager manager) {
+        super(manager);
+        this.manager = manager;
         mRoomUpdateCallback = new RoomUpdateCallback() {
             @Override
             public void onRoomCreated(int i, @Nullable Room room) {
@@ -54,7 +55,8 @@ public class LocalNetworkAdmin extends LocalNetwork {
             public void onLeftRoom(int i, @NonNull String s) {
                 Log.d(Controller.APP_TAG, "Left room");
                 if (!gameIsFinished) {
-                    LocalController.finishLocalGame(true);
+                    manager.finishGame();
+                    manager.getActivity().finish();
                 }
             }
 
@@ -72,7 +74,7 @@ public class LocalNetworkAdmin extends LocalNetwork {
                 } else {
                     Log.d(Controller.APP_TAG,"Connecting error");
                 }
-                Games.getPlayersClient(LocalController.getJuryActivity(), googleSignInAccount)
+                Games.getPlayersClient(manager.getActivity(), googleSignInAccount)
                         .getCurrentPlayerId()
                         .addOnSuccessListener(myPlayerId -> {
                             myParticipantId = room.getParticipantId(myPlayerId);
@@ -94,7 +96,7 @@ public class LocalNetworkAdmin extends LocalNetwork {
         Log.d(Controller.APP_TAG, "Received message as admin!");
         try {
             Message message = Message.readMessage(buf);
-            LocalAdminMessageProcessor.process(message, userId);
+            manager.getProcessor().process(message, userId);
         } catch (IOException e) {
             Log.e(Controller.APP_TAG, "Error while reading message");
             e.printStackTrace();
@@ -110,7 +112,7 @@ public class LocalNetworkAdmin extends LocalNetwork {
         greenId = userId;
         if (redId != null) {
             handshaked = true;
-            LocalController.LocalNetworkAdminController.startGameCycle();
+            manager.getLogic().startGameCycle(greenId, redId);
         }
     }
 
@@ -123,15 +125,15 @@ public class LocalNetworkAdmin extends LocalNetwork {
         redId = userId;
         if (greenId != null) {
             handshaked = true;
-            LocalController.LocalNetworkAdminController.startGameCycle();
+            manager.getLogic().startGameCycle(greenId, redId);
         }
     }
 
     /** Starts quick game with two auto matched players */
     @Override
     public void startQuickGame() {
-        mRealTimeMultiplayerClient = Games.getRealTimeMultiplayerClient(
-                LocalController.getJuryActivity(), googleSignInAccount);
+        mRealTimeMultiplayerClient = Games.getRealTimeMultiplayerClient(manager.getActivity(),
+                googleSignInAccount);
         final int MIN_OPPONENTS = 2, MAX_OPPONENTS = 2;
         Bundle autoMatchCriteria = RoomConfig.createAutoMatchCriteria(MIN_OPPONENTS,
                 MAX_OPPONENTS, ROLE_ADMIN);
@@ -142,7 +144,7 @@ public class LocalNetworkAdmin extends LocalNetwork {
                 .setAutoMatchCriteria(autoMatchCriteria)
                 .build();
 
-        Games.getRealTimeMultiplayerClient(LocalController.getJuryActivity(), googleSignInAccount)
+        Games.getRealTimeMultiplayerClient(manager.getActivity(), googleSignInAccount)
                 .create(mRoomConfig);
     }
 
@@ -175,8 +177,7 @@ public class LocalNetworkAdmin extends LocalNetwork {
     protected void leaveRoom() {
         if (room != null) {
             Log.d(Controller.APP_TAG,"Leaving room");
-            Games.getRealTimeMultiplayerClient(LocalController.getJuryActivity(),
-                    googleSignInAccount).leave(mRoomConfig, room.getRoomId());
+            mRealTimeMultiplayerClient.leave(mRoomConfig, room.getRoomId());
             room = null;
         }
     }

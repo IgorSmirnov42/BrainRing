@@ -14,8 +14,7 @@ import com.google.android.gms.games.multiplayer.realtime.RoomUpdateCallback;
 import java.io.IOException;
 
 import ru.spbhse.brainring.controllers.Controller;
-import ru.spbhse.brainring.controllers.LocalController;
-import ru.spbhse.brainring.messageProcessing.LocalPlayerMessageProcessor;
+import ru.spbhse.brainring.managers.LocalPlayerGameManager;
 import ru.spbhse.brainring.network.messages.Message;
 import ru.spbhse.brainring.network.messages.messageTypes.IAmGreenMessage;
 import ru.spbhse.brainring.network.messages.messageTypes.IAmRedMessage;
@@ -28,13 +27,16 @@ public class LocalNetworkPlayer extends LocalNetwork {
     private String serverId;
     /** Green or red table. Values are written in base class */
     private int myColor;
+    private LocalPlayerGameManager manager;
 
     /**
      * Creates new instance of LocalNetworkPlayer.
      * @param myColor string "red" or "green"
      */
-    public LocalNetworkPlayer(@NonNull String myColor) {
-        super();
+    public LocalNetworkPlayer(@NonNull String myColor, LocalPlayerGameManager manager) {
+        super(manager);
+
+        this.manager = manager;
 
         if (myColor.equals("green")) {
             this.myColor = ROLE_GREEN;
@@ -59,7 +61,8 @@ public class LocalNetworkPlayer extends LocalNetwork {
             public void onLeftRoom(int i, @NonNull String s) {
                 Log.d(Controller.APP_TAG, "Left room");
                 if (!gameIsFinished) {
-                    LocalController.finishLocalGame(true);
+                    manager.finishGame();
+                    manager.getActivity().finish();
                 }
             }
 
@@ -93,7 +96,7 @@ public class LocalNetworkPlayer extends LocalNetwork {
 
         try {
             Message message = Message.readMessage(buf);
-            LocalPlayerMessageProcessor.process(message, userId);
+            manager.getProcessor().process(message, userId);
         } catch (IOException e) {
             Log.e(Controller.APP_TAG, "Error while reading message");
             e.printStackTrace();
@@ -116,8 +119,7 @@ public class LocalNetworkPlayer extends LocalNetwork {
     /** Starts quick game with auto matched server and player */
     @Override
     public void startQuickGame() {
-        mRealTimeMultiplayerClient = Games.getRealTimeMultiplayerClient(
-                LocalController.getPlayerActivity(),
+        mRealTimeMultiplayerClient = Games.getRealTimeMultiplayerClient(manager.getActivity(),
                 googleSignInAccount);
         final int MIN_OPPONENTS = 2, MAX_OPPONENTS = 2;
         Bundle autoMatchCriteria = RoomConfig.createAutoMatchCriteria(MIN_OPPONENTS,
@@ -129,7 +131,7 @@ public class LocalNetworkPlayer extends LocalNetwork {
                 .setAutoMatchCriteria(autoMatchCriteria)
                 .build();
 
-        Games.getRealTimeMultiplayerClient(LocalController.getPlayerActivity(), googleSignInAccount)
+        Games.getRealTimeMultiplayerClient(manager.getActivity(), googleSignInAccount)
                 .create(mRoomConfig);
     }
 
@@ -149,8 +151,7 @@ public class LocalNetworkPlayer extends LocalNetwork {
     protected void leaveRoom() {
         if (room != null) {
             Log.d("RainRing","Leaving room");
-            Games.getRealTimeMultiplayerClient(LocalController.getPlayerActivity(),
-                    googleSignInAccount).leave(mRoomConfig, room.getRoomId());
+            mRealTimeMultiplayerClient.leave(mRoomConfig, room.getRoomId());
             room = null;
         }
     }

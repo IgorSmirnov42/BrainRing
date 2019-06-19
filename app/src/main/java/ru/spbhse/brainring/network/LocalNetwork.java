@@ -16,7 +16,7 @@ import com.google.android.gms.games.multiplayer.realtime.RoomUpdateCallback;
 import java.util.List;
 
 import ru.spbhse.brainring.controllers.Controller;
-import ru.spbhse.brainring.controllers.LocalController;
+import ru.spbhse.brainring.managers.Manager;
 import ru.spbhse.brainring.network.messages.Message;
 
 /** Class for interaction with network in local network mode */
@@ -26,6 +26,8 @@ public abstract class LocalNetwork {
     protected static final int ROLE_RED = 1 << 2;
     /** Number of tries that should be done to deliver a message that was failed to deliver */
     private static final int TIMES_TO_SEND = 100;
+
+    private Manager manager;
     /** Flag to determine if handshake was done */
     protected boolean handshaked = false;
     protected boolean gameIsFinished = false;
@@ -79,7 +81,8 @@ public abstract class LocalNetwork {
             Log.d(Controller.APP_TAG, "onPeerLeft");
             LocalNetwork.this.room = room;
             if (!gameIsFinished) {
-                LocalController.finishLocalGame(true);
+                manager.finishGame();
+                manager.getActivity().finish();
             }
         }
 
@@ -94,7 +97,8 @@ public abstract class LocalNetwork {
             Log.d(Controller.APP_TAG, "onDisconnectedFromRoom");
             LocalNetwork.this.room = room;
             if (!gameIsFinished) {
-                LocalController.finishLocalGame(true);
+                manager.finishGame();
+                manager.getActivity().finish();
             }
         }
 
@@ -109,7 +113,8 @@ public abstract class LocalNetwork {
             Log.d(Controller.APP_TAG, "onPeersDisconnected");
             LocalNetwork.this.room = room;
             if (!gameIsFinished) {
-                LocalController.finishLocalGame(true);
+                manager.finishGame();
+                manager.getActivity().finish();
             }
         }
 
@@ -128,10 +133,15 @@ public abstract class LocalNetwork {
             Log.d(Controller.APP_TAG, "onP2PDisconnected");
             --p2pConnected;
             if (!gameIsFinished) {
-                LocalController.finishLocalGame(true);
+                manager.finishGame();
+                manager.getActivity().finish();
             }
         }
     };
+
+    protected LocalNetwork(Manager manager) {
+        this.manager = manager;
+    }
 
     protected RoomUpdateCallback mRoomUpdateCallback;
 
@@ -171,7 +181,8 @@ public abstract class LocalNetwork {
         }
         if (timesToSend < 0) {
             Log.wtf(Controller.APP_TAG, "Failed to send message too many times. Finish game");
-            LocalController.finishLocalGame(true);
+            manager.finishGame();
+            manager.getActivity().finish();
             return;
         }
         mRealTimeMultiplayerClient.sendReliableMessage(message.toByteArray(), room.getRoomId(),
@@ -205,7 +216,7 @@ public abstract class LocalNetwork {
     }
 
     /** Sets Google account */
-    public void signIn(GoogleSignInAccount account) {
+    public void signedIn(GoogleSignInAccount account) {
         googleSignInAccount = account;
     }
 
