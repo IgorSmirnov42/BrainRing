@@ -10,12 +10,12 @@ import com.google.android.gms.games.multiplayer.realtime.RoomConfig;
 
 import java.io.IOException;
 
-import ru.spbhse.brainring.controllers.Controller;
 import ru.spbhse.brainring.managers.LocalAdminGameManager;
 import ru.spbhse.brainring.network.callbacks.LocalAdminRoomUpdateCallback;
 import ru.spbhse.brainring.network.messages.Message;
 import ru.spbhse.brainring.network.messages.messageTypes.HandshakeMessage;
 import ru.spbhse.brainring.network.messages.messageTypes.InitialHandshakeMessage;
+import ru.spbhse.brainring.utils.Constants;
 
 /**
  * Class with methods to interact with network
@@ -44,12 +44,12 @@ public class LocalNetworkAdmin extends LocalNetwork {
         if (gameIsFinished) {
             return;
         }
-        Log.d(Controller.APP_TAG, "Received message as admin!");
+        Log.d(Constants.APP_TAG, "Received message as admin!");
         try {
             Message message = Message.readMessage(buf);
             manager.getProcessor().process(message, userId);
         } catch (IOException e) {
-            Log.e(Controller.APP_TAG, "Error while reading message");
+            Log.e(Constants.APP_TAG, "Error while reading message");
             e.printStackTrace();
         }
     }
@@ -57,7 +57,7 @@ public class LocalNetworkAdmin extends LocalNetwork {
     /** Sets green player id. If both players shared their ids starts game cycle */
     public void setGreenPlayer(@NonNull String userId) {
         if (handshaked) {
-            Log.d(Controller.APP_TAG, "Handshake is done");
+            Log.d(Constants.APP_TAG, "Handshake is done");
             return;
         }
         greenId = userId;
@@ -70,7 +70,7 @@ public class LocalNetworkAdmin extends LocalNetwork {
     /** Sets red player id. If both players shared their ids starts game cycle */
     public void setRedPlayer(@NonNull String userId) {
         if (handshaked) {
-            Log.d(Controller.APP_TAG, "Handshake is done");
+            Log.d(Constants.APP_TAG, "Handshake is done");
             return;
         }
         redId = userId;
@@ -109,7 +109,7 @@ public class LocalNetworkAdmin extends LocalNetwork {
         if (handshaked) {
             return;
         }
-        Log.d(Controller.APP_TAG, "Start handshake");
+        Log.d(Constants.APP_TAG, "Start handshake");
         sendMessageToOthers(new InitialHandshakeMessage());
         // Sometimes first message doesn't reach opponent for some reason
         // so we have to send it one more time
@@ -127,7 +127,7 @@ public class LocalNetworkAdmin extends LocalNetwork {
     @Override
     protected void leaveRoom() {
         if (room != null) {
-            Log.d(Controller.APP_TAG,"Leaving room");
+            Log.d(Constants.APP_TAG,"Leaving room");
             mRealTimeMultiplayerClient.leave(mRoomConfig, room.getRoomId());
             room = null;
         }

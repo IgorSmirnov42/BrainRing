@@ -5,13 +5,13 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 
 import ru.spbhse.brainring.R;
-import ru.spbhse.brainring.controllers.Controller;
 import ru.spbhse.brainring.controllers.DatabaseController;
 import ru.spbhse.brainring.files.ComplainedQuestion;
 import ru.spbhse.brainring.logic.timers.TrainingGameTimer;
 import ru.spbhse.brainring.logic.timers.TrainingWritingTimer;
 import ru.spbhse.brainring.ui.GameActivityLocation;
 import ru.spbhse.brainring.ui.TrainingGameActivity;
+import ru.spbhse.brainring.utils.Constants;
 import ru.spbhse.brainring.utils.Question;
 import ru.spbhse.brainring.utils.SoundPlayer;
 
@@ -64,7 +64,7 @@ public class TrainingPlayerLogic implements PlayerLogic {
         activity.setCommentText(currentQuestion.getComment());
         activity.onNewQuestion();
 
-        Log.d(Controller.APP_TAG, "New question");
+        Log.d(Constants.APP_TAG, "New question");
 
         timer = new TrainingGameTimer(readingTime, this);
         timer.start();
@@ -106,7 +106,7 @@ public class TrainingPlayerLogic implements PlayerLogic {
             timer = null;
         }
         activity.setTime("");
-        Log.d(Controller.APP_TAG, "Checking answer " + answer);
+        Log.d(Constants.APP_TAG, "Checking answer " + answer);
         if (currentQuestion.checkAnswer(answer)) {
             activity.setQuestionResult(activity.getString(R.string.right_answer));
             correctAnswers++;

@@ -8,8 +8,8 @@ import com.google.android.gms.games.GamesCallbackStatusCodes;
 import com.google.android.gms.games.multiplayer.realtime.Room;
 import com.google.android.gms.games.multiplayer.realtime.RoomUpdateCallback;
 
-import ru.spbhse.brainring.controllers.Controller;
 import ru.spbhse.brainring.network.LocalNetworkPlayer;
+import ru.spbhse.brainring.utils.Constants;
 
 public class LocalPlayerRoomUpdateCallback extends RoomUpdateCallback {
     private LocalNetworkPlayer network;
@@ -20,19 +20,19 @@ public class LocalPlayerRoomUpdateCallback extends RoomUpdateCallback {
 
     @Override
     public void onRoomCreated(int i, @Nullable Room room) {
-        Log.d(Controller.APP_TAG, "Room was created");
+        Log.d(Constants.APP_TAG, "Room was created");
         network.setRoom(room);
     }
 
     @Override
     public void onJoinedRoom(int i, @Nullable Room room) {
-        Log.d(Controller.APP_TAG, "Joined room");
+        Log.d(Constants.APP_TAG, "Joined room");
         network.setRoom(room);
     }
 
     @Override
     public void onLeftRoom(int i, @NonNull String s) {
-        Log.d(Controller.APP_TAG, "Left room");
+        Log.d(Constants.APP_TAG, "Left room");
         if (!network.gameIsFinished()) {
             network.getManager().finishGame();
             network.getManager().getActivity().finish();
@@ -41,16 +41,16 @@ public class LocalPlayerRoomUpdateCallback extends RoomUpdateCallback {
 
     @Override
     public void onRoomConnected(int code, @Nullable Room room) {
-        Log.d(Controller.APP_TAG, "Connected to room");
+        Log.d(Constants.APP_TAG, "Connected to room");
         if (room == null) {
-            Log.wtf(Controller.APP_TAG, "onRoomConnected got null as room");
+            Log.wtf(Constants.APP_TAG, "onRoomConnected got null as room");
             return;
         }
         network.setRoom(room);
         if (code == GamesCallbackStatusCodes.OK) {
-            Log.d(Controller.APP_TAG,"Connected");
+            Log.d(Constants.APP_TAG,"Connected");
         } else {
-            Log.d(Controller.APP_TAG,"Error during connecting");
+            Log.d(Constants.APP_TAG,"Error during connecting");
         }
     }
 }

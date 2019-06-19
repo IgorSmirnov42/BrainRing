@@ -7,7 +7,6 @@ import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 
-import ru.spbhse.brainring.controllers.Controller;
 import ru.spbhse.brainring.network.messages.messageTypes.AllowedToAnswerMessage;
 import ru.spbhse.brainring.network.messages.messageTypes.AnswerReadyMessage;
 import ru.spbhse.brainring.network.messages.messageTypes.AnswerWrittenMessage;
@@ -26,6 +25,7 @@ import ru.spbhse.brainring.network.messages.messageTypes.QuestionMessage;
 import ru.spbhse.brainring.network.messages.messageTypes.ReadyForQuestionMessage;
 import ru.spbhse.brainring.network.messages.messageTypes.TimeLimitMessage;
 import ru.spbhse.brainring.network.messages.messageTypes.TimeStartMessage;
+import ru.spbhse.brainring.utils.Constants;
 
 public abstract class Message {
     private int messageCode;
@@ -52,7 +52,7 @@ public abstract class Message {
     public static Message readMessage(@NonNull byte[] message) throws IOException {
         try (DataInputStream inputStream = new DataInputStream(new ByteArrayInputStream(message))) {
             int messageCode = inputStream.readInt();
-            Log.d(Controller.APP_TAG, "Received message. Identifier is " + messageCode);
+            Log.d(Constants.APP_TAG, "Received message. Identifier is " + messageCode);
             switch (messageCode) {
                 case MessageCodes.ANSWER_IS_READY:
                     return new AnswerReadyMessage(inputStream);

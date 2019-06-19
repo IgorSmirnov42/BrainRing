@@ -2,12 +2,12 @@ package ru.spbhse.brainring.managers;
 
 import android.util.Log;
 
-import ru.spbhse.brainring.controllers.Controller;
 import ru.spbhse.brainring.logic.OnlineGameAdminLogic;
 import ru.spbhse.brainring.logic.OnlineGameUserLogic;
 import ru.spbhse.brainring.messageProcessing.OnlineMessageProcessor;
 import ru.spbhse.brainring.network.Network;
 import ru.spbhse.brainring.ui.OnlineGameActivity;
+import ru.spbhse.brainring.utils.Constants;
 
 public class OnlineGameManager implements Manager {
     private Network network;
@@ -51,13 +51,13 @@ public class OnlineGameManager implements Manager {
     /** Finishes current game */
     public void finishGame() {
         if (adminLogic != null) {
-            Log.d(Controller.APP_TAG,"Clearing admin logic");
+            Log.d(Constants.APP_TAG,"Clearing admin logic");
             adminLogic.finishGame();
         }
-        Log.d(Controller.APP_TAG,"Clearing user logic");
+        Log.d(Constants.APP_TAG,"Clearing user logic");
         userLogic.finishGame();
 
-        Log.d(Controller.APP_TAG,"Clearing network");
+        Log.d(Constants.APP_TAG,"Clearing network");
         network.finish();
     }
 }

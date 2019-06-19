@@ -12,10 +12,10 @@ import com.google.android.gms.games.multiplayer.realtime.RoomConfig;
 import com.google.android.gms.games.multiplayer.realtime.RoomStatusUpdateCallback;
 import com.google.android.gms.games.multiplayer.realtime.RoomUpdateCallback;
 
-import ru.spbhse.brainring.controllers.Controller;
 import ru.spbhse.brainring.managers.Manager;
 import ru.spbhse.brainring.network.callbacks.LocalRoomStatusUpdateCallback;
 import ru.spbhse.brainring.network.messages.Message;
+import ru.spbhse.brainring.utils.Constants;
 
 /** Class for interaction with network in local network mode */
 public abstract class LocalNetwork {
@@ -86,7 +86,7 @@ public abstract class LocalNetwork {
      * CANNOT send message to itself
      */
     public void sendMessageToConcreteUser(@NonNull String userId, @NonNull Message message) {
-        Log.d(Controller.APP_TAG, "Start sending message to " + userId);
+        Log.d(Constants.APP_TAG, "Start sending message to " + userId);
         sendMessageToConcreteUserNTimes(userId, message, TIMES_TO_SEND);
     }
 
@@ -102,7 +102,7 @@ public abstract class LocalNetwork {
             return;
         }
         if (timesToSend < 0) {
-            Log.wtf(Controller.APP_TAG, "Failed to send message too many times. Finish game");
+            Log.wtf(Constants.APP_TAG, "Failed to send message too many times. Finish game");
             manager.finishGame();
             manager.getActivity().finish();
             return;
@@ -110,11 +110,11 @@ public abstract class LocalNetwork {
         mRealTimeMultiplayerClient.sendReliableMessage(message.toByteArray(), room.getRoomId(),
                 userId, (i, i1, s) -> {
             if (i != GamesCallbackStatusCodes.OK) {
-                Log.e(Controller.APP_TAG, "Failed to send message. Left " + timesToSend +
+                Log.e(Constants.APP_TAG, "Failed to send message. Left " + timesToSend +
                         " tries\n" + "Error is " + GamesCallbackStatusCodes.getStatusCodeString(i));
                 sendMessageToConcreteUserNTimes(userId, message, timesToSend - 1);
             } else {
-                Log.d(Controller.APP_TAG, "Message to " + userId + " is delivered. Took " +
+                Log.d(Constants.APP_TAG, "Message to " + userId + " is delivered. Took " +
                         (TIMES_TO_SEND - timesToSend + 1) + " tries");
             }
         });

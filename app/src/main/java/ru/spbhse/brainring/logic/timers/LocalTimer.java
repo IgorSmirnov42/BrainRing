@@ -5,7 +5,6 @@ import android.os.CountDownTimer;
 import android.util.Log;
 
 import ru.spbhse.brainring.R;
-import ru.spbhse.brainring.controllers.Controller;
 import ru.spbhse.brainring.logic.LocalGameAdminLogic;
 import ru.spbhse.brainring.utils.Constants;
 
@@ -42,7 +41,7 @@ public class LocalTimer extends CountDownTimer {
 
     @Override
     public void onFinish() {
-        Log.d(Controller.APP_TAG, "Finish timer");
+        Log.d(Constants.APP_TAG, "Finish timer");
         if (logic.getTimer() == this) {
             new Thread(() -> {
                 MediaPlayer player = MediaPlayer.create(logic.getManager().getActivity(), R.raw.beep);

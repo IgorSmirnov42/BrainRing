@@ -20,8 +20,8 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 
 import ru.spbhse.brainring.R;
-import ru.spbhse.brainring.controllers.Controller;
 import ru.spbhse.brainring.managers.LocalAdminGameManager;
+import ru.spbhse.brainring.utils.Constants;
 
 /** This activity is for maintaining score of teams in local game */
 public class JuryActivity extends AppCompatActivity {
@@ -201,7 +201,7 @@ public class JuryActivity extends AppCompatActivity {
             } else if (resultCode == JudgingActivity.RESULT_ACCEPTED) {
                 manager.getLogic().onAcceptAnswer();
             } else {
-                Log.wtf(Controller.APP_TAG, "Unexpected result code");
+                Log.wtf(Constants.APP_TAG, "Unexpected result code");
             }
         }
     }

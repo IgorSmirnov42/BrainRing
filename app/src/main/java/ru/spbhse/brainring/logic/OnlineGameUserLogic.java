@@ -6,7 +6,6 @@ import android.util.Log;
 import android.widget.Toast;
 
 import ru.spbhse.brainring.R;
-import ru.spbhse.brainring.controllers.Controller;
 import ru.spbhse.brainring.files.ComplainedQuestion;
 import ru.spbhse.brainring.logic.timers.OnlineGameTimer;
 import ru.spbhse.brainring.logic.timers.OnlineShowingAnswerTimer;
@@ -20,6 +19,7 @@ import ru.spbhse.brainring.network.messages.messageTypes.HandshakeMessage;
 import ru.spbhse.brainring.network.messages.messageTypes.ReadyForQuestionMessage;
 import ru.spbhse.brainring.network.messages.messageTypes.TimeLimitMessage;
 import ru.spbhse.brainring.ui.GameActivityLocation;
+import ru.spbhse.brainring.utils.Constants;
 import ru.spbhse.brainring.utils.SoundPlayer;
 
 /**
@@ -141,7 +141,7 @@ public class OnlineGameUserLogic implements PlayerLogic {
      */
     public void onAllowedToAnswer() {
         alreadyAnswered = true;
-        Log.d(Controller.APP_TAG,"Allowed to answer");
+        Log.d(Constants.APP_TAG,"Allowed to answer");
         manager.getActivity().setLocation(GameActivityLocation.WRITE_ANSWER);
         timer = new OnlineWritingTimer(TIME_TO_WRITE_ANSWER, this);
         timer.start();

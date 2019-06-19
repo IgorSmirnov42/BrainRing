@@ -3,10 +3,10 @@ package ru.spbhse.brainring.messageProcessing;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
-import ru.spbhse.brainring.controllers.Controller;
 import ru.spbhse.brainring.managers.LocalPlayerGameManager;
 import ru.spbhse.brainring.network.messages.Message;
 import ru.spbhse.brainring.network.messages.MessageCodes;
+import ru.spbhse.brainring.utils.Constants;
 
 public class LocalPlayerMessageProcessor {
     private LocalPlayerGameManager manager;
@@ -36,7 +36,7 @@ public class LocalPlayerMessageProcessor {
                 manager.getNetwork().sendMessageToConcreteUser(senderId, message);
                 break;
             default:
-                Log.wtf(Controller.APP_TAG, "Unexpected message received");
+                Log.wtf(Constants.APP_TAG, "Unexpected message received");
         }
     }
 }

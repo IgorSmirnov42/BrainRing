@@ -3,7 +3,6 @@ package ru.spbhse.brainring.logic.timers;
 import android.os.CountDownTimer;
 import android.util.Log;
 
-import ru.spbhse.brainring.controllers.Controller;
 import ru.spbhse.brainring.logic.OnlineGameUserLogic;
 import ru.spbhse.brainring.utils.Constants;
 
@@ -32,7 +31,7 @@ public class OnlineGameTimer extends CountDownTimer {
     @Override
     public void onFinish() {
         if (logic.getTimer() == this) {
-            Log.d(Controller.APP_TAG, "Finish first timer");
+            Log.d(Constants.APP_TAG, "Finish first timer");
             logic.sendTimeLimitedAnswer(roundNumber);
         }
     }

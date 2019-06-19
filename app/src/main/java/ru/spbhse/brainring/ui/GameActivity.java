@@ -14,10 +14,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import ru.spbhse.brainring.R;
-import ru.spbhse.brainring.controllers.Controller;
 import ru.spbhse.brainring.files.ComplainedQuestion;
 import ru.spbhse.brainring.files.ComplainsFileHandler;
 import ru.spbhse.brainring.logic.PlayerLogic;
+import ru.spbhse.brainring.utils.Constants;
 
 import static ru.spbhse.brainring.ui.GameActivityLocation.GAME_WAITING_START;
 import static ru.spbhse.brainring.ui.GameActivityLocation.OPPONENT_IS_ANSWERING;
@@ -241,7 +241,7 @@ abstract public class GameActivity extends AppCompatActivity {
         if (answerEditor != null) {
             return answerEditor.getText().toString();
         } else {
-            Log.wtf(Controller.APP_TAG, "Answer editing wasn't open but should");
+            Log.wtf(Constants.APP_TAG, "Answer editing wasn't open but should");
             return "";
         }
     }

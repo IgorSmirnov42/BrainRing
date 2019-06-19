@@ -2,7 +2,9 @@ package ru.spbhse.brainring.controllers;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 import java.util.Random;
 
 import ru.spbhse.brainring.database.DatabaseTable;
@@ -13,8 +15,7 @@ import ru.spbhse.brainring.utils.Question;
 public class DatabaseController {
     private static final Random RAND = new Random();
     private static QuestionDatabase database;
-    private static List<Integer> questionSequence;
-    private static int currentQuestion = 0;
+    private static final Queue<Integer> questionSequence = new LinkedList<>();
 
     /** Gets random question from database
      *  Random is specified by the {@code questionSequence},
@@ -22,7 +23,7 @@ public class DatabaseController {
      */
     public static Question getRandomQuestion() {
         DatabaseTable gameTable = database.getGameTable();
-        return database.getQuestion(gameTable, questionSequence.get(currentQuestion++));
+        return database.getQuestion(gameTable, questionSequence.poll());
     }
 
     /**
@@ -45,11 +46,13 @@ public class DatabaseController {
 
     /** Generates new sequence of non-repeating questions, based on stored gameTable **/
     public static void generateNewSequence() {
-        questionSequence = new ArrayList<>();
-        for (int i = 0; i < database.size(database.getGameTable()); i++)
-            questionSequence.add(i);
-        Collections.shuffle(questionSequence, RAND);
-        currentQuestion = 0;
+        List<Integer> newSequence = new ArrayList<>();
+        for (int i = 0; i < database.size(database.getGameTable()); i++) {
+            newSequence.add(i);
+        }
+        Collections.shuffle(newSequence, RAND);
+
+        questionSequence.addAll(newSequence);
     }
 
     /**
@@ -58,6 +61,6 @@ public class DatabaseController {
      * @return number of not yet played questions
      */
     public static int getNumberOfRemainingQuestions() {
-        return questionSequence.size() - currentQuestion;
+        return questionSequence.size();
     }
 }

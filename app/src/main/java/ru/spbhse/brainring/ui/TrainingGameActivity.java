@@ -14,11 +14,11 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import ru.spbhse.brainring.R;
-import ru.spbhse.brainring.controllers.Controller;
 import ru.spbhse.brainring.controllers.DatabaseController;
 import ru.spbhse.brainring.database.DatabaseTable;
 import ru.spbhse.brainring.database.QuestionDatabase;
 import ru.spbhse.brainring.logic.TrainingPlayerLogic;
+import ru.spbhse.brainring.utils.Constants;
 
 /** This activity maintains training game */
 public class TrainingGameActivity extends GameActivity {
@@ -63,7 +63,7 @@ public class TrainingGameActivity extends GameActivity {
     /** {@inheritDoc} */
     @Override
     protected void onStop() {
-        Log.d(Controller.APP_TAG, "Stop training game");
+        Log.d(Constants.APP_TAG, "Stop training game");
         super.onStop();
         logic.finishGame();
         if (toClear) {

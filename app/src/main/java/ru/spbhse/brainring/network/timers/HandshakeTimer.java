@@ -3,7 +3,6 @@ package ru.spbhse.brainring.network.timers;
 import android.os.CountDownTimer;
 import android.util.Log;
 
-import ru.spbhse.brainring.controllers.Controller;
 import ru.spbhse.brainring.network.Network;
 import ru.spbhse.brainring.network.messages.OnlineFinishCodes;
 import ru.spbhse.brainring.network.messages.messageTypes.FinishMessage;
@@ -26,7 +25,7 @@ public class HandshakeTimer extends CountDownTimer {
     public void onFinish() {
         // check in case message was delivered right before finish
         if (network.getHandshakeTimer() == this) {
-            Log.wtf(Controller.APP_TAG, "Unsuccessful handshake");
+            Log.wtf(Constants.APP_TAG, "Unsuccessful handshake");
             network.sendMessageToAll(new FinishMessage(OnlineFinishCodes.UNSUCCESSFUL_HANDSHAKE));
         }
     }

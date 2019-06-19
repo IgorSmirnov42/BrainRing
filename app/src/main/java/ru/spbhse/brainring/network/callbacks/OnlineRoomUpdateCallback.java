@@ -11,8 +11,8 @@ import com.google.android.gms.games.multiplayer.realtime.RoomUpdateCallback;
 
 import java.util.Collections;
 
-import ru.spbhse.brainring.controllers.Controller;
 import ru.spbhse.brainring.network.Network;
+import ru.spbhse.brainring.utils.Constants;
 
 public class OnlineRoomUpdateCallback extends RoomUpdateCallback {
     private Network network;
@@ -23,20 +23,20 @@ public class OnlineRoomUpdateCallback extends RoomUpdateCallback {
 
     @Override
     public void onRoomCreated(int i, @Nullable Room room) {
-        Log.d(Controller.APP_TAG, "Room was created");
+        Log.d(Constants.APP_TAG, "Room was created");
         network.setRoom(room);
         network.startNewTimer();
     }
 
     @Override
     public void onJoinedRoom(int i, @Nullable Room room) {
-        Log.d(Controller.APP_TAG, "Joined room");
+        Log.d(Constants.APP_TAG, "Joined room");
         network.setRoom(room);
     }
 
     @Override
     public void onLeftRoom(int i, @NonNull String s) {
-        Log.d(Controller.APP_TAG, "Left room");
+        Log.d(Constants.APP_TAG, "Left room");
         network.waitOrFinish();
     }
 
@@ -48,16 +48,16 @@ public class OnlineRoomUpdateCallback extends RoomUpdateCallback {
      */
     @Override
     public void onRoomConnected(int code, @Nullable Room room) {
-        Log.d(Controller.APP_TAG, "Connected to room");
+        Log.d(Constants.APP_TAG, "Connected to room");
         if (room == null) {
-            Log.wtf(Controller.APP_TAG, "onRoomConnected got null as room");
+            Log.wtf(Constants.APP_TAG, "onRoomConnected got null as room");
             return;
         }
         network.setRoom(room);
         if (code == GamesCallbackStatusCodes.OK) {
-            Log.d(Controller.APP_TAG,"Connected");
+            Log.d(Constants.APP_TAG,"Connected");
         } else {
-            Log.d(Controller.APP_TAG,"Error during connecting");
+            Log.d(Constants.APP_TAG,"Error during connecting");
         }
         network.setServerId(Collections.min(room.getParticipantIds()));
 
@@ -65,11 +65,11 @@ public class OnlineRoomUpdateCallback extends RoomUpdateCallback {
                 .getCurrentPlayerId()
                 .addOnSuccessListener(myPlayerId -> {
                     network.setMyParticipantId(room.getParticipantId(myPlayerId));
-                    Log.d(Controller.APP_TAG, "Received participant id");
+                    Log.d(Constants.APP_TAG, "Received participant id");
                     network.walkRoomMembers();
                     if (network.getMyParticipantId().equals(network.getServerId())) {
                         network.setIAmServer();
-                        Log.d(Controller.APP_TAG, "I am server");
+                        Log.d(Constants.APP_TAG, "I am server");
                         network.plusConnection();
                         if (network.getConnections() == 2) {
                             network.getManager().startOnlineGame();

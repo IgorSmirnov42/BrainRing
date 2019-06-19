@@ -9,13 +9,13 @@ import com.google.android.gms.games.multiplayer.realtime.RoomConfig;
 
 import java.io.IOException;
 
-import ru.spbhse.brainring.controllers.Controller;
 import ru.spbhse.brainring.managers.LocalPlayerGameManager;
 import ru.spbhse.brainring.managers.Manager;
 import ru.spbhse.brainring.network.callbacks.LocalPlayerRoomUpdateCallback;
 import ru.spbhse.brainring.network.messages.Message;
 import ru.spbhse.brainring.network.messages.messageTypes.IAmGreenMessage;
 import ru.spbhse.brainring.network.messages.messageTypes.IAmRedMessage;
+import ru.spbhse.brainring.utils.Constants;
 
 /**
  * Class with methods to interact with network
@@ -54,13 +54,13 @@ public class LocalNetworkPlayer extends LocalNetwork {
         if (gameIsFinished) {
             return;
         }
-        Log.d(Controller.APP_TAG,"RECEIVED MESSAGE AS PLAYER!");
+        Log.d(Constants.APP_TAG,"RECEIVED MESSAGE AS PLAYER!");
 
         try {
             Message message = Message.readMessage(buf);
             manager.getProcessor().process(message, userId);
         } catch (IOException e) {
-            Log.e(Controller.APP_TAG, "Error while reading message");
+            Log.e(Constants.APP_TAG, "Error while reading message");
             e.printStackTrace();
         }
 
@@ -70,10 +70,10 @@ public class LocalNetworkPlayer extends LocalNetwork {
         this.serverId = serverId;
         handshaked = true;
         if (myColor == ROLE_GREEN) {
-            Log.d(Controller.APP_TAG, "I am green");
+            Log.d(Constants.APP_TAG, "I am green");
             sendMessageToConcreteUser(serverId, new IAmGreenMessage());
         } else {
-            Log.d(Controller.APP_TAG, "I am red");
+            Log.d(Constants.APP_TAG, "I am red");
             sendMessageToConcreteUser(serverId, new IAmRedMessage());
         }
     }
@@ -103,7 +103,7 @@ public class LocalNetworkPlayer extends LocalNetwork {
      */
     public void sendMessageToServer(@NonNull Message message) {
         if (serverId == null) {
-            Log.d(Controller.APP_TAG, "Sending message before handshake");
+            Log.d(Constants.APP_TAG, "Sending message before handshake");
         } else {
             sendMessageToConcreteUser(serverId, message);
         }
@@ -120,7 +120,7 @@ public class LocalNetworkPlayer extends LocalNetwork {
 
     @Override
     public void handshake() {
-        Log.wtf(Controller.APP_TAG, "Handshake was called for player");
+        Log.wtf(Constants.APP_TAG, "Handshake was called for player");
     }
 
     @Override

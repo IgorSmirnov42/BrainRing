@@ -17,10 +17,10 @@ import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.games.GamesActivityResultCodes;
 
 import ru.spbhse.brainring.R;
-import ru.spbhse.brainring.controllers.Controller;
 import ru.spbhse.brainring.controllers.DatabaseController;
 import ru.spbhse.brainring.database.QuestionDatabase;
 import ru.spbhse.brainring.managers.OnlineGameManager;
+import ru.spbhse.brainring.utils.Constants;
 
 /** This activity maintains online game */
 public class OnlineGameActivity extends GameActivity {
@@ -51,7 +51,7 @@ public class OnlineGameActivity extends GameActivity {
         GoogleSignInOptions signInOptions = GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN;
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
         if (GoogleSignIn.hasPermissions(account, signInOptions.getScopeArray())) {
-            Log.d(Controller.APP_TAG, "Already logged in");
+            Log.d(Constants.APP_TAG, "Already logged in");
             manager.getNetwork().onSignedIn(account);
         } else {
             GoogleSignInClient signInClient = GoogleSignIn.getClient(this,
@@ -78,12 +78,12 @@ public class OnlineGameActivity extends GameActivity {
                         .setNeutralButton(android.R.string.ok, (dialog, which) -> finish()).show();
             }
         } else if (requestCode == GamesActivityResultCodes.RESULT_LEFT_ROOM) {
-            Log.d(Controller.APP_TAG, "Left room from activity");
+            Log.d(Constants.APP_TAG, "Left room from activity");
             manager.getNetwork().finishImmediately(getString(R.string.default_error));
         } else if (requestCode == GamesActivityResultCodes.RESULT_SEND_REQUEST_FAILED) {
-            Log.d(Controller.APP_TAG, "Send request failed");
+            Log.d(Constants.APP_TAG, "Send request failed");
         } else if (requestCode == GamesActivityResultCodes.RESULT_NETWORK_FAILURE) {
-            Log.d(Controller.APP_TAG, "Network failure");
+            Log.d(Constants.APP_TAG, "Network failure");
         }
     }
 
@@ -120,7 +120,7 @@ public class OnlineGameActivity extends GameActivity {
     /** {@inheritDoc} */
     @Override
     protected void onStop() {
-        Log.d(Controller.APP_TAG, "Stopping activity. Leaving room");
+        Log.d(Constants.APP_TAG, "Stopping activity. Leaving room");
         super.onStop();
         manager.finishGame();
     }

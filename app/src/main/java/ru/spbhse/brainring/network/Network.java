@@ -21,7 +21,6 @@ import com.google.android.gms.games.multiplayer.realtime.RoomUpdateCallback;
 import java.io.IOException;
 
 import ru.spbhse.brainring.R;
-import ru.spbhse.brainring.controllers.Controller;
 import ru.spbhse.brainring.managers.OnlineGameManager;
 import ru.spbhse.brainring.network.callbacks.OnlineRoomStatusUpdateCallback;
 import ru.spbhse.brainring.network.callbacks.OnlineRoomUpdateCallback;
@@ -107,11 +106,11 @@ public class Network {
      * Reloads timer if needed
      */
     private OnRealTimeMessageReceivedListener mOnRealTimeMessageReceivedListener = realTimeMessage -> {
-        Log.d(Controller.APP_TAG,"Received message");
+        Log.d(Constants.APP_TAG,"Received message");
         byte[] buf = realTimeMessage.getMessageData();
         String userId = realTimeMessage.getSenderParticipantId();
         if (gameIsFinished) {
-            Log.e(Controller.APP_TAG, "received message but game is over");
+            Log.e(Constants.APP_TAG, "received message but game is over");
             return;
         }
         if (timer != null && !userId.equals(myParticipantId)) {
@@ -122,7 +121,7 @@ public class Network {
             Message message = Message.readMessage(buf);
             manager.getMessageProcessor().process(message, userId);
         } catch (IOException e) {
-            Log.e(Controller.APP_TAG, "Error during reading message");
+            Log.e(Constants.APP_TAG, "Error during reading message");
             e.printStackTrace();
         }
     };
@@ -135,7 +134,7 @@ public class Network {
 
     /** Prints all room members' names, sets nicknames to score counter */
     public void walkRoomMembers() {
-        Log.d(Controller.APP_TAG, "Start printing room members");
+        Log.d(Constants.APP_TAG, "Start printing room members");
         if (room != null) {
             for (Participant participant : room.getParticipants()) {
                 if (participant.getParticipantId().equals(myParticipantId)) {
@@ -143,10 +142,10 @@ public class Network {
                 } else {
                     manager.getActivity().setOpponentNick(participant.getDisplayName());
                 }
-                Log.d(Controller.APP_TAG, participant.getDisplayName());
+                Log.d(Constants.APP_TAG, participant.getDisplayName());
             }
         }
-        Log.d(Controller.APP_TAG, "Finish printing room members");
+        Log.d(Constants.APP_TAG, "Finish printing room members");
     }
 
     /** Closes connection to room */
@@ -187,7 +186,7 @@ public class Network {
         if (leaderboardsClient == null || scoreSum == -1) {
             return;
         }
-        Log.d(Controller.APP_TAG, "Updating rating");
+        Log.d(Constants.APP_TAG, "Updating rating");
         leaderboardsClient.submitScoreImmediate(manager.getActivity()
                 .getString(R.string.leaderboard), scoreSum);
     }
@@ -203,7 +202,7 @@ public class Network {
         if (handshakeTimer != null) {
             handshakeTimer.cancel();
             handshakeTimer = null;
-            Log.d(Controller.APP_TAG, "Successful handshake. Took "
+            Log.d(Constants.APP_TAG, "Successful handshake. Took "
                     + (System.currentTimeMillis() - handshakeStartTime) + "ms");
             manager.getAdminLogic().publishing();
         }
@@ -211,7 +210,7 @@ public class Network {
 
     /** Saves Google account, loads current score of user. On success starts searching for opponents */
     public void onSignedIn(@NonNull GoogleSignInAccount signInAccount) {
-        Log.d(Controller.APP_TAG, "Logged in");
+        Log.d(Constants.APP_TAG, "Logged in");
         googleSignInAccount = signInAccount;
         mRealTimeMultiplayerClient = Games.getRealTimeMultiplayerClient(manager.getActivity(),
                 googleSignInAccount);
@@ -221,14 +220,14 @@ public class Network {
                 manager.getActivity().getString(R.string.leaderboard),
                 TIME_SPAN_ALL_TIME, COLLECTION_PUBLIC).addOnSuccessListener(
                         leaderboardScoreAnnotatedData -> {
-                            Log.d(Controller.APP_TAG, "Got score");
+                            Log.d(Constants.APP_TAG, "Got score");
                             LeaderboardScore score = leaderboardScoreAnnotatedData.get();
                             if (score != null) {
                                 scoreSum = score.getRawScore();
                             } else {
                                 scoreSum = 0;
                             }
-                            Log.d(Controller.APP_TAG, "Score is " + scoreSum);
+                            Log.d(Constants.APP_TAG, "Score is " + scoreSum);
                             startQuickGame();
                         });
     }
@@ -290,14 +289,14 @@ public class Network {
      */
     public void sendMessageToConcreteUser(@NonNull String userId, @NonNull Message message) {
         if (myParticipantId == null || room == null) {
-            Log.e(Controller.APP_TAG, "Cannot send message before initialization");
+            Log.e(Constants.APP_TAG, "Cannot send message before initialization");
             return;
         }
         if (userId.equals(myParticipantId)) {
-            Log.d(Controller.APP_TAG, "Sending message to myself");
+            Log.d(Constants.APP_TAG, "Sending message to myself");
             manager.getMessageProcessor().process(message, myParticipantId);
         } else {
-            Log.d(Controller.APP_TAG, "Start sending message to " + userId);
+            Log.d(Constants.APP_TAG, "Start sending message to " + userId);
             sendMessageToConcreteUserNTimes(userId, message, TIMES_TO_SEND);
         }
     }
@@ -313,7 +312,7 @@ public class Network {
             return;
         }
         if (timesToSend < 0) {
-            Log.wtf(Controller.APP_TAG, "Failed to send message too many times. Finish game");
+            Log.wtf(Constants.APP_TAG, "Failed to send message too many times. Finish game");
             finishImmediately(manager.getActivity().getString(R.string.default_error));
             return;
         }
@@ -321,11 +320,11 @@ public class Network {
                 userId, (i, i1, s) -> {
             if (i != GamesCallbackStatusCodes.OK) {
 
-                Log.e(Controller.APP_TAG, "Failed to send message. Left " + timesToSend + " tries\n" +
+                Log.e(Constants.APP_TAG, "Failed to send message. Left " + timesToSend + " tries\n" +
                                 "Error is " + GamesCallbackStatusCodes.getStatusCodeString(i));
                 sendMessageToConcreteUserNTimes(userId, message, timesToSend - 1);
             } else {
-                Log.d(Controller.APP_TAG, "Message to " + userId + " is delivered. Took " +
+                Log.d(Constants.APP_TAG, "Message to " + userId + " is delivered. Took " +
                         (TIMES_TO_SEND - timesToSend + 1) + " tries");
             }
         });
@@ -381,7 +380,7 @@ public class Network {
                 return participantId;
             }
         }
-        Log.wtf(Controller.APP_TAG, "Opponent id was not found.");
+        Log.wtf(Constants.APP_TAG, "Opponent id was not found.");
         return null;
     }
 

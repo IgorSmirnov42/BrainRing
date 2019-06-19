@@ -7,7 +7,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import ru.spbhse.brainring.controllers.Controller;
+import ru.spbhse.brainring.utils.Constants;
 
 /**
  * Wrapper above {@code DataOutputStream} and {@code ByteArrayOutputStream} that allows to combine
@@ -38,7 +38,7 @@ public class MessageGenerator {
         try {
             outputStream.writeUTF(string);
         } catch (IOException e) {
-            Log.wtf(Controller.APP_TAG, "Error on writing");
+            Log.wtf(Constants.APP_TAG, "Error on writing");
             e.printStackTrace();
         }
         return this;
@@ -50,7 +50,7 @@ public class MessageGenerator {
         try {
             outputStream.writeLong(longValue);
         } catch (IOException e) {
-            Log.wtf(Controller.APP_TAG, "Error on writing");
+            Log.wtf(Constants.APP_TAG, "Error on writing");
             e.printStackTrace();
         }
         return this;
@@ -62,7 +62,7 @@ public class MessageGenerator {
         try {
             outputStream.writeInt(intValue);
         } catch (IOException e) {
-            Log.wtf(Controller.APP_TAG, "Error on writing");
+            Log.wtf(Constants.APP_TAG, "Error on writing");
             e.printStackTrace();
         }
         return this;
@@ -72,7 +72,7 @@ public class MessageGenerator {
         try {
             outputStream.close();
         } catch (IOException e) {
-            Log.wtf(Controller.APP_TAG, "Error on closing");
+            Log.wtf(Constants.APP_TAG, "Error on closing");
             e.printStackTrace();
         }
     }
@@ -83,7 +83,7 @@ public class MessageGenerator {
         try {
             outputStream.flush();
         } catch (IOException e) {
-            Log.wtf(Controller.APP_TAG, "Error on flushing");
+            Log.wtf(Constants.APP_TAG, "Error on flushing");
             e.printStackTrace();
         }
         byte[] result = byteArrayOutputStream.toByteArray();
