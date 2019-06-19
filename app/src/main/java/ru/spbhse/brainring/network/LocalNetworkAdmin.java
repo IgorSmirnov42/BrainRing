@@ -3,19 +3,16 @@ package ru.spbhse.brainring.network;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.google.android.gms.games.Games;
-import com.google.android.gms.games.GamesCallbackStatusCodes;
-import com.google.android.gms.games.multiplayer.realtime.Room;
 import com.google.android.gms.games.multiplayer.realtime.RoomConfig;
-import com.google.android.gms.games.multiplayer.realtime.RoomUpdateCallback;
 
 import java.io.IOException;
 
 import ru.spbhse.brainring.controllers.Controller;
 import ru.spbhse.brainring.managers.LocalAdminGameManager;
+import ru.spbhse.brainring.network.callbacks.LocalAdminRoomUpdateCallback;
 import ru.spbhse.brainring.network.messages.Message;
 import ru.spbhse.brainring.network.messages.messageTypes.HandshakeMessage;
 import ru.spbhse.brainring.network.messages.messageTypes.InitialHandshakeMessage;
@@ -38,53 +35,7 @@ public class LocalNetworkAdmin extends LocalNetwork {
     public LocalNetworkAdmin(LocalAdminGameManager manager) {
         super(manager);
         this.manager = manager;
-        mRoomUpdateCallback = new RoomUpdateCallback() {
-            @Override
-            public void onRoomCreated(int i, @Nullable Room room) {
-                Log.d(Controller.APP_TAG, "Room was created");
-                LocalNetworkAdmin.this.room = room;
-            }
-
-            @Override
-            public void onJoinedRoom(int i, @Nullable Room room) {
-                Log.d(Controller.APP_TAG, "Joined room");
-                LocalNetworkAdmin.this.room = room;
-            }
-
-            @Override
-            public void onLeftRoom(int i, @NonNull String s) {
-                Log.d(Controller.APP_TAG, "Left room");
-                if (!gameIsFinished) {
-                    manager.finishGame();
-                    manager.getActivity().finish();
-                }
-            }
-
-            /** Gets participant id. If both players are p2p connected starts handshake process */
-            @Override
-            public void onRoomConnected(int code, @Nullable Room room) {
-                Log.d(Controller.APP_TAG, "Connected to room");
-                if (room == null) {
-                    Log.wtf(Controller.APP_TAG, "onRoomConnected got null as room");
-                    return;
-                }
-                LocalNetworkAdmin.this.room = room;
-                if (code == GamesCallbackStatusCodes.OK) {
-                    Log.d(Controller.APP_TAG,"Connected");
-                } else {
-                    Log.d(Controller.APP_TAG,"Connecting error");
-                }
-                Games.getPlayersClient(manager.getActivity(), googleSignInAccount)
-                        .getCurrentPlayerId()
-                        .addOnSuccessListener(myPlayerId -> {
-                            myParticipantId = room.getParticipantId(myPlayerId);
-                            serverRoomConnected = true;
-                            if (p2pConnected == 2) {
-                                handshake();
-                            }
-                        });
-            }
-        };
+        mRoomUpdateCallback = new LocalAdminRoomUpdateCallback(this, manager);
     }
 
     /** Decodes byte message received by server and calls needed functions in LocalController */
@@ -154,7 +105,7 @@ public class LocalNetworkAdmin extends LocalNetwork {
      * After execution starts game cycle
      */
     @Override
-    protected void handshake() {
+    public void handshake() {
         if (handshaked) {
             return;
         }
@@ -182,11 +133,7 @@ public class LocalNetworkAdmin extends LocalNetwork {
         }
     }
 
-    public String getGreenId() {
-        return greenId;
-    }
-
-    public String getRedId() {
-        return redId;
+    public void serverRoomIsConnected() {
+        serverRoomConnected = true;
     }
 }

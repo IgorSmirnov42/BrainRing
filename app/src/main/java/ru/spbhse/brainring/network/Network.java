@@ -1,10 +1,8 @@
 package ru.spbhse.brainring.network;
 
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.os.Handler;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -21,16 +19,16 @@ import com.google.android.gms.games.multiplayer.realtime.RoomStatusUpdateCallbac
 import com.google.android.gms.games.multiplayer.realtime.RoomUpdateCallback;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
 
 import ru.spbhse.brainring.R;
 import ru.spbhse.brainring.controllers.Controller;
 import ru.spbhse.brainring.managers.OnlineGameManager;
+import ru.spbhse.brainring.network.callbacks.OnlineRoomStatusUpdateCallback;
+import ru.spbhse.brainring.network.callbacks.OnlineRoomUpdateCallback;
 import ru.spbhse.brainring.network.messages.Message;
-import ru.spbhse.brainring.network.messages.OnlineFinishCodes;
-import ru.spbhse.brainring.network.messages.messageTypes.FinishMessage;
 import ru.spbhse.brainring.network.messages.messageTypes.QuestionMessage;
+import ru.spbhse.brainring.network.timers.HandshakeTimer;
+import ru.spbhse.brainring.network.timers.TimeoutTimer;
 
 import static com.google.android.gms.games.leaderboard.LeaderboardVariant.COLLECTION_PUBLIC;
 import static com.google.android.gms.games.leaderboard.LeaderboardVariant.TIME_SPAN_ALL_TIME;
@@ -50,7 +48,7 @@ public class Network {
      *      handshake in a game and panics if haven't received handshake message by that time.
      * Handshake messages are sent by server before each round to check if opponent is connected
      */
-    private CountDownTimer handshakeTimer;
+    private HandshakeTimer handshakeTimer;
     private LeaderboardsClient leaderboardsClient;
     /**
      * Number of points in all online games earned by this player.
@@ -73,16 +71,10 @@ public class Network {
      */
     private static final int FIRST_HANDSHAKE_TIME = 5000; // first message may take longer time
     /**
-     * If server doesn't receive any messages during that time it panics and finishes game
-     * This time is bigger than a longest time without messages from concrete user, so if timer
-     *      panics then definitely something gone wrong
-     */
-    private static final int MAXIMUM_TIME_WITHOUT_MESSAGES = 80 * 1000;
-    /**
      * Timer that checks if last message from opponent was too much time ago
      * Also determines whether online opponent was not found
      */
-    private static CountDownTimer timer;
+    private static TimeoutTimer timer;
     private boolean gameIsFinished = false;
     /**
      * Game should start only if {@code onRoomConnected} and {@code onP2PConnected were called}
@@ -101,147 +93,8 @@ public class Network {
     /** Time when last handshake started to determine time it takes */
     private long handshakeStartTime;
 
-    private RoomStatusUpdateCallback mRoomStatusUpdateCallback = new RoomStatusUpdateCallback() {
-        @Override
-        public void onRoomConnecting(@Nullable Room room) {
-            Log.d(Controller.APP_TAG, "onRoomConnecting");
-            Network.this.room = room;
-        }
-
-        @Override
-        public void onRoomAutoMatching(@Nullable Room room) {
-            Log.d(Controller.APP_TAG, "onRoomAutoMatching");
-            Network.this.room = room;
-        }
-
-        @Override
-        public void onPeerInvitedToRoom(@Nullable Room room, @NonNull List<String> list) {
-            Log.d(Controller.APP_TAG, "onPeerInvitedToRoom");
-            Network.this.room = room;
-        }
-
-        @Override
-        public void onPeerDeclined(@Nullable Room room, @NonNull List<String> list) {
-            Log.d(Controller.APP_TAG, "onPeerDeclined");
-            Network.this.room = room;
-        }
-
-        @Override
-        public void onPeerJoined(@Nullable Room room, @NonNull List<String> list) {
-            Log.d(Controller.APP_TAG, "onPeerJoined");
-            Network.this.room = room;
-        }
-
-        @Override
-        public void onPeerLeft(@Nullable Room room, @NonNull List<String> list) {
-            Log.d(Controller.APP_TAG, "onPeerLeft");
-            Network.this.room = room;
-            waitOrFinish();
-        }
-
-        @Override
-        public void onConnectedToRoom(@Nullable Room room) {
-            Log.d(Controller.APP_TAG, "onConnectedToRoom");
-            Network.this.room = room;
-        }
-
-        @Override
-        public void onDisconnectedFromRoom(@Nullable Room room) {
-            Log.d(Controller.APP_TAG, "onDisconnectedFromRoom");
-            Network.this.room = room;
-            waitOrFinish();
-        }
-
-        @Override
-        public void onPeersConnected(@Nullable Room room, @NonNull List<String> list) {
-            Log.d(Controller.APP_TAG, "onPeersConnected");
-            Network.this.room = room;
-        }
-
-        @Override
-        public void onPeersDisconnected(@Nullable Room room, @NonNull List<String> list) {
-            Log.d(Controller.APP_TAG, "onPeersDisconnected");
-            Network.this.room = room;
-            waitOrFinish();
-        }
-
-        /**
-         * Checks whether {@code onRoomConnected} had already been called.
-         * If so and I am server, starts game
-         */
-        @Override
-        public void onP2PConnected(@NonNull String s) {
-            Log.d(Controller.APP_TAG, "onP2PConnected " + s);
-            ++counterOfConnections;
-            if (counterOfConnections == 2 && isServer) {
-                manager.startOnlineGame();
-            }
-        }
-
-
-        @Override
-        public void onP2PDisconnected(@NonNull String s) {
-            Log.d(Controller.APP_TAG, "onP2PDisconnected " + s);
-            waitOrFinish();
-        }
-    };
-    private RoomUpdateCallback mRoomUpdateCallback = new RoomUpdateCallback() {
-        @Override
-        public void onRoomCreated(int i, @Nullable Room room) {
-            Log.d(Controller.APP_TAG, "Room was created");
-            startNewTimer();
-        }
-
-        @Override
-        public void onJoinedRoom(int i, @Nullable Room room) {
-            Log.d(Controller.APP_TAG, "Joined room");
-            Network.this.room = room;
-        }
-
-        @Override
-        public void onLeftRoom(int i, @NonNull String s) {
-            Log.d(Controller.APP_TAG, "Left room");
-            waitOrFinish();
-        }
-
-        /**
-         * Determines which player is a server (with minimal participantId)
-         * Gets {@code myParticipantId}
-         * If I am server and {@code onP2PConnected} with opponent was already called
-         * then starts game
-         */
-        @Override
-        public void onRoomConnected(int code, @Nullable Room room) {
-            Log.d(Controller.APP_TAG, "Connected to room");
-            if (room == null) {
-                Log.wtf(Controller.APP_TAG, "onRoomConnected got null as room");
-                return;
-            }
-            Network.this.room = room;
-            if (code == GamesCallbackStatusCodes.OK) {
-                Log.d(Controller.APP_TAG,"Connected");
-            } else {
-                Log.d(Controller.APP_TAG,"Error during connecting");
-            }
-            serverId = Collections.min(room.getParticipantIds());
-
-            Games.getPlayersClient(manager.getActivity(), googleSignInAccount)
-                    .getCurrentPlayerId()
-                    .addOnSuccessListener(myPlayerId -> {
-                        myParticipantId = room.getParticipantId(myPlayerId);
-                        Log.d(Controller.APP_TAG, "Received participant id");
-                        walkRoomMembers();
-                        if (myParticipantId.equals(serverId)) {
-                            isServer = true;
-                            Log.d(Controller.APP_TAG, "I am server");
-                            ++counterOfConnections;
-                            if (counterOfConnections == 2) {
-                                manager.startOnlineGame();
-                            }
-                        }
-                    });
-        }
-    };
+    private RoomStatusUpdateCallback mRoomStatusUpdateCallback;
+    private RoomUpdateCallback mRoomUpdateCallback;
     /**
      * Parses message and starts message processing
      * Reloads timer if needed
@@ -269,10 +122,12 @@ public class Network {
 
     public Network(OnlineGameManager onlineGameManager) {
         manager = onlineGameManager;
+        mRoomStatusUpdateCallback = new OnlineRoomStatusUpdateCallback(this, manager);
+        mRoomUpdateCallback = new OnlineRoomUpdateCallback(this, manager);
     }
 
     /** Prints all room members' names, sets nicknames to score counter */
-    private void walkRoomMembers() {
+    public void walkRoomMembers() {
         Log.d(Controller.APP_TAG, "Start printing room members");
         if (room != null) {
             for (Participant participant : room.getParticipants()) {
@@ -331,24 +186,8 @@ public class Network {
     }
 
     /** Reloads {@code timer} */
-    private void startNewTimer() {
-        timer = new CountDownTimer(MAXIMUM_TIME_WITHOUT_MESSAGES, MAXIMUM_TIME_WITHOUT_MESSAGES) {
-            @Override
-            public void onTick(long millisUntilFinished) {
-            }
-
-            @Override
-            public void onFinish() {
-                if (timer == this) {
-                    if (counterOfConnections == 0) {
-                        finishImmediately(manager.getActivity()
-                                .getString(R.string.opponent_not_found));
-                    } else {
-                        sendMessageToAll(new FinishMessage(OnlineFinishCodes.SERVER_TIMER_TIMEOUT));
-                    }
-                }
-            }
-        };
+    public void startNewTimer() {
+        timer = new TimeoutTimer(this, manager);
         timer.start();
     }
 
@@ -388,7 +227,7 @@ public class Network {
     }
 
     /** Starts quick game with 1 auto matched player */
-    public void startQuickGame() {
+    private void startQuickGame() {
         final int MIN_OPPONENTS = 1, MAX_OPPONENTS = 1;
         Bundle autoMatchCriteria = RoomConfig.createAutoMatchCriteria(MIN_OPPONENTS,
                 MAX_OPPONENTS, 0);
@@ -406,7 +245,7 @@ public class Network {
      * Waits {@code WAIT_FOR_MESSAGE} time. If no message with cause of finish was delivered sets
      * default cause
      */
-    private void waitOrFinish() {
+    public void waitOrFinish() {
         if (gameIsFinished) {
             return;
         }
@@ -493,20 +332,7 @@ public class Network {
             handshakeTime = FIRST_HANDSHAKE_TIME;
             firstMessage = false;
         }
-        handshakeTimer = new CountDownTimer(handshakeTime, handshakeTime) {
-            @Override
-            public void onTick(long millisUntilFinished) {
-            }
-
-            @Override
-            public void onFinish() {
-                // check in case message was delivered right before finish
-                if (handshakeTimer == this) {
-                    Log.wtf(Controller.APP_TAG, "Unsuccessful handshake");
-                    sendMessageToAll(new FinishMessage(OnlineFinishCodes.UNSUCCESSFUL_HANDSHAKE));
-                }
-            }
-        };
+        handshakeTimer = new HandshakeTimer(this, handshakeTime);
         handshakeStartTime = System.currentTimeMillis();
         handshakeTimer.start();
     }
@@ -530,10 +356,6 @@ public class Network {
         }
     }
 
-    public String getMyParticipantId() {
-        return myParticipantId;
-    }
-
     /** Determines whether server of this game is on current device */
     public boolean iAmServer() {
         return isServer;
@@ -554,5 +376,49 @@ public class Network {
         }
         Log.wtf(Controller.APP_TAG, "Opponent id was not found.");
         return null;
+    }
+
+    public void setRoom(Room room) {
+        this.room = room;
+    }
+
+    public void setServerId(String serverId) {
+        this.serverId = serverId;
+    }
+
+    public GoogleSignInAccount getSignInAccount() {
+        return googleSignInAccount;
+    }
+
+    public void setMyParticipantId(String participantId) {
+        myParticipantId = participantId;
+    }
+
+    public String getMyParticipantId() {
+        return myParticipantId;
+    }
+
+    public String getServerId() {
+        return serverId;
+    }
+
+    public void setIAmServer() {
+        isServer = true;
+    }
+
+    public void plusConnection() {
+        ++counterOfConnections;
+    }
+
+    public int getConnections() {
+        return counterOfConnections;
+    }
+
+    public TimeoutTimer getTimer() {
+        return timer;
+    }
+
+    public HandshakeTimer getHandshakeTimer() {
+        return handshakeTimer;
     }
 }

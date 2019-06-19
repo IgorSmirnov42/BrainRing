@@ -2,19 +2,16 @@ package ru.spbhse.brainring.network;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.google.android.gms.games.Games;
-import com.google.android.gms.games.GamesCallbackStatusCodes;
-import com.google.android.gms.games.multiplayer.realtime.Room;
 import com.google.android.gms.games.multiplayer.realtime.RoomConfig;
-import com.google.android.gms.games.multiplayer.realtime.RoomUpdateCallback;
 
 import java.io.IOException;
 
 import ru.spbhse.brainring.controllers.Controller;
 import ru.spbhse.brainring.managers.LocalPlayerGameManager;
+import ru.spbhse.brainring.network.callbacks.LocalPlayerRoomUpdateCallback;
 import ru.spbhse.brainring.network.messages.Message;
 import ru.spbhse.brainring.network.messages.messageTypes.IAmGreenMessage;
 import ru.spbhse.brainring.network.messages.messageTypes.IAmRedMessage;
@@ -44,43 +41,7 @@ public class LocalNetworkPlayer extends LocalNetwork {
             this.myColor = ROLE_RED;
         }
 
-        mRoomUpdateCallback = new RoomUpdateCallback() {
-            @Override
-            public void onRoomCreated(int i, @Nullable Room room) {
-                Log.d(Controller.APP_TAG, "Room was created");
-                LocalNetworkPlayer.this.room = room;
-            }
-
-            @Override
-            public void onJoinedRoom(int i, @Nullable Room room) {
-                Log.d(Controller.APP_TAG, "Joined room");
-                LocalNetworkPlayer.this.room = room;
-            }
-
-            @Override
-            public void onLeftRoom(int i, @NonNull String s) {
-                Log.d(Controller.APP_TAG, "Left room");
-                if (!gameIsFinished) {
-                    manager.finishGame();
-                    manager.getActivity().finish();
-                }
-            }
-
-            @Override
-            public void onRoomConnected(int code, @Nullable Room room) {
-                Log.d(Controller.APP_TAG, "Connected to room");
-                if (room == null) {
-                    Log.wtf(Controller.APP_TAG, "onRoomConnected got null as room");
-                    return;
-                }
-                LocalNetworkPlayer.this.room = room;
-                if (code == GamesCallbackStatusCodes.OK) {
-                    Log.d(Controller.APP_TAG,"Connected");
-                } else {
-                    Log.d(Controller.APP_TAG,"Error during connecting");
-                }
-            }
-        };
+        mRoomUpdateCallback = new LocalPlayerRoomUpdateCallback(this, manager);
     }
 
     /**
@@ -157,7 +118,7 @@ public class LocalNetworkPlayer extends LocalNetwork {
     }
 
     @Override
-    protected void handshake() {
+    public void handshake() {
         Log.wtf(Controller.APP_TAG, "Handshake was called for player");
     }
 }

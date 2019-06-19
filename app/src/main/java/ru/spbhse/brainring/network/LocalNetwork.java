@@ -1,7 +1,6 @@
 package ru.spbhse.brainring.network;
 
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -13,10 +12,9 @@ import com.google.android.gms.games.multiplayer.realtime.RoomConfig;
 import com.google.android.gms.games.multiplayer.realtime.RoomStatusUpdateCallback;
 import com.google.android.gms.games.multiplayer.realtime.RoomUpdateCallback;
 
-import java.util.List;
-
 import ru.spbhse.brainring.controllers.Controller;
 import ru.spbhse.brainring.managers.Manager;
+import ru.spbhse.brainring.network.callbacks.LocalRoomStatusUpdateCallback;
 import ru.spbhse.brainring.network.messages.Message;
 
 /** Class for interaction with network in local network mode */
@@ -45,105 +43,29 @@ public abstract class LocalNetwork {
     protected GoogleSignInAccount googleSignInAccount;
     protected RealTimeMultiplayerClient mRealTimeMultiplayerClient;
     protected String myParticipantId;
-    protected RoomStatusUpdateCallback mRoomStatusUpdateCallback = new RoomStatusUpdateCallback() {
-        @Override
-        public void onRoomConnecting(@Nullable Room room) {
-            Log.d(Controller.APP_TAG, "onRoomConnecting");
-            LocalNetwork.this.room = room;
-        }
-
-        @Override
-        public void onRoomAutoMatching(@Nullable Room room) {
-            Log.d(Controller.APP_TAG, "onRoomAutoMatching");
-            LocalNetwork.this.room = room;
-        }
-
-        @Override
-        public void onPeerInvitedToRoom(@Nullable Room room, @NonNull List<String> list) {
-            Log.d(Controller.APP_TAG, "onPeerInvitedToRoom");
-            LocalNetwork.this.room = room;
-        }
-
-        @Override
-        public void onPeerDeclined(@Nullable Room room, @NonNull List<String> list) {
-            Log.d(Controller.APP_TAG, "onPeerDeclined");
-            LocalNetwork.this.room = room;
-        }
-
-        @Override
-        public void onPeerJoined(@Nullable Room room, @NonNull List<String> list) {
-            Log.d(Controller.APP_TAG, "onPeerJoined");
-            LocalNetwork.this.room = room;
-        }
-
-        @Override
-        public void onPeerLeft(@Nullable Room room, @NonNull List<String> list) {
-            Log.d(Controller.APP_TAG, "onPeerLeft");
-            LocalNetwork.this.room = room;
-            if (!gameIsFinished) {
-                manager.finishGame();
-                manager.getActivity().finish();
-            }
-        }
-
-        @Override
-        public void onConnectedToRoom(@Nullable Room room) {
-            Log.d(Controller.APP_TAG, "onConnectedToRoom");
-            LocalNetwork.this.room = room;
-        }
-
-        @Override
-        public void onDisconnectedFromRoom(@Nullable Room room) {
-            Log.d(Controller.APP_TAG, "onDisconnectedFromRoom");
-            LocalNetwork.this.room = room;
-            if (!gameIsFinished) {
-                manager.finishGame();
-                manager.getActivity().finish();
-            }
-        }
-
-        @Override
-        public void onPeersConnected(@Nullable Room room, @NonNull List<String> list) {
-            Log.d(Controller.APP_TAG, "onPeersConnected");
-            LocalNetwork.this.room = room;
-        }
-
-        @Override
-        public void onPeersDisconnected(@Nullable Room room, @NonNull List<String> list) {
-            Log.d(Controller.APP_TAG, "onPeersDisconnected");
-            LocalNetwork.this.room = room;
-            if (!gameIsFinished) {
-                manager.finishGame();
-                manager.getActivity().finish();
-            }
-        }
-
-        /** If I am server and both players are p2p connected starts handshake process */
-        @Override
-        public void onP2PConnected(@NonNull String s) {
-            Log.d(Controller.APP_TAG, "onP2PConnected " + s);
-            ++p2pConnected;
-            if (serverRoomConnected && p2pConnected == 2) {
-                handshake();
-            }
-        }
-
-        @Override
-        public void onP2PDisconnected(@NonNull String s) {
-            Log.d(Controller.APP_TAG, "onP2PDisconnected");
-            --p2pConnected;
-            if (!gameIsFinished) {
-                manager.finishGame();
-                manager.getActivity().finish();
-            }
-        }
-    };
+    protected RoomStatusUpdateCallback mRoomStatusUpdateCallback;
+    protected RoomUpdateCallback mRoomUpdateCallback;
 
     protected LocalNetwork(Manager manager) {
         this.manager = manager;
+        mRoomStatusUpdateCallback = new LocalRoomStatusUpdateCallback(this, manager);
     }
 
-    protected RoomUpdateCallback mRoomUpdateCallback;
+    public GoogleSignInAccount getSignInAccount() {
+        return googleSignInAccount;
+    }
+
+    public void setRoom(Room room) {
+        this.room = room;
+    }
+
+    public void setMyParticipantId(String participantId) {
+        myParticipantId = participantId;
+    }
+
+    public int getP2PConnected() {
+        return p2pConnected;
+    }
 
     /** Gets message and resubmits it to {@code onMessageReceived} with sender id */
     protected OnRealTimeMessageReceivedListener mOnRealTimeMessageReceivedListener = realTimeMessage -> {
@@ -198,6 +120,22 @@ public abstract class LocalNetwork {
         });
     }
 
+    public boolean gameIsFinished() {
+        return gameIsFinished;
+    }
+
+    public void plusP2PConnected() {
+        ++p2pConnected;
+    }
+
+    public void minusP2PConnected() {
+        --p2pConnected;
+    }
+
+    public boolean isServerRoomConnected() {
+        return serverRoomConnected;
+    }
+
     /** Closes connection with room */
     abstract protected void leaveRoom();
 
@@ -205,7 +143,7 @@ public abstract class LocalNetwork {
      * Server starts handshake process sending everybody initial handshake message
      * After that player should send message describing its table color
      */
-    abstract protected void handshake();
+    abstract public void handshake();
 
     /** Finishes network part of local game */
     public void finish() {
