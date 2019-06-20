@@ -9,6 +9,20 @@ import ru.spbhse.brainring.network.messages.MessageCodes;
 import ru.spbhse.brainring.network.messages.MessageGenerator;
 import ru.spbhse.brainring.network.messages.Message;
 
+/**
+ * Message from server to client with information about finished round in online game
+ * Format:  [String : correctAnswer]
+ *          [String : comment]
+ *          [int : firstUserScore]
+ *          [int : secondUserScore]
+ *          [String : questionMessage]
+ *      correctAnswer -- correct answer for a question
+ *      comment -- comment for an answer
+ *      firstUserScore -- number of points first user has
+ *      secondUserScore -- number of points second user has
+ *      questionMessage -- message with additional information about question tha should be printed
+ *              (i.e. nick of player who answered right)
+ */
 public class CorrectAnswerAndScoreMessage extends Message {
     private String correctAnswer;
     private String comment;

@@ -1,6 +1,5 @@
 package ru.spbhse.brainring.logic.timers;
 
-import android.media.MediaPlayer;
 import android.os.CountDownTimer;
 import android.util.Log;
 
@@ -10,6 +9,10 @@ import ru.spbhse.brainring.utils.Constants;
 
 import static java.lang.Math.max;
 
+/**
+ * Timer used in local game to countdown time on question
+ * If finishes without cancel starts new question
+ */
 public class LocalTimer extends CountDownTimer {
     private LocalGameAdminLogic logic;
     private int fault;
@@ -29,12 +32,7 @@ public class LocalTimer extends CountDownTimer {
             logic.getManager().getActivity().showTime(max((millisUntilFinished - fault) / Constants.SECOND, 0));
 
             if (millisUntilFinished - fault <= sendingCountdown * Constants.SECOND) {
-                new Thread(() -> {
-                    MediaPlayer player = MediaPlayer.create(logic.getManager().getActivity(),
-                            R.raw.countdown);
-                    player.setOnCompletionListener(MediaPlayer::release);
-                    player.start();
-                }).start();
+                logic.getPlayer().play(logic.getManager().getActivity(), R.raw.countdown);
             }
         }
     }
@@ -43,11 +41,7 @@ public class LocalTimer extends CountDownTimer {
     public void onFinish() {
         Log.d(Constants.APP_TAG, "Finish timer");
         if (logic.getTimer() == this) {
-            new Thread(() -> {
-                MediaPlayer player = MediaPlayer.create(logic.getManager().getActivity(), R.raw.beep);
-                player.setOnCompletionListener(MediaPlayer::release);
-                player.start();
-            }).start();
+            logic.getPlayer().play(logic.getManager().getActivity(), R.raw.beep);
             logic.newQuestion();
         }
     }

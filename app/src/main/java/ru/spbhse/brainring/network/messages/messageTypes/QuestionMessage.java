@@ -9,6 +9,13 @@ import ru.spbhse.brainring.network.messages.MessageCodes;
 import ru.spbhse.brainring.network.messages.MessageGenerator;
 import ru.spbhse.brainring.network.messages.Message;
 
+/**
+ * Message from server to client in online game with question information for next round
+ * Format: [int : questionId]
+ *         [String : question]
+ *      questionId -- id of question in database (for complaining)
+ *      question -- question text
+ */
 public class QuestionMessage extends Message {
     private int questionId;
     private String question;

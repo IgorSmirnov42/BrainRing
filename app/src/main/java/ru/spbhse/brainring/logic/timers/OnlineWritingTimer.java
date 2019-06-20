@@ -5,6 +5,10 @@ import android.os.CountDownTimer;
 import ru.spbhse.brainring.logic.OnlineGameUserLogic;
 import ru.spbhse.brainring.utils.Constants;
 
+/**
+ * Timer for writing answer in online game.
+ * If finishes without cancel takes what user had written
+ */
 public class OnlineWritingTimer extends CountDownTimer {
     private OnlineGameUserLogic logic;
 

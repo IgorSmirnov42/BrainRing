@@ -27,6 +27,12 @@ import ru.spbhse.brainring.network.messages.messageTypes.TimeLimitMessage;
 import ru.spbhse.brainring.network.messages.messageTypes.TimeStartMessage;
 import ru.spbhse.brainring.utils.Constants;
 
+/**
+ * Abstract class for conversion between {@code byte[]} and {@code Object} messages
+ * New type of message should be declared here in {@code readMessage}, in {@code MessageCodes}
+ *      and as a new class in {@code messageTypes} with functions for serializing and deserializing.
+ * Also all inheritors should transfer their code to constructor of this class
+ */
 public abstract class Message {
     private int messageCode;
 
@@ -47,6 +53,10 @@ public abstract class Message {
         return toByteArray(MessageGenerator.create().writeInt(messageCode));
     }
 
+    /**
+     * This function should implement serialization of message to {@code generator} excepting
+     *      message code (it will be serialized automatically by this class).
+     */
     protected abstract byte[] toByteArray(@NonNull MessageGenerator generator);
 
     public static Message readMessage(@NonNull byte[] message) throws IOException {

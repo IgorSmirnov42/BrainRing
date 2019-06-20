@@ -6,6 +6,10 @@ import android.util.Log;
 import ru.spbhse.brainring.logic.OnlineGameUserLogic;
 import ru.spbhse.brainring.utils.Constants;
 
+/**
+ * Timer used for time countdown in online game.
+ * If finishes without cancel sends time limit message to server
+ */
 public class OnlineGameTimer extends CountDownTimer {
     private OnlineGameUserLogic logic;
     private int sendingCountdown;

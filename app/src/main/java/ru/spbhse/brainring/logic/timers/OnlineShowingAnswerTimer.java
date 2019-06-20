@@ -5,6 +5,10 @@ import android.os.CountDownTimer;
 import ru.spbhse.brainring.logic.OnlineGameUserLogic;
 import ru.spbhse.brainring.utils.Constants;
 
+/**
+ * Timer used in online game for showing answer.
+ * If finishes without cancel sends ready for question message to server
+ */
 public class OnlineShowingAnswerTimer extends CountDownTimer {
     private OnlineGameUserLogic logic;
 
