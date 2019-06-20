@@ -14,6 +14,7 @@ import java.util.Collections;
 import ru.spbhse.brainring.network.Network;
 import ru.spbhse.brainring.utils.Constants;
 
+/** Reacts on room update. Used in {@code Network} */
 public class OnlineRoomUpdateCallback extends RoomUpdateCallback {
     private Network network;
 

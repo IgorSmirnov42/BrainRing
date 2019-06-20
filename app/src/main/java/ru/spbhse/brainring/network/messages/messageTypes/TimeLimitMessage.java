@@ -9,6 +9,12 @@ import ru.spbhse.brainring.network.messages.MessageCodes;
 import ru.spbhse.brainring.network.messages.MessageGenerator;
 import ru.spbhse.brainring.network.messages.Message;
 
+/**
+ * Message from client to server in online game signalizing that client didn't push a button before
+ *      time limit
+ * Format: [int : roundNumber]
+ *      roundNumber -- 1 or 2 -- number of round when time limit was exceeded
+ */
 public class TimeLimitMessage extends Message {
     private int roundNumber;
 

@@ -12,6 +12,7 @@ import java.util.List;
 import ru.spbhse.brainring.network.LocalNetwork;
 import ru.spbhse.brainring.utils.Constants;
 
+/** Reacts on room status update. Used in {@code LocalNetwork} */
 public class LocalRoomStatusUpdateCallback extends RoomStatusUpdateCallback {
     private LocalNetwork network;
 

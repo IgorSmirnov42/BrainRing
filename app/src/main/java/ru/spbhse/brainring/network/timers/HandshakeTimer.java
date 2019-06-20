@@ -8,6 +8,10 @@ import ru.spbhse.brainring.network.messages.OnlineFinishCodes;
 import ru.spbhse.brainring.network.messages.messageTypes.FinishMessage;
 import ru.spbhse.brainring.utils.Constants;
 
+/**
+ * Timer used in {@code Network} to check connection with opponent.
+ * If finished without cancel, finishes game
+ */
 public class HandshakeTimer extends CountDownTimer {
     private Network network;
 

@@ -9,6 +9,11 @@ import ru.spbhse.brainring.network.messages.MessageCodes;
 import ru.spbhse.brainring.network.messages.MessageGenerator;
 import ru.spbhse.brainring.network.messages.Message;
 
+/**
+ * Message from client to server with client's answer
+ * Format: [String : answer]
+ *      answer -- client's answer
+ */
 public class AnswerWrittenMessage extends Message {
     private String answer;
 

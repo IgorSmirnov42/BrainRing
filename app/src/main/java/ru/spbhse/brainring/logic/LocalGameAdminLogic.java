@@ -1,6 +1,5 @@
 package ru.spbhse.brainring.logic;
 
-import android.media.MediaPlayer;
 import android.support.annotation.NonNull;
 import android.widget.Toast;
 
@@ -13,11 +12,13 @@ import ru.spbhse.brainring.network.messages.messageTypes.FalseStartMessage;
 import ru.spbhse.brainring.network.messages.messageTypes.ForbiddenToAnswerMessage;
 import ru.spbhse.brainring.network.messages.messageTypes.TimeStartMessage;
 import ru.spbhse.brainring.ui.LocalGameLocation;
+import ru.spbhse.brainring.utils.SoundPlayer;
 
 /** Class realizing admin's logic (counting time, switching locations etc) in local mode */
 public class LocalGameAdminLogic {
     public static final String GREEN = "green";
     public static final String RED = "red";
+    private SoundPlayer player = new SoundPlayer();
     private LocalAdminGameManager manager;
     private LocalGameLocation location = LocalGameLocation.GAME_WAITING_START;
     private UserScore green;
@@ -113,11 +114,7 @@ public class LocalGameAdminLogic {
             toLocation(LocalGameLocation.COUNTDOWN);
             timer = firstGameTimer;
             timer.start();
-            new Thread(() -> {
-                MediaPlayer player = MediaPlayer.create(manager.getActivity(), R.raw.start);
-                player.setOnCompletionListener(MediaPlayer::release);
-                player.start();
-            }).start();
+            player.play(manager.getActivity(), R.raw.start);
             manager.getNetwork().sendMessageToOthers(TIME_START);
             return true;
         }
@@ -183,11 +180,7 @@ public class LocalGameAdminLogic {
         } else {
             user.status.setAlreadyAnswered(true);
             answeringUserId = userId;
-            new Thread(() -> {
-                MediaPlayer player = MediaPlayer.create(manager.getActivity(), R.raw.answering);
-                player.setOnCompletionListener(MediaPlayer::release);
-                player.start();
-            }).start();
+            player.play(manager.getActivity(), R.raw.answering);
             manager.getNetwork().sendMessageToConcreteUser(userId, ALLOW_ANSWER);
             manager.getActivity().onReceivingAnswer(getColor(userId));
             location = LocalGameLocation.ONE_IS_ANSWERING;
@@ -292,6 +285,7 @@ public class LocalGameAdminLogic {
             timer.cancel();
             timer = null;
         }
+        player.finish();
     }
 
     public LocalTimer getTimer() {
@@ -300,6 +294,10 @@ public class LocalGameAdminLogic {
 
     public LocalAdminGameManager getManager() {
         return manager;
+    }
+
+    public SoundPlayer getPlayer() {
+        return player;
     }
 
     /** Class to store current score and status of user */

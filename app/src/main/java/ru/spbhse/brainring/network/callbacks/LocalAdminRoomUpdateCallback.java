@@ -12,6 +12,7 @@ import com.google.android.gms.games.multiplayer.realtime.RoomUpdateCallback;
 import ru.spbhse.brainring.network.LocalNetworkAdmin;
 import ru.spbhse.brainring.utils.Constants;
 
+/** Reacts on room update. Used in {@code LocalNetworkAdmin} */
 public class LocalAdminRoomUpdateCallback extends RoomUpdateCallback {
     private LocalNetworkAdmin network;
 

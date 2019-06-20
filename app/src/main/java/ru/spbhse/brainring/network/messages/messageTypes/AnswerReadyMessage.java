@@ -9,6 +9,12 @@ import ru.spbhse.brainring.network.messages.MessageCodes;
 import ru.spbhse.brainring.network.messages.MessageGenerator;
 import ru.spbhse.brainring.network.messages.Message;
 
+/**
+ * Message from client to server signalizing that client pushed answer button in both local and
+ *      online games
+ * Format: [long : time]
+ *      time -- time from the beginning of the round when button was pushed. Ignored in local game
+ */
 public class AnswerReadyMessage extends Message {
     private long time;
 

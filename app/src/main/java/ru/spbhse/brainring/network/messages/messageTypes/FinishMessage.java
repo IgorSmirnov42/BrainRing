@@ -12,12 +12,13 @@ import ru.spbhse.brainring.network.messages.MessageGenerator;
 import ru.spbhse.brainring.network.messages.Message;
 import ru.spbhse.brainring.network.messages.OnlineFinishCodes;
 
+/**
+ * Message that can be sent by any user to any in online game signalizing that game is finished
+ * Format: [int : finishCode]
+ *      finishCode -- see {@code OnlineFinishCodes}
+ */
 public class FinishMessage extends Message {
     private int finishCode;
-
-    public int getFinishCode() {
-        return finishCode;
-    }
 
     public FinishMessage(int finishCode) {
         super(MessageCodes.FINISH);
@@ -29,6 +30,8 @@ public class FinishMessage extends Message {
         finishCode = inputStream.readInt();
     }
 
+
+    /** Returns human readable description of finish code */
     public String getFinishMessage(Context context) {
         String message;
         switch (finishCode) {

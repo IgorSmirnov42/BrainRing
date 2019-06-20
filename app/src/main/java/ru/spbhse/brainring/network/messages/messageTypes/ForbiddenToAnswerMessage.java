@@ -6,6 +6,10 @@ import ru.spbhse.brainring.network.messages.MessageCodes;
 import ru.spbhse.brainring.network.messages.MessageGenerator;
 import ru.spbhse.brainring.network.messages.Message;
 
+/**
+ * Message from server to client signalizing that server forbidden client answering now
+ * Format: empty message
+ */
 public class ForbiddenToAnswerMessage extends Message {
     public ForbiddenToAnswerMessage() {
         super(MessageCodes.FORBIDDEN_TO_ANSWER);

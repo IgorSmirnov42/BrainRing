@@ -5,6 +5,10 @@ import android.os.CountDownTimer;
 import ru.spbhse.brainring.logic.TrainingPlayerLogic;
 import ru.spbhse.brainring.utils.Constants;
 
+/**
+ * Timer used in training game
+ * If finishes without cancel starts answering
+ */
 public class TrainingGameTimer extends CountDownTimer {
     private TrainingPlayerLogic logic;
 

@@ -6,6 +6,10 @@ import ru.spbhse.brainring.network.messages.MessageCodes;
 import ru.spbhse.brainring.network.messages.MessageGenerator;
 import ru.spbhse.brainring.network.messages.Message;
 
+/**
+ * Message from client to server in online game signalizing that client is ready to continue a game
+ * Format: empty message
+ */
 public class ReadyForQuestionMessage extends Message {
     public ReadyForQuestionMessage() {
         super(MessageCodes.READY_FOR_QUESTION);

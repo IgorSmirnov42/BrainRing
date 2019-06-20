@@ -9,6 +9,12 @@ import ru.spbhse.brainring.network.messages.MessageCodes;
 import ru.spbhse.brainring.network.messages.MessageGenerator;
 import ru.spbhse.brainring.network.messages.Message;
 
+/**
+ * Message from server to client in online game signalizing that opponent answered wrong
+ *         with opponent's answer inside
+ * Format: [String : opponentAnswer]
+ *      opponentAnswer -- wrong answer that opponent wrote
+ */
 public class IncorrectOpponentAnswerMessage extends Message {
     private String opponentAnswer;
 

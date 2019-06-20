@@ -6,6 +6,10 @@ import ru.spbhse.brainring.network.messages.MessageCodes;
 import ru.spbhse.brainring.network.messages.MessageGenerator;
 import ru.spbhse.brainring.network.messages.Message;
 
+/**
+ * Message from server to client in both online and local game signalizing that time has started
+ * Format: empty message
+ */
 public class TimeStartMessage extends Message {
     public TimeStartMessage() {
         super(MessageCodes.TIME_START);
