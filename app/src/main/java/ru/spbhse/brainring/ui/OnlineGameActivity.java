@@ -35,9 +35,6 @@ public class OnlineGameActivity extends GameActivity {
         manager = new OnlineGameManager(this);
         playerLogic = manager.getUserLogic();
 
-        QuestionDatabase dataBase = QuestionDatabase.getInstance(this);
-        DatabaseController.setDatabase(dataBase);
-
         drawLocation();
 
         DatabaseController.generateNewSequence();

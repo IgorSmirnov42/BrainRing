@@ -133,8 +133,14 @@ public class QuestionDatabase extends SQLiteOpenHelper {
     /** Returns single instance of database, or constructs a new one, if there was no such */
     public static QuestionDatabase getInstance(Context context) {
         if (database == null) {
-            database = new QuestionDatabase(context);
+            database = new QuestionDatabase(context.getApplicationContext());
         }
+        return database;
+    }
+
+    /** Returns instance of stored database */
+    @Nullable
+    public static QuestionDatabase getInstanceUnsafe() {
         return database;
     }
 
@@ -171,6 +177,7 @@ public class QuestionDatabase extends SQLiteOpenHelper {
         try {
             Document doc = Jsoup.connect(table.getURL()).get();
             loadQuestions(doc, table);
+            Log.d(Constants.APP_TAG, "downloaded table " + table.getTableName());
         } catch (IOException e) {
             Log.wtf(Constants.APP_TAG, "Error occurred while connecting to the url " + table.getURL());
         }

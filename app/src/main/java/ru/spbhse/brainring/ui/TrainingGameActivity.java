@@ -36,8 +36,7 @@ public class TrainingGameActivity extends GameActivity {
         logic = new TrainingPlayerLogic(this);
         playerLogic = logic;
 
-        dataBase = QuestionDatabase.getInstance(TrainingGameActivity.this);
-        DatabaseController.setDatabase(dataBase);
+        dataBase = QuestionDatabase.getInstance(this);
 
         String packageAddress = getIntent().getStringExtra(Intent.EXTRA_TITLE);
         try {
