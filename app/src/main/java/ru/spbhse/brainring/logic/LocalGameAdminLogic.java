@@ -285,6 +285,7 @@ public class LocalGameAdminLogic {
             timer.cancel();
             timer = null;
         }
+        player.finish();
     }
 
     public LocalTimer getTimer() {
