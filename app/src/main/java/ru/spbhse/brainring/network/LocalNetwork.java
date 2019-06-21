@@ -19,9 +19,6 @@ import ru.spbhse.brainring.utils.Constants;
 
 /** Class for interaction with network in local network mode */
 public abstract class LocalNetwork {
-    protected static final int ROLE_ADMIN = 1;
-    protected static final int ROLE_GREEN = 1 << 1;
-    protected static final int ROLE_RED = 1 << 2;
     /** Number of tries that should be done to deliver a message that was failed to deliver */
     private static final int TIMES_TO_SEND = 100;
 
@@ -30,7 +27,7 @@ public abstract class LocalNetwork {
     protected boolean handshaked = false;
     protected boolean gameIsFinished = false;
     /** Number of users that are p2pConnected.
-     * Server should start online game only of both players are p2p connected
+     * Server should start online game only if both players are p2p connected
      */
     protected int p2pConnected = 0;
     /**

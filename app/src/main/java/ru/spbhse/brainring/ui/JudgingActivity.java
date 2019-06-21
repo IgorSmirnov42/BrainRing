@@ -7,7 +7,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import ru.spbhse.brainring.R;
-import ru.spbhse.brainring.logic.LocalGameAdminLogic;
+import ru.spbhse.brainring.utils.LocalGameRoles;
 
 /**
  * This is activity for judge in local game.
@@ -23,11 +23,11 @@ public class JudgingActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_judging);
 
-        String colorName = getIntent().getStringExtra("color");
+        LocalGameRoles colorName = (LocalGameRoles) getIntent().getSerializableExtra("color");
         String playerName;
         TextView answering = findViewById(R.id.answeringId);
         int color;
-        if (colorName.equals(LocalGameAdminLogic.RED)) {
+        if (colorName == LocalGameRoles.ROLE_RED) {
             color = ContextCompat.getColor(this, R.color.colorCardinal);
             playerName = getString(R.string.red);
         } else {

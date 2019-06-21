@@ -20,7 +20,7 @@ public class LocalTimer extends CountDownTimer {
 
     public LocalTimer(int totalTimeSec, int faultMillis, int sendingCountdownSec,
                       LocalGameAdminLogic logic) {
-        super(totalTimeSec * Constants.SECOND, Constants.SECOND);
+        super(totalTimeSec * Constants.SECOND + faultMillis, Constants.SECOND);
         fault = faultMillis;
         sendingCountdown = sendingCountdownSec;
         this.logic = logic;

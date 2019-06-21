@@ -16,6 +16,7 @@ import ru.spbhse.brainring.network.messages.Message;
 import ru.spbhse.brainring.network.messages.messageTypes.HandshakeMessage;
 import ru.spbhse.brainring.network.messages.messageTypes.InitialHandshakeMessage;
 import ru.spbhse.brainring.utils.Constants;
+import ru.spbhse.brainring.utils.LocalGameRoles;
 
 /**
  * Class with methods to interact with network
@@ -87,7 +88,7 @@ public class LocalNetworkAdmin extends LocalNetwork {
                 googleSignInAccount);
         final int MIN_OPPONENTS = 2, MAX_OPPONENTS = 2;
         Bundle autoMatchCriteria = RoomConfig.createAutoMatchCriteria(MIN_OPPONENTS,
-                MAX_OPPONENTS, ROLE_ADMIN);
+                MAX_OPPONENTS, LocalGameRoles.ROLE_ADMIN.getCode());
 
         mRoomConfig = RoomConfig.builder(mRoomUpdateCallback)
                 .setOnMessageReceivedListener(mOnRealTimeMessageReceivedListener)

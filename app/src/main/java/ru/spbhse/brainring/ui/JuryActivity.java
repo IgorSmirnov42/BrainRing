@@ -22,6 +22,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import ru.spbhse.brainring.R;
 import ru.spbhse.brainring.managers.LocalAdminGameManager;
 import ru.spbhse.brainring.utils.Constants;
+import ru.spbhse.brainring.utils.LocalGameRoles;
 
 /** This activity is for maintaining score of teams in local game */
 public class JuryActivity extends AppCompatActivity {
@@ -140,7 +141,7 @@ public class JuryActivity extends AppCompatActivity {
     }
 
     /** Reacts on pressing the answer button from some team*/
-    public void onReceivingAnswer(String color) {
+    public void onReceivingAnswer(LocalGameRoles color) {
         Intent intent = new Intent(JuryActivity.this, JudgingActivity.class);
         intent.putExtra("color", color);
         startActivityForResult(intent, RC_ANSWER_JUDGED);

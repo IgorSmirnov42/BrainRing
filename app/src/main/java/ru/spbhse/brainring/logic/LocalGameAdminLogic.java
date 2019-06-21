@@ -12,12 +12,11 @@ import ru.spbhse.brainring.network.messages.messageTypes.FalseStartMessage;
 import ru.spbhse.brainring.network.messages.messageTypes.ForbiddenToAnswerMessage;
 import ru.spbhse.brainring.network.messages.messageTypes.TimeStartMessage;
 import ru.spbhse.brainring.ui.LocalGameLocation;
+import ru.spbhse.brainring.utils.LocalGameRoles;
 import ru.spbhse.brainring.utils.SoundPlayer;
 
 /** Class realizing admin's logic (counting time, switching locations etc) in local mode */
 public class LocalGameAdminLogic {
-    public static final String GREEN = "green";
-    public static final String RED = "red";
     private SoundPlayer player = new SoundPlayer();
     private LocalAdminGameManager manager;
     private LocalGameLocation location = LocalGameLocation.GAME_WAITING_START;
@@ -188,11 +187,11 @@ public class LocalGameAdminLogic {
     }
 
     /** Returns user's color by id */
-    private String getColor(@NonNull String userId) {
+    private LocalGameRoles getColor(@NonNull String userId) {
         if (green.status.getParticipantId().equals(userId)) {
-            return GREEN;
+            return LocalGameRoles.ROLE_GREEN;
         } else {
-            return RED;
+            return LocalGameRoles.ROLE_RED;
         }
     }
 
@@ -228,7 +227,7 @@ public class LocalGameAdminLogic {
             toLocation(LocalGameLocation.NOT_STARTED);
             return;
         }
-        if (getColor(userId).equals("red")) {
+        if (getColor(userId) == LocalGameRoles.ROLE_RED) {
             manager.getActivity().setRedStatus(manager.getActivity().getString(R.string.connected));
         } else {
             manager.getActivity().setGreenStatus(manager.getActivity().getString(R.string.connected));

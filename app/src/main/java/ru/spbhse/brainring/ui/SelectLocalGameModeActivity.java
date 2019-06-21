@@ -8,12 +8,14 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import ru.spbhse.brainring.R;
-import ru.spbhse.brainring.logic.LocalGameAdminLogic;
+import ru.spbhse.brainring.utils.LocalGameRoles;
 
 /** This activity is for selecting user role in local game mode, and selecting time spent on answer */
 public class SelectLocalGameModeActivity extends AppCompatActivity {
     private int firstValue = 20;
     private int secondValue = 20;
+    private static final int BAR_GRADE = 10;
+    private static final int BAR_START = 10;
 
     /** {@inheritDoc} */
     @Override
@@ -25,7 +27,7 @@ public class SelectLocalGameModeActivity extends AppCompatActivity {
         firstBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                firstValue = 10 + progress * 10;
+                firstValue = BAR_START + progress * BAR_GRADE;
                 reloadValues();
             }
 
@@ -42,7 +44,7 @@ public class SelectLocalGameModeActivity extends AppCompatActivity {
         secondBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                secondValue = 10 + progress * 10;
+                secondValue = BAR_START + progress * BAR_GRADE;
                 reloadValues();
             }
 
@@ -66,14 +68,14 @@ public class SelectLocalGameModeActivity extends AppCompatActivity {
         Button greenButton = findViewById(R.id.greenPlayerButton);
         greenButton.setOnClickListener(v -> {
             Intent intent = new Intent(SelectLocalGameModeActivity.this, PlayerActivity.class);
-            intent.putExtra("color", LocalGameAdminLogic.GREEN);
+            intent.putExtra("color", LocalGameRoles.ROLE_GREEN);
             startActivity(intent);
         });
 
         Button redButton = findViewById(R.id.redPlayerButton);
         redButton.setOnClickListener(v -> {
             Intent intent = new Intent(SelectLocalGameModeActivity.this, PlayerActivity.class);
-            intent.putExtra("color", LocalGameAdminLogic.RED);
+            intent.putExtra("color", LocalGameRoles.ROLE_RED);
             startActivity(intent);
         });
     }

@@ -4,6 +4,7 @@ import ru.spbhse.brainring.logic.LocalGamePlayerLogic;
 import ru.spbhse.brainring.messageProcessing.LocalPlayerMessageProcessor;
 import ru.spbhse.brainring.network.LocalNetworkPlayer;
 import ru.spbhse.brainring.ui.PlayerActivity;
+import ru.spbhse.brainring.utils.LocalGameRoles;
 
 /**
  * Storage of data needed for communication between packages in local mode by player.
@@ -17,10 +18,10 @@ public class LocalPlayerGameManager implements Manager {
     private LocalNetworkPlayer network;
     private LocalPlayerMessageProcessor processor;
 
-    public LocalPlayerGameManager(PlayerActivity activity, String colorName) {
+    public LocalPlayerGameManager(PlayerActivity activity, LocalGameRoles color) {
         this.activity = activity;
         logic = new LocalGamePlayerLogic(this);
-        network = new LocalNetworkPlayer(colorName, this);
+        network = new LocalNetworkPlayer(color, this);
         processor = new LocalPlayerMessageProcessor(this);
     }
 

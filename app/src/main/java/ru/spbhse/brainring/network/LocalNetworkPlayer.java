@@ -16,6 +16,7 @@ import ru.spbhse.brainring.network.messages.Message;
 import ru.spbhse.brainring.network.messages.messageTypes.IAmGreenMessage;
 import ru.spbhse.brainring.network.messages.messageTypes.IAmRedMessage;
 import ru.spbhse.brainring.utils.Constants;
+import ru.spbhse.brainring.utils.LocalGameRoles;
 
 /**
  * Class with methods to interact with network
@@ -24,23 +25,18 @@ import ru.spbhse.brainring.utils.Constants;
 public class LocalNetworkPlayer extends LocalNetwork {
     private String serverId;
     /** Green or red table. Values are written in base class */
-    private int myColor;
+    private LocalGameRoles myColor;
     private LocalPlayerGameManager manager;
 
     /**
      * Creates new instance of LocalNetworkPlayer.
      * @param myColor string "red" or "green"
      */
-    public LocalNetworkPlayer(@NonNull String myColor, LocalPlayerGameManager manager) {
+    public LocalNetworkPlayer(@NonNull LocalGameRoles myColor, LocalPlayerGameManager manager) {
         super(manager);
 
         this.manager = manager;
-
-        if (myColor.equals("green")) {
-            this.myColor = ROLE_GREEN;
-        } else {
-            this.myColor = ROLE_RED;
-        }
+        this.myColor = myColor;
 
         mRoomUpdateCallback = new LocalPlayerRoomUpdateCallback(this);
     }
@@ -69,7 +65,7 @@ public class LocalNetworkPlayer extends LocalNetwork {
     public void doInitialHandshake(@NonNull String serverId) {
         this.serverId = serverId;
         handshaked = true;
-        if (myColor == ROLE_GREEN) {
+        if (myColor == LocalGameRoles.ROLE_GREEN) {
             Log.d(Constants.APP_TAG, "I am green");
             sendMessageToConcreteUser(serverId, new IAmGreenMessage());
         } else {
@@ -85,7 +81,7 @@ public class LocalNetworkPlayer extends LocalNetwork {
                 googleSignInAccount);
         final int MIN_OPPONENTS = 2, MAX_OPPONENTS = 2;
         Bundle autoMatchCriteria = RoomConfig.createAutoMatchCriteria(MIN_OPPONENTS,
-                MAX_OPPONENTS, myColor);
+                MAX_OPPONENTS, myColor.getCode());
 
         mRoomConfig = RoomConfig.builder(mRoomUpdateCallback)
                 .setOnMessageReceivedListener(mOnRealTimeMessageReceivedListener)

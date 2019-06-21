@@ -16,8 +16,8 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 
 import ru.spbhse.brainring.R;
-import ru.spbhse.brainring.logic.LocalGameAdminLogic;
 import ru.spbhse.brainring.managers.LocalPlayerGameManager;
+import ru.spbhse.brainring.utils.LocalGameRoles;
 
 /** This activity is for maintaining player in local mode */
 public class PlayerActivity extends AppCompatActivity {
@@ -30,12 +30,12 @@ public class PlayerActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_player);
 
-        String colorName = getIntent().getStringExtra("color");
+        LocalGameRoles colorName = (LocalGameRoles) getIntent().getSerializableExtra("color");
         manager = new LocalPlayerGameManager(this, colorName);
 
         Button button = findViewById(R.id.buttonPush);
         button.setOnClickListener(v -> manager.getLogic().answerButtonPushed());
-        if (colorName.equals(LocalGameAdminLogic.RED)) {
+        if (colorName == LocalGameRoles.ROLE_RED) {
             button.setBackgroundColor(ContextCompat.getColor(this, R.color.colorCardinal));
         } else {
             button.setBackgroundColor(ContextCompat.getColor(this, R.color.colorJungleGreen));
