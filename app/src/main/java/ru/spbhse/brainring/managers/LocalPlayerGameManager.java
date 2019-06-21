@@ -5,6 +5,12 @@ import ru.spbhse.brainring.messageProcessing.LocalPlayerMessageProcessor;
 import ru.spbhse.brainring.network.LocalNetworkPlayer;
 import ru.spbhse.brainring.ui.PlayerActivity;
 
+/**
+ * Storage of data needed for communication between packages in local mode by player.
+ *
+ * Stores links to network, activity, players's logic and message processor
+ * Has function to finish game that finishes all running processes connected with game
+ */
 public class LocalPlayerGameManager implements Manager {
     private LocalGamePlayerLogic logic;
     private PlayerActivity activity;
