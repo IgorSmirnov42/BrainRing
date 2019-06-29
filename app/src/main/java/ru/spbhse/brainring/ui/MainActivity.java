@@ -19,7 +19,7 @@ import com.google.android.gms.games.Games;
 import java.util.Objects;
 
 import ru.spbhse.brainring.R;
-import ru.spbhse.brainring.controllers.Controller;
+import ru.spbhse.brainring.utils.Constants;
 
 /** This activity contains menu fields */
 public class MainActivity extends AppCompatActivity {
@@ -104,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
                         .setNeutralButton(android.R.string.ok, null).show();
             }
         } else if (requestCode == RC_LEADERBOARD_UI) {
-            Log.d(Controller.APP_TAG, "Showed leaderboard");
+            Log.d(Constants.APP_TAG, "Showed leaderboard");
         }
     }
 }

@@ -7,7 +7,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import ru.spbhse.brainring.controllers.Controller;
+import ru.spbhse.brainring.utils.Constants;
 
 /**
  * Wrapper above {@code DataOutputStream} and {@code ByteArrayOutputStream} that allows to combine
@@ -38,7 +38,7 @@ public class MessageGenerator {
         try {
             outputStream.writeUTF(string);
         } catch (IOException e) {
-            Log.wtf(Controller.APP_TAG, "Error on writing");
+            Log.wtf(Constants.APP_TAG, "Error on writing");
             e.printStackTrace();
         }
         return this;
@@ -50,7 +50,7 @@ public class MessageGenerator {
         try {
             outputStream.writeLong(longValue);
         } catch (IOException e) {
-            Log.wtf(Controller.APP_TAG, "Error on writing");
+            Log.wtf(Constants.APP_TAG, "Error on writing");
             e.printStackTrace();
         }
         return this;
@@ -62,10 +62,19 @@ public class MessageGenerator {
         try {
             outputStream.writeInt(intValue);
         } catch (IOException e) {
-            Log.wtf(Controller.APP_TAG, "Error on writing");
+            Log.wtf(Constants.APP_TAG, "Error on writing");
             e.printStackTrace();
         }
         return this;
+    }
+
+    private void close() {
+        try {
+            outputStream.close();
+        } catch (IOException e) {
+            Log.wtf(Constants.APP_TAG, "Error on closing");
+            e.printStackTrace();
+        }
     }
 
     /** Transforms output stream to byte array. Closes output streams */
@@ -73,18 +82,12 @@ public class MessageGenerator {
     public byte[] toByteArray() {
         try {
             outputStream.flush();
-            byteArrayOutputStream.flush();
         } catch (IOException e) {
-            Log.wtf(Controller.APP_TAG, "Error on flushing");
+            Log.wtf(Constants.APP_TAG, "Error on flushing");
             e.printStackTrace();
         }
         byte[] result = byteArrayOutputStream.toByteArray();
-        try {
-            outputStream.close();
-        } catch (IOException e) {
-            Log.wtf(Controller.APP_TAG, "Error on closing");
-            e.printStackTrace();
-        }
+        close();
         return result;
     }
 }

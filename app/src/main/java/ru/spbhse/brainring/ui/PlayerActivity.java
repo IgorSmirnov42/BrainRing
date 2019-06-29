@@ -16,12 +16,13 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 
 import ru.spbhse.brainring.R;
-import ru.spbhse.brainring.controllers.LocalController;
-import ru.spbhse.brainring.logic.LocalGameAdminLogic;
+import ru.spbhse.brainring.managers.LocalPlayerGameManager;
+import ru.spbhse.brainring.utils.LocalGameRoles;
 
 /** This activity is for maintaining player in local mode */
 public class PlayerActivity extends AppCompatActivity {
     private final static int RC_SIGN_IN = 42;
+    private LocalPlayerGameManager manager;
 
     /** {@inheritDoc} */
     @Override
@@ -29,19 +30,18 @@ public class PlayerActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_player);
 
-        LocalController.initializeLocalPlayer();
-        LocalController.setUI(this);
+        LocalGameRoles colorName = (LocalGameRoles) getIntent().getSerializableExtra("color");
+        manager = new LocalPlayerGameManager(this, colorName);
 
         Button button = findViewById(R.id.buttonPush);
-        button.setOnClickListener(v -> LocalController.LocalPlayerLogicController.answerButtonPushed());
-        String colorName = getIntent().getStringExtra("color");
-        if (colorName.equals(LocalGameAdminLogic.RED)) {
+        button.setOnClickListener(v -> manager.getLogic().answerButtonPushed());
+        if (colorName == LocalGameRoles.ROLE_RED) {
             button.setBackgroundColor(ContextCompat.getColor(this, R.color.colorCardinal));
         } else {
             button.setBackgroundColor(ContextCompat.getColor(this, R.color.colorJungleGreen));
         }
 
-        LocalController.LocalNetworkPlayerController.createLocalGame(colorName);
+        signIn();
     }
 
     /* I know that this function is out of content here,
@@ -51,7 +51,8 @@ public class PlayerActivity extends AppCompatActivity {
         GoogleSignInOptions signInOptions = GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN;
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
         if (GoogleSignIn.hasPermissions(account, signInOptions.getScopeArray())) {
-            LocalController.LocalNetworkController.loggedIn(account);
+            manager.getNetwork().signedIn(account);
+            manager.getNetwork().startQuickGame();
         } else {
             GoogleSignInClient signInClient = GoogleSignIn.getClient(this,
                     GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN);
@@ -67,7 +68,8 @@ public class PlayerActivity extends AppCompatActivity {
         if (requestCode == RC_SIGN_IN) {
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
             if (result.isSuccess()) {
-                LocalController.LocalNetworkController.loggedIn(result.getSignInAccount());
+                manager.getNetwork().signedIn(result.getSignInAccount());
+                manager.getNetwork().startQuickGame();
             } else {
                 String message = result.getStatus().getStatusMessage();
                 if (message == null || message.isEmpty()) {
@@ -83,7 +85,7 @@ public class PlayerActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        LocalController.finishLocalGame(false);
+        manager.finishGame();
     }
 
     /** When back button is pressed, asks if user is sure to leave the game and did not pressed it accidentally */
@@ -92,8 +94,8 @@ public class PlayerActivity extends AppCompatActivity {
         new AlertDialog.Builder(this).setTitle(getString(R.string.out_of_local))
                 .setMessage(getString(R.string.want_out))
                 .setPositiveButton(getString(R.string.yes), (dialog, which) -> {
-                    LocalController.finishLocalGame(false);
-                    super.onBackPressed();
+                    manager.finishGame();
+                    finish();
                 })
                 .setNegativeButton(getString(R.string.no), (dialog, which) -> {
                 })

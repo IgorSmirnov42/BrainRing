@@ -1,42 +1,107 @@
 package ru.spbhse.brainring.network.messages;
 
-/** Codes of messages used in {@code Network} and {@code LocalNetwork} */
-public class Message {
-    /** From player to server. Indicates that player pushed button */
-    public static final int ANSWER_IS_READY = 0;
-    /** From answering player to server. Indicates that player wrote an answer */
-    public static final int ANSWER_IS_WRITTEN = 1;
-    /** From server to player. Forbiddance to answer */
-    public static final int FORBIDDEN_TO_ANSWER = 2;
-    /** From server to player. Allowance to answer */
-    public static final int ALLOWED_TO_ANSWER = 3;
-    /** From server to player. Sending question data */
-    public static final int SENDING_QUESTION = 4;
-    /** From server to player. On opponent's incorrect answer */
-    public static final int SENDING_INCORRECT_OPPONENT_ANSWER = 5;
-    /** From server to player. Finishing round. Showing answer */
-    public static final int SENDING_CORRECT_ANSWER_AND_SCORE = 6;
-    /** From server to player. On opponent's pushing */
-    public static final int OPPONENT_IS_ANSWERING = 7;
-    /** From player to server. Time is ran out */
-    public static final int TIME_LIMIT = 8;
-    /** From player to server. Player pushed button before signal */
-    public static final int FALSE_START = 9;
-    /** From server to player. Allowance to push button */
-    public static final int TIME_START = 10;
-    /** From server to player. Game's finish reason */
-    public static final int FINISH = 11;
-    /** From player to server. Player received question data */
-    public static final int HANDSHAKE = 12;
-    /** From server to player. Written answer is correct */
-    public static final int CORRECT_ANSWER = 13;
-    /** From player to server. Ready to get next question */
-    public static final int READY_FOR_QUESTION = 14;
-    // for local game only
-    /** From server to player. First handshake to determine color */
-    public static final int INITIAL_HANDSHAKE = 15;
-    /** From player to server. Player has green table */
-    public static final int I_AM_GREEN = 16;
-    /** From player to server. Player has red table */
-    public static final int I_AM_RED = 17;
+import android.support.annotation.NonNull;
+import android.util.Log;
+
+import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
+import java.io.IOException;
+
+import ru.spbhse.brainring.network.messages.messageTypes.AllowedToAnswerMessage;
+import ru.spbhse.brainring.network.messages.messageTypes.AnswerReadyMessage;
+import ru.spbhse.brainring.network.messages.messageTypes.AnswerWrittenMessage;
+import ru.spbhse.brainring.network.messages.messageTypes.CorrectAnswerAndScoreMessage;
+import ru.spbhse.brainring.network.messages.messageTypes.CorrectAnswerMessage;
+import ru.spbhse.brainring.network.messages.messageTypes.FalseStartMessage;
+import ru.spbhse.brainring.network.messages.messageTypes.FinishMessage;
+import ru.spbhse.brainring.network.messages.messageTypes.ForbiddenToAnswerMessage;
+import ru.spbhse.brainring.network.messages.messageTypes.HandshakeMessage;
+import ru.spbhse.brainring.network.messages.messageTypes.IAmGreenMessage;
+import ru.spbhse.brainring.network.messages.messageTypes.IAmRedMessage;
+import ru.spbhse.brainring.network.messages.messageTypes.IncorrectOpponentAnswerMessage;
+import ru.spbhse.brainring.network.messages.messageTypes.InitialHandshakeMessage;
+import ru.spbhse.brainring.network.messages.messageTypes.OpponentIsAnsweringMessage;
+import ru.spbhse.brainring.network.messages.messageTypes.QuestionMessage;
+import ru.spbhse.brainring.network.messages.messageTypes.ReadyForQuestionMessage;
+import ru.spbhse.brainring.network.messages.messageTypes.TimeLimitMessage;
+import ru.spbhse.brainring.network.messages.messageTypes.TimeStartMessage;
+import ru.spbhse.brainring.utils.Constants;
+
+/**
+ * Abstract class for conversion between {@code byte[]} and {@code Object} messages
+ * New type of message should be declared here in {@code readMessage}, in {@code MessageCodes}
+ *      and as a new class in {@code messageTypes} with functions for serializing and deserializing.
+ * Also all inheritors should transfer their code to constructor of this class
+ */
+public abstract class Message {
+    private int messageCode;
+
+    public int getMessageCode() {
+        return messageCode;
+    }
+
+    protected Message(int messageCode) {
+        this.messageCode = messageCode;
+    }
+
+    /**
+     * Serializes message.
+     * This method creates {@code MessageGenerator}, writes message code and then
+     * transfers control to overridden version with generator as an argument
+     */
+    public byte[] toByteArray() {
+        return toByteArray(MessageGenerator.create().writeInt(messageCode));
+    }
+
+    /**
+     * This function should implement serialization of message to {@code generator} excepting
+     *      message code (it will be serialized automatically by this class).
+     */
+    protected abstract byte[] toByteArray(@NonNull MessageGenerator generator);
+
+    public static Message readMessage(@NonNull byte[] message) throws IOException {
+        try (DataInputStream inputStream = new DataInputStream(new ByteArrayInputStream(message))) {
+            int messageCode = inputStream.readInt();
+            Log.d(Constants.APP_TAG, "Received message. Identifier is " + messageCode);
+            switch (messageCode) {
+                case MessageCodes.ANSWER_IS_READY:
+                    return new AnswerReadyMessage(inputStream);
+                case MessageCodes.ANSWER_IS_WRITTEN:
+                    return new AnswerWrittenMessage(inputStream);
+                case MessageCodes.FORBIDDEN_TO_ANSWER:
+                    return new ForbiddenToAnswerMessage();
+                case MessageCodes.ALLOWED_TO_ANSWER:
+                    return new AllowedToAnswerMessage();
+                case MessageCodes.SENDING_QUESTION:
+                    return new QuestionMessage(inputStream);
+                case MessageCodes.SENDING_INCORRECT_OPPONENT_ANSWER:
+                    return new IncorrectOpponentAnswerMessage(inputStream);
+                case MessageCodes.SENDING_CORRECT_ANSWER_AND_SCORE:
+                    return new CorrectAnswerAndScoreMessage(inputStream);
+                case MessageCodes.OPPONENT_IS_ANSWERING:
+                    return new OpponentIsAnsweringMessage();
+                case MessageCodes.TIME_START:
+                    return new TimeStartMessage();
+                case MessageCodes.FALSE_START:
+                    return new FalseStartMessage();
+                case MessageCodes.HANDSHAKE:
+                    return new HandshakeMessage();
+                case MessageCodes.TIME_LIMIT:
+                    return new TimeLimitMessage(inputStream);
+                case MessageCodes.FINISH:
+                    return new FinishMessage(inputStream);
+                case MessageCodes.CORRECT_ANSWER:
+                    return new CorrectAnswerMessage();
+                case MessageCodes.READY_FOR_QUESTION:
+                    return new ReadyForQuestionMessage();
+                case MessageCodes.I_AM_GREEN:
+                    return new IAmGreenMessage();
+                case MessageCodes.I_AM_RED:
+                    return new IAmRedMessage();
+                case MessageCodes.INITIAL_HANDSHAKE:
+                    return new InitialHandshakeMessage();
+            }
+        }
+        throw new IllegalArgumentException("Unexpected message code");
+    }
 }

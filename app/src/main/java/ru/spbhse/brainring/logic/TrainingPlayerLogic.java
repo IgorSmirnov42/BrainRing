@@ -1,27 +1,34 @@
 package ru.spbhse.brainring.logic;
 
-import android.media.MediaPlayer;
 import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
 import ru.spbhse.brainring.R;
-import ru.spbhse.brainring.controllers.Controller;
 import ru.spbhse.brainring.controllers.DatabaseController;
-import ru.spbhse.brainring.controllers.TrainingController;
 import ru.spbhse.brainring.files.ComplainedQuestion;
+import ru.spbhse.brainring.logic.timers.TrainingGameTimer;
+import ru.spbhse.brainring.logic.timers.TrainingWritingTimer;
 import ru.spbhse.brainring.ui.GameActivityLocation;
+import ru.spbhse.brainring.ui.TrainingGameActivity;
+import ru.spbhse.brainring.utils.Constants;
 import ru.spbhse.brainring.utils.Question;
+import ru.spbhse.brainring.utils.SoundPlayer;
 
-public class TrainingPlayerLogic {
+public class TrainingPlayerLogic implements PlayerLogic {
     private static final int TIME_TO_WRITE_ANSWER = 20;
-    private static final int SECOND = 1000;
     public static final int DEFAULT_READING_TIME = 20;
+    private SoundPlayer player = new SoundPlayer();
     private Question currentQuestion;
     private int correctAnswers = 0;
     private int wrongAnswers = 0;
     private int readingTime = DEFAULT_READING_TIME;
     private CountDownTimer timer;
+    private TrainingGameActivity activity;
+
+    public TrainingPlayerLogic(TrainingGameActivity activity) {
+        this.activity = activity;
+    }
 
     /**
      * Returns current question data
@@ -29,6 +36,7 @@ public class TrainingPlayerLogic {
      * @return current question data as {@code ComplainedQuestions}
      */
     @NonNull
+    @Override
     public ComplainedQuestion getCurrentQuestionData() {
         return new ComplainedQuestion(currentQuestion.getQuestion(),
                 currentQuestion.getAllAnswers(), currentQuestion.getId());
@@ -44,41 +52,29 @@ public class TrainingPlayerLogic {
             timer = null;
         }
         if (DatabaseController.getNumberOfRemainingQuestions() == 0) {
-            TrainingController.TrainingUIController.onGameFinished();
+            activity.onGameFinished();
             return;
         }
         currentQuestion = DatabaseController.getRandomQuestion();
 
-        TrainingController.TrainingUIController.setLocation(GameActivityLocation.SHOW_QUESTION);
-        TrainingController.TrainingUIController.setQuestionText(currentQuestion.getQuestion());
-        TrainingController.TrainingUIController.setTime("");
-        TrainingController.TrainingUIController.setAnswer(currentQuestion.getAllAnswers());
-        TrainingController.TrainingUIController.setComment(currentQuestion.getComment());
-        TrainingController.TrainingUIController.onNewQuestion();
+        activity.setLocation(GameActivityLocation.SHOW_QUESTION);
+        activity.setQuestionText(currentQuestion.getQuestion());
+        activity.setTime("");
+        activity.setAnswerText(currentQuestion.getAllAnswers());
+        activity.setCommentText(currentQuestion.getComment());
+        activity.onNewQuestion();
 
-        Log.d(Controller.APP_TAG, "New question");
+        Log.d(Constants.APP_TAG, "New question");
 
-        timer = new CountDownTimer(readingTime * SECOND, SECOND) {
-            @Override
-            public void onTick(long millisUntilFinished) {
-                if (timer == this) {
-                    if (millisUntilFinished <= readingTime * SECOND) {
-                        long secondsLeft = millisUntilFinished / SECOND;
-                        TrainingController.TrainingUIController.setTime(String.valueOf(secondsLeft));
-                        Log.d(Controller.APP_TAG, "TICK" + secondsLeft);
-                    }
-                }
-            }
-
-            @Override
-            public void onFinish() {
-                startAnswer();
-            }
-        };
+        timer = new TrainingGameTimer(readingTime, this);
         timer.start();
     }
 
-    /** Reacts on pushing the answer button, cancels the timer and suggests user to answer the question */
+    /**
+     * Reacts on pushing the answer button, cancels the timer and suggests user to answer
+     * the question
+     */
+    @Override
     public void answerButtonPushed() {
         if (timer != null) {
             timer.cancel();
@@ -94,6 +90,7 @@ public class TrainingPlayerLogic {
             timer = null;
         }
         DatabaseController.setGameTable(null);
+        player.finish();
     }
 
     /** Sets the reading time */
@@ -102,57 +99,45 @@ public class TrainingPlayerLogic {
     }
 
     /** Reacts on writing the answer */
+    @Override
     public void answerIsWritten(@NonNull String answer) {
         if (timer != null) {
             timer.cancel();
             timer = null;
         }
-        TrainingController.TrainingUIController.setTime("");
-        Log.d(Controller.APP_TAG, "Checking answer " + answer);
+        activity.setTime("");
+        Log.d(Constants.APP_TAG, "Checking answer " + answer);
         if (currentQuestion.checkAnswer(answer)) {
-            TrainingController.TrainingUIController.setQuestionResult(
-                    TrainingController.getTrainingGameActivity().getString(R.string.right_answer));
+            activity.setQuestionResult(activity.getString(R.string.right_answer));
             correctAnswers++;
         } else {
-            TrainingController.TrainingUIController.setQuestionResult(
-                    TrainingController.getTrainingGameActivity().getString(R.string.wrong_answer));
+            activity.setQuestionResult(activity.getString(R.string.wrong_answer));
             wrongAnswers++;
         }
-        TrainingController.TrainingUIController.setScore(correctAnswers, wrongAnswers);
-        TrainingController.TrainingUIController.setLocation(GameActivityLocation.SHOW_ANSWER);
+        activity.setScore(String.valueOf(correctAnswers), String.valueOf(wrongAnswers));
+        activity.setLocation(GameActivityLocation.SHOW_ANSWER);
     }
 
-    private void startAnswer() {
+    public void startAnswer() {
         if (timer != null) {
             timer.cancel();
             timer = null;
         }
-        TrainingController.TrainingUIController.setLocation(GameActivityLocation.WRITE_ANSWER);
+        activity.setLocation(GameActivityLocation.WRITE_ANSWER);
 
-        timer = new CountDownTimer(TIME_TO_WRITE_ANSWER * SECOND, SECOND) {
-            @Override
-            public void onTick(long millisUntilFinished) {
-                if (timer == this) {
-                    if (millisUntilFinished <= TIME_TO_WRITE_ANSWER * SECOND / 2) {
-                        onReceivingTick(millisUntilFinished / SECOND);
-                    }
-                }
-            }
-
-            @Override
-            public void onFinish() {
-                answerIsWritten(TrainingController.TrainingUIController.getWhatWritten());
-            }
-        };
+        timer = new TrainingWritingTimer(TIME_TO_WRITE_ANSWER, this);
         timer.start();
     }
 
-    private void onReceivingTick(long secondsLeft) {
-        new Thread(() -> {
-            MediaPlayer player = MediaPlayer.create(TrainingController.getTrainingGameActivity(),
-                    R.raw.countdown);
-            player.setOnCompletionListener(MediaPlayer::release);
-            player.start();
-        }).start();
+    public void onReceivingTick(long secondsLeft) {
+        player.play(activity, R.raw.countdown);
+    }
+
+    public CountDownTimer getTimer() {
+        return timer;
+    }
+
+    public TrainingGameActivity getActivity() {
+        return activity;
     }
 }

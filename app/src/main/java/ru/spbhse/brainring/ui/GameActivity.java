@@ -14,10 +14,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import ru.spbhse.brainring.R;
-import ru.spbhse.brainring.controllers.Controller;
-import ru.spbhse.brainring.controllers.GameController;
 import ru.spbhse.brainring.files.ComplainedQuestion;
 import ru.spbhse.brainring.files.ComplainsFileHandler;
+import ru.spbhse.brainring.logic.PlayerLogic;
+import ru.spbhse.brainring.utils.Constants;
 
 import static ru.spbhse.brainring.ui.GameActivityLocation.GAME_WAITING_START;
 import static ru.spbhse.brainring.ui.GameActivityLocation.OPPONENT_IS_ANSWERING;
@@ -31,7 +31,6 @@ import static ru.spbhse.brainring.ui.GameActivityLocation.WRITE_ANSWER;
  */
 abstract public class GameActivity extends AppCompatActivity {
     protected GameActivityLocation currentLocation = GAME_WAITING_START;
-    protected GameController gameController;
     protected String question = "";
     protected String answer = "";
     protected String comment = "";
@@ -43,6 +42,7 @@ abstract public class GameActivity extends AppCompatActivity {
     protected String timeLeft = "";
     protected String buttonText = "";
     protected String questionResult = "";
+    protected PlayerLogic playerLogic;
 
     /** Main function. Based on current location, draws all needed components for this location. */
     protected void drawLocation() {
@@ -64,7 +64,7 @@ abstract public class GameActivity extends AppCompatActivity {
             setTime(timeLeft);
 
             Button answerButton = findViewById(R.id.answerReadyButton);
-            answerButton.setOnClickListener(v -> gameController.answerButtonPushed());
+            answerButton.setOnClickListener(v -> playerLogic.answerButtonPushed());
         }
         if (currentLocation == WRITE_ANSWER) {
             setContentView(R.layout.activity_writing_answer);
@@ -79,8 +79,7 @@ abstract public class GameActivity extends AppCompatActivity {
 
             Button answerWrittenButton = findViewById(R.id.answerWrittenButton);
             answerWrittenButton.setOnClickListener(
-                    v -> gameController.answerIsWritten(
-                            answerEditor.getText().toString()));
+                    v -> playerLogic.answerIsWritten(answerEditor.getText().toString()));
         }
         if (currentLocation == SHOW_ANSWER) {
             setContentView(R.layout.activity_showing_answer);
@@ -98,7 +97,7 @@ abstract public class GameActivity extends AppCompatActivity {
 
             Button complainButton = findViewById(R.id.complainButton);
             complainButton.setOnClickListener(v -> {
-                ComplainedQuestion question = gameController.getCurrentQuestionData();
+                ComplainedQuestion question = playerLogic.getCurrentQuestionData();
                 try {
                     ComplainsFileHandler.appendComplain(question, this);
                 } catch (Exception e) {
@@ -242,7 +241,7 @@ abstract public class GameActivity extends AppCompatActivity {
         if (answerEditor != null) {
             return answerEditor.getText().toString();
         } else {
-            Log.wtf(Controller.APP_TAG, "Answer editing wasn't open but should");
+            Log.wtf(Constants.APP_TAG, "Answer editing wasn't open but should");
             return "";
         }
     }

@@ -24,13 +24,12 @@ import java.util.Scanner;
 import java.util.regex.Pattern;
 
 import ru.spbhse.brainring.R;
-import ru.spbhse.brainring.controllers.Controller;
+import ru.spbhse.brainring.utils.Constants;
 import ru.spbhse.brainring.utils.Question;
 
 /** This class provides methods for managing database with questions */
 public class QuestionDatabase extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "Questions.db";
-    private static int databaseVersion;
     private static QuestionDatabase database;
     private static DatabaseTable baseTable;
     private static DatabaseTable gameTable;
@@ -109,13 +108,12 @@ public class QuestionDatabase extends SQLiteOpenHelper {
 
                 db.execSQL(deleteBaseTable);
                 db.execSQL(createNewBaseTable);
-                databaseVersion = currentVersion;
                 updateVersion(context);
 
                 out.close();
                 in.close();
             } catch (IOException e) {
-                Log.wtf(Controller.APP_TAG, "failed to read database");
+                Log.wtf(Constants.APP_TAG, "failed to read database");
             }
         }
     }
@@ -127,7 +125,7 @@ public class QuestionDatabase extends SQLiteOpenHelper {
         try {
              version = versionScanner.nextInt();
         } catch (Exception e) {
-            Log.wtf(Controller.APP_TAG, "couldn't read version from its resource");
+            Log.wtf(Constants.APP_TAG, "couldn't read version from its resource");
         }
         return version;
     }
@@ -135,8 +133,14 @@ public class QuestionDatabase extends SQLiteOpenHelper {
     /** Returns single instance of database, or constructs a new one, if there was no such */
     public static QuestionDatabase getInstance(Context context) {
         if (database == null) {
-            database = new QuestionDatabase(context);
+            database = new QuestionDatabase(context.getApplicationContext());
         }
+        return database;
+    }
+
+    /** Returns instance of stored database */
+    @Nullable
+    public static QuestionDatabase getInstanceUnsafe() {
         return database;
     }
 
@@ -165,7 +169,7 @@ public class QuestionDatabase extends SQLiteOpenHelper {
         }
 
         if (alreadyExists(table)) {
-            Log.d(Controller.APP_TAG, "Table already exists");
+            Log.d(Constants.APP_TAG, "Table already exists");
             return;
         }
 
@@ -173,8 +177,9 @@ public class QuestionDatabase extends SQLiteOpenHelper {
         try {
             Document doc = Jsoup.connect(table.getURL()).get();
             loadQuestions(doc, table);
+            Log.d(Constants.APP_TAG, "downloaded table " + table.getTableName());
         } catch (IOException e) {
-            Log.wtf(Controller.APP_TAG, "Error occurred while connecting to the url " + table.getURL());
+            Log.wtf(Constants.APP_TAG, "Error occurred while connecting to the url " + table.getURL());
         }
     }
 

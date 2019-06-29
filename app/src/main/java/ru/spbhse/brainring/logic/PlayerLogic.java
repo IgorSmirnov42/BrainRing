@@ -1,11 +1,10 @@
-package ru.spbhse.brainring.controllers;
+package ru.spbhse.brainring.logic;
 
 import android.support.annotation.NonNull;
 
 import ru.spbhse.brainring.files.ComplainedQuestion;
 
-/** Provides interface to control the game, network or training one */
-public interface GameController {
+public interface PlayerLogic {
     /** Reacts on pushing answer button */
     void answerButtonPushed();
 

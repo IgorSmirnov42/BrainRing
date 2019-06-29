@@ -11,9 +11,9 @@ import android.widget.TextView;
 import java.util.List;
 
 import ru.spbhse.brainring.R;
-import ru.spbhse.brainring.controllers.Controller;
 import ru.spbhse.brainring.files.ComplainedQuestion;
 import ru.spbhse.brainring.files.ComplainsFileHandler;
+import ru.spbhse.brainring.utils.Constants;
 import ru.spbhse.brainring.utils.MailSender;
 
 /**
@@ -34,7 +34,7 @@ public class ConcreteComplain extends AppCompatActivity {
             list = ComplainsFileHandler.getAllQuestionsFromFile(this);
         } catch (Exception e) {
             e.printStackTrace();
-            Log.wtf(Controller.APP_TAG, "Cannot load list of questions");
+            Log.wtf(Constants.APP_TAG, "Cannot load list of questions");
             finish();
             return;
         }
@@ -79,7 +79,7 @@ public class ConcreteComplain extends AppCompatActivity {
             ComplainsFileHandler.saveComplainsToFile(list, this);
         } catch (Exception e) {
             e.printStackTrace();
-            Log.wtf(Controller.APP_TAG, "Error while writing to file");
+            Log.wtf(Constants.APP_TAG, "Error while writing to file");
         }
     }
 
