@@ -6,4 +6,5 @@ public class Constants {
     public static final int SECOND = 1000;
     /** App tag, used in logging */
     public static String APP_TAG = "BrainRing";
+    public static final int LOCAL_PORT = 10239;
 }

@@ -1,19 +1,17 @@
 package ru.spbhse.brainring.network;
 
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.games.GamesCallbackStatusCodes;
-import com.google.android.gms.games.RealTimeMultiplayerClient;
-import com.google.android.gms.games.multiplayer.realtime.OnRealTimeMessageReceivedListener;
-import com.google.android.gms.games.multiplayer.realtime.Room;
-import com.google.android.gms.games.multiplayer.realtime.RoomConfig;
-import com.google.android.gms.games.multiplayer.realtime.RoomStatusUpdateCallback;
-import com.google.android.gms.games.multiplayer.realtime.RoomUpdateCallback;
+import java.io.IOException;
+import java.net.Socket;
+import java.util.HashMap;
+import java.util.Objects;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import ru.spbhse.brainring.managers.Manager;
-import ru.spbhse.brainring.network.callbacks.LocalRoomStatusUpdateCallback;
 import ru.spbhse.brainring.network.messages.Message;
 import ru.spbhse.brainring.utils.Constants;
 
@@ -21,120 +19,37 @@ import ru.spbhse.brainring.utils.Constants;
 public abstract class LocalNetwork {
     /** Number of tries that should be done to deliver a message that was failed to deliver */
     private static final int TIMES_TO_SEND = 100;
-
+    protected HashMap<String, Socket> contacts = new HashMap<>();
     private Manager manager;
+    private Handler uiHandler = new Handler();
+    protected final ExecutorService executor = Executors.newFixedThreadPool(4);
     /** Flag to determine if handshake was done */
     protected boolean handshaked = false;
     protected boolean gameIsFinished = false;
-    /** Number of users that are p2pConnected.
-     * Server should start online game only if both players are p2p connected
-     */
-    protected int p2pConnected = 0;
-    /**
-     * Flag to determine whether I am server and {@code onRoomConnected} had already been called
-     * Always false for player
-     */
-    protected boolean serverRoomConnected = false;
-    protected RoomConfig mRoomConfig;
-    protected Room room;
-    protected GoogleSignInAccount googleSignInAccount;
-    protected RealTimeMultiplayerClient mRealTimeMultiplayerClient;
-    protected String myParticipantId;
-    protected RoomStatusUpdateCallback mRoomStatusUpdateCallback;
-    protected RoomUpdateCallback mRoomUpdateCallback;
 
     protected LocalNetwork(Manager manager) {
         this.manager = manager;
-        mRoomStatusUpdateCallback = new LocalRoomStatusUpdateCallback(this);
     }
-
-    public GoogleSignInAccount getSignInAccount() {
-        return googleSignInAccount;
-    }
-
-    public void setRoom(Room room) {
-        this.room = room;
-    }
-
-    public void setMyParticipantId(String participantId) {
-        myParticipantId = participantId;
-    }
-
-    public int getP2PConnected() {
-        return p2pConnected;
-    }
-
-    /** Gets message and resubmits it to {@code onMessageReceived} with sender id */
-    protected OnRealTimeMessageReceivedListener mOnRealTimeMessageReceivedListener = realTimeMessage -> {
-        byte[] buf = realTimeMessage.getMessageData();
-        onMessageReceived(buf, realTimeMessage.getSenderParticipantId());
-    };
 
     /** Reacts on received message */
     protected abstract void onMessageReceived(@NonNull byte[] buf, @NonNull String userId);
 
-    /** Starts quick game with 2 auto matched players */
-    abstract public void startQuickGame();
-
-    /**
-     * Sends message to user by id reliably.
-     * If sending is unsuccessful repeats it {@code TIMES_TO_SEND} times until success
-     * If there was no success, panics
-     * CANNOT send message to itself
-     */
     public void sendMessageToConcreteUser(@NonNull String userId, @NonNull Message message) {
-        Log.d(Constants.APP_TAG, "Start sending message to " + userId);
-        sendMessageToConcreteUserNTimes(userId, message, TIMES_TO_SEND);
-    }
-
-    /**
-     * Sends message to user by id reliably.
-     * If sending is unsuccessful repeats it {@code timesToSend} times until success
-     * If there was no success, panics
-     * CANNOT send message to itself
-     */
-    private void sendMessageToConcreteUserNTimes(@NonNull String userId, @NonNull Message message,
-                                                 int timesToSend) {
-        if (gameIsFinished) {
-            return;
-        }
-        if (timesToSend < 0) {
-            Log.wtf(Constants.APP_TAG, "Failed to send message too many times. Finish game");
-            manager.finishGame();
-            manager.getActivity().finish();
-            return;
-        }
-        mRealTimeMultiplayerClient.sendReliableMessage(message.toByteArray(), room.getRoomId(),
-                userId, (i, i1, s) -> {
-            if (i != GamesCallbackStatusCodes.OK) {
-                Log.e(Constants.APP_TAG, "Failed to send message. Left " + timesToSend +
-                        " tries\n" + "Error is " + GamesCallbackStatusCodes.getStatusCodeString(i));
-                sendMessageToConcreteUserNTimes(userId, message, timesToSend - 1);
-            } else {
-                Log.d(Constants.APP_TAG, "Message to " + userId + " is delivered. Took " +
-                        (TIMES_TO_SEND - timesToSend + 1) + " tries");
+        executor.submit(() -> {
+            Log.d(Constants.APP_TAG, "Start sending message to " + userId);
+            if (!contacts.containsKey(userId)) {
+                Log.wtf(Constants.APP_TAG, "unexpected user id");
+                return;
+            }
+            try {
+                contacts.get(userId).getOutputStream().write(message.toByteArray());
+                contacts.get(userId).getOutputStream().flush();
+            } catch (IOException e) {
+                Log.wtf(Constants.APP_TAG, "Error while sending");
+                e.printStackTrace();
             }
         });
     }
-
-    public boolean gameIsFinished() {
-        return gameIsFinished;
-    }
-
-    public void plusP2PConnected() {
-        ++p2pConnected;
-    }
-
-    public void minusP2PConnected() {
-        --p2pConnected;
-    }
-
-    public boolean isServerRoomConnected() {
-        return serverRoomConnected;
-    }
-
-    /** Closes connection with room */
-    abstract protected void leaveRoom();
 
     /**
      * Server starts handshake process sending everybody initial handshake message
@@ -146,23 +61,22 @@ public abstract class LocalNetwork {
     public void finish() {
         if (!gameIsFinished) {
             gameIsFinished = true;
-            leaveRoom();
-        }
-    }
-
-    /** Sets Google account */
-    public void signedIn(GoogleSignInAccount account) {
-        googleSignInAccount = account;
-    }
-
-    /** Sends message to all users in a room except itself */
-    public void sendMessageToOthers(@NonNull Message message) {
-        for (String participantId : room.getParticipantIds()) {
-            if (!participantId.equals(myParticipantId)) {
-                sendMessageToConcreteUser(participantId, message);
+            for (String id : contacts.keySet()) {
+                try {
+                    Objects.requireNonNull(contacts.get(id)).close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
+            executor.shutdownNow();
         }
     }
 
     public abstract Manager getManager();
+
+    public abstract void onDisconnected(String disconnectedId);
+
+    public Handler getUiHandler() {
+        return uiHandler;
+    }
 }

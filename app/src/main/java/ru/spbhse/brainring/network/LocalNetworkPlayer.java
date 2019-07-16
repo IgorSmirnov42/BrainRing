@@ -1,17 +1,14 @@
 package ru.spbhse.brainring.network;
 
-import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
-import com.google.android.gms.games.Games;
-import com.google.android.gms.games.multiplayer.realtime.RoomConfig;
-
 import java.io.IOException;
+import java.net.ConnectException;
+import java.net.Socket;
 
 import ru.spbhse.brainring.managers.LocalPlayerGameManager;
 import ru.spbhse.brainring.managers.Manager;
-import ru.spbhse.brainring.network.callbacks.LocalPlayerRoomUpdateCallback;
 import ru.spbhse.brainring.network.messages.Message;
 import ru.spbhse.brainring.network.messages.messageTypes.IAmGreenMessage;
 import ru.spbhse.brainring.network.messages.messageTypes.IAmRedMessage;
@@ -37,8 +34,6 @@ public class LocalNetworkPlayer extends LocalNetwork {
 
         this.manager = manager;
         this.myColor = myColor;
-
-        mRoomUpdateCallback = new LocalPlayerRoomUpdateCallback(this);
     }
 
     /**
@@ -47,10 +42,10 @@ public class LocalNetworkPlayer extends LocalNetwork {
      */
     @Override
     protected void onMessageReceived(@NonNull byte[] buf, @NonNull String userId) {
+        Log.d(Constants.APP_TAG,"RECEIVED MESSAGE AS PLAYER!");
         if (gameIsFinished) {
             return;
         }
-        Log.d(Constants.APP_TAG,"RECEIVED MESSAGE AS PLAYER!");
 
         try {
             Message message = Message.readMessage(buf);
@@ -74,24 +69,6 @@ public class LocalNetworkPlayer extends LocalNetwork {
         }
     }
 
-    /** Starts quick game with auto matched server and player */
-    @Override
-    public void startQuickGame() {
-        mRealTimeMultiplayerClient = Games.getRealTimeMultiplayerClient(manager.getActivity(),
-                googleSignInAccount);
-        final int MIN_OPPONENTS = 2, MAX_OPPONENTS = 2;
-        Bundle autoMatchCriteria = RoomConfig.createAutoMatchCriteria(MIN_OPPONENTS,
-                MAX_OPPONENTS, myColor.getCode());
-
-        mRoomConfig = RoomConfig.builder(mRoomUpdateCallback)
-                .setOnMessageReceivedListener(mOnRealTimeMessageReceivedListener)
-                .setRoomStatusUpdateCallback(mRoomStatusUpdateCallback)
-                .setAutoMatchCriteria(autoMatchCriteria)
-                .build();
-
-        Games.getRealTimeMultiplayerClient(manager.getActivity(), googleSignInAccount)
-                .create(mRoomConfig);
-    }
 
     /**
      * Sends message to server
@@ -105,13 +82,29 @@ public class LocalNetworkPlayer extends LocalNetwork {
         }
     }
 
+    public void connect(String serverIp) {
+        executor.submit(() -> {
+            try {
+                Socket socket = new Socket(serverIp, Constants.LOCAL_PORT);
+                if (socket.isConnected()) {
+                    LocalMessageDealing messageDealing = new LocalMessageDealing(socket,
+                            LocalNetworkPlayer.this, "server");
+                    contacts.put("server", socket);
+                    executor.submit(messageDealing);
+                } else {
+                    throw new ConnectException();
+                }
+            } catch (IOException e) {
+                Log.wtf(Constants.APP_TAG, "Cannot connect");
+                e.printStackTrace();
+                getUiHandler().post(() -> manager.finishGame());
+            }
+        });
+    }
+
     @Override
-    protected void leaveRoom() {
-        if (room != null) {
-            Log.d("RainRing","Leaving room");
-            mRealTimeMultiplayerClient.leave(mRoomConfig, room.getRoomId());
-            room = null;
-        }
+    public void onDisconnected(String disconnectedId) {
+        manager.finishGame();
     }
 
     @Override

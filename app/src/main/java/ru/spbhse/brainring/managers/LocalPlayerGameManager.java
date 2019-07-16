@@ -17,6 +17,7 @@ public class LocalPlayerGameManager implements Manager {
     private PlayerActivity activity;
     private LocalNetworkPlayer network;
     private LocalPlayerMessageProcessor processor;
+    private boolean finished = false;
 
     public LocalPlayerGameManager(PlayerActivity activity, LocalGameRoles color) {
         this.activity = activity;
@@ -42,7 +43,11 @@ public class LocalPlayerGameManager implements Manager {
     }
 
     public void finishGame() {
-        network.finish();
-        logic.finish();
+        if (!finished) {
+            finished = true;
+            network.finish();
+            logic.finish();
+            activity.finish(); // TODO
+        }
     }
 }
