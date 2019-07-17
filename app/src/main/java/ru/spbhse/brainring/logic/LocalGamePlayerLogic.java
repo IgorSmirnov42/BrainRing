@@ -1,7 +1,5 @@
 package ru.spbhse.brainring.logic;
 
-import android.widget.Toast;
-
 import ru.spbhse.brainring.R;
 import ru.spbhse.brainring.managers.LocalPlayerGameManager;
 import ru.spbhse.brainring.network.messages.Message;
@@ -20,23 +18,17 @@ public class LocalGamePlayerLogic {
 
     /** Shows toast with forbiddance to answer */
     public void onForbiddenToAnswer() {
-        Toast.makeText(manager.getActivity(),
-                manager.getActivity().getString(R.string.forbidden_answer),
-                Toast.LENGTH_LONG).show();
+        manager.getActivity().makeToast(manager.getActivity().getString(R.string.forbidden_answer));
     }
 
     /** Shows toast with allowance to answer */
     public void onAllowedToAnswer() {
-        Toast.makeText(manager.getActivity(),
-                manager.getActivity().getString(R.string.allowed_answer),
-                Toast.LENGTH_LONG).show();
+        manager.getActivity().makeToast(manager.getActivity().getString(R.string.allowed_answer));
     }
 
     /** Shows toast with false start message */
     public void onFalseStart() {
-        Toast.makeText(manager.getActivity(),
-                manager.getActivity().getString(R.string.false_start),
-                Toast.LENGTH_LONG).show();
+        manager.getActivity().makeToast(manager.getActivity().getString(R.string.false_start));
     }
 
     /** Plays sound of time start */

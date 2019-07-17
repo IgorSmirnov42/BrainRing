@@ -16,6 +16,7 @@ public class LocalAdminGameManager implements Manager {
     private JuryActivity activity;
     private LocalGameAdminLogic logic;
     private LocalAdminMessageProcessor processor;
+    private boolean finished = false;
 
     public LocalAdminGameManager(JuryActivity juryActivity, int firstTimer, int secondTimer) {
         activity = juryActivity;
@@ -41,7 +42,11 @@ public class LocalAdminGameManager implements Manager {
     }
 
     public void finishGame() {
-        logic.finishGame();
-        network.finish();
+        if (!finished) {
+            finished = true;
+            logic.finishGame();
+            network.finish();
+            activity.finish(); // TODO
+        }
     }
 }

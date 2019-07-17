@@ -57,9 +57,10 @@ public class SelectLocalGameModeActivity extends AppCompatActivity {
             }
         });
 
-        Button juryButton = findViewById(R.id.juryModeButton);
+        Button juryButton = findViewById(R.id.readyButton);
         juryButton.setOnClickListener(v -> {
-            Intent intent = new Intent(SelectLocalGameModeActivity.this, JuryActivity.class);
+            Intent intent = new Intent(SelectLocalGameModeActivity.this,
+                    JuryActivity.class);
             intent.putExtra("firstTimer", firstValue);
             intent.putExtra("secondTimer", secondValue);
             startActivity(intent);
@@ -67,14 +68,16 @@ public class SelectLocalGameModeActivity extends AppCompatActivity {
 
         Button greenButton = findViewById(R.id.greenPlayerButton);
         greenButton.setOnClickListener(v -> {
-            Intent intent = new Intent(SelectLocalGameModeActivity.this, PlayerActivity.class);
+            Intent intent = new Intent(SelectLocalGameModeActivity.this,
+                    WriteIPActivity.class);
             intent.putExtra("color", LocalGameRoles.ROLE_GREEN);
             startActivity(intent);
         });
 
         Button redButton = findViewById(R.id.redPlayerButton);
         redButton.setOnClickListener(v -> {
-            Intent intent = new Intent(SelectLocalGameModeActivity.this, PlayerActivity.class);
+            Intent intent = new Intent(SelectLocalGameModeActivity.this,
+                    WriteIPActivity.class);
             intent.putExtra("color", LocalGameRoles.ROLE_RED);
             startActivity(intent);
         });

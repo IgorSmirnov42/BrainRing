@@ -39,7 +39,7 @@
         app:layout_constraintVertical_bias="0.869" />
 
     <Button
-        android:id="@+id/juryModeButton"
+        android:id="@+id/readyButton"
         android:layout_width="265dp"
         android:layout_height="107dp"
         android:layout_marginTop="8dp"
@@ -149,7 +149,7 @@
         app:layout_constraintVertical_bias="0.666" />
 
     <TextView
-        android:id="@+id/roleChoose"
+        android:id="@+id/writeIP"
         android:layout_width="252dp"
         android:layout_height="61dp"
         android:layout_marginStart="8dp"
@@ -161,7 +161,7 @@
         android:textAlignment="center"
         android:textAppearance="@style/GrayText"
         android:textSize="18sp"
-        app:layout_constraintBottom_toTopOf="@+id/juryModeButton"
+        app:layout_constraintBottom_toTopOf="@+id/readyButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.496"
         app:layout_constraintStart_toStartOf="parent"

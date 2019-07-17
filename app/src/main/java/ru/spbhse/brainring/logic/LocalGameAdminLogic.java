@@ -1,7 +1,6 @@
 package ru.spbhse.brainring.logic;
 
 import android.support.annotation.NonNull;
-import android.widget.Toast;
 
 import ru.spbhse.brainring.R;
 import ru.spbhse.brainring.logic.timers.LocalTimer;
@@ -114,7 +113,7 @@ public class LocalGameAdminLogic {
             timer = firstGameTimer;
             timer.start();
             player.play(manager.getActivity(), R.raw.start);
-            manager.getNetwork().sendMessageToOthers(TIME_START);
+            manager.getNetwork().sendMessageToUsers(TIME_START);
             return true;
         }
         // Start of a new round
@@ -257,9 +256,7 @@ public class LocalGameAdminLogic {
         if (location == LocalGameLocation.NOT_STARTED && red != null && green != null) {
             return true;
         } else {
-            Toast.makeText(manager.getActivity(),
-                    manager.getActivity().getString(R.string.cannot_change_score),
-                    Toast.LENGTH_LONG).show();
+            manager.getActivity().makeToast(manager.getActivity().getString(R.string.cannot_change_score));
             return false;
         }
     }
