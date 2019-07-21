@@ -219,6 +219,10 @@ public class LocalGameAdminLogic {
 
     /** Changes user's information when he/she answers on handshake */
     public void onHandshakeAccept(@NonNull String userId) {
+        if (manager.getNetwork().hasSpeedTest()) {
+            manager.getNetwork().finishSpeedTest();
+            return;
+        }
         ++handshakeAccepted;
         if (handshakeAccepted == 2) {
             manager.getActivity().setGreenStatus("");

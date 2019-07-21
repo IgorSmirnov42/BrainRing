@@ -69,7 +69,6 @@ public class LocalNetworkPlayer extends LocalNetwork {
         }
     }
 
-
     /**
      * Sends message to server
      * If server is not known, does nothing
@@ -89,8 +88,11 @@ public class LocalNetworkPlayer extends LocalNetwork {
                 if (socket.isConnected()) {
                     LocalMessageDealing messageDealing = new LocalMessageDealing(socket,
                             LocalNetworkPlayer.this, "server");
-                    contacts.put("server", socket);
+                    synchronized (contacts) {
+                        contacts.put("server", socket);
+                    }
                     executor.submit(messageDealing);
+                    doInitialHandshake("server");
                 } else {
                     throw new ConnectException();
                 }
@@ -105,11 +107,6 @@ public class LocalNetworkPlayer extends LocalNetwork {
     @Override
     public void onDisconnected(String disconnectedId) {
         manager.finishGame();
-    }
-
-    @Override
-    public void handshake() {
-        Log.wtf(Constants.APP_TAG, "Handshake was called for player");
     }
 
     @Override

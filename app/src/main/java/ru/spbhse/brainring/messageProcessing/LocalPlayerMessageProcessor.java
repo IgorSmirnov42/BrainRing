@@ -17,9 +17,6 @@ public class LocalPlayerMessageProcessor {
 
     public void process(@NonNull Message message, @NonNull String senderId) {
         switch (message.getMessageCode()) {
-            case MessageCodes.INITIAL_HANDSHAKE:
-                manager.getNetwork().doInitialHandshake(senderId);
-                break;
             case MessageCodes.FORBIDDEN_TO_ANSWER:
                 manager.getLogic().onForbiddenToAnswer();
                 break;

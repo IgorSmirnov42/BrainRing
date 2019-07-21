@@ -16,8 +16,8 @@ import java.util.Random;
 import ru.spbhse.brainring.managers.LocalAdminGameManager;
 import ru.spbhse.brainring.network.messages.Message;
 import ru.spbhse.brainring.network.messages.messageTypes.HandshakeMessage;
-import ru.spbhse.brainring.network.messages.messageTypes.InitialHandshakeMessage;
 import ru.spbhse.brainring.utils.Constants;
+import ru.spbhse.brainring.utils.LocalGameRoles;
 
 /**
  * Class with methods to interact with network
@@ -29,7 +29,9 @@ public class LocalNetworkAdmin extends LocalNetwork {
     private String greenId;
     private ServerSocket serverSocket;
     private static final Message HANDSHAKE = new HandshakeMessage();
-    private static final int HANDSHAKE_DELAY = 1000;
+    private boolean greenSpeedTesting = false;
+    private boolean redSpeedTesting = false;
+    private long timeSpeedTest;
 
     /**
      * Creates new instance. Fills {@code mRoomUpdateCallback} with an instance that
@@ -58,11 +60,15 @@ public class LocalNetworkAdmin extends LocalNetwork {
 
     /** Sets green player id. If both players shared their ids starts game cycle */
     public void setGreenPlayer(@NonNull String userId) {
+        if (greenId != null) { // TODO: fix
+            return;
+        }
         if (handshaked) {
             Log.d(Constants.APP_TAG, "Handshake is done");
             return;
         }
         greenId = userId;
+        manager.getActivity().setGreenStatus("Connected");
         if (redId != null) {
             handshaked = true;
             manager.getLogic().startGameCycle(greenId, redId);
@@ -71,36 +77,29 @@ public class LocalNetworkAdmin extends LocalNetwork {
 
     /** Sets red player id. If both players shared their ids starts game cycle */
     public void setRedPlayer(@NonNull String userId) {
+        if (redId != null) { // TODO : fix
+            return;
+        }
         if (handshaked) {
             Log.d(Constants.APP_TAG, "Handshake is done");
             return;
         }
         redId = userId;
+        manager.getActivity().setRedStatus("Connected");
         if (greenId != null) {
             handshaked = true;
             manager.getLogic().startGameCycle(greenId, redId);
         }
     }
 
-    /**
-     * Sends empty message to players in order to determine which of them is green/red
-     * Waits while the answer isn't received
-     * After execution starts game cycle
-     */
-    @Override
-    public void handshake() {
-        if (handshaked) {
-            return;
-        }
-        Log.d(Constants.APP_TAG, "Start handshake");
-        sendMessageToUsers(new InitialHandshakeMessage());
-        /*// Sometimes first message doesn't reach opponent for some reason
-        // so we have to send it one more time
-        uiHandler.postDelayed(this::handshake, HANDSHAKE_DELAY);*/
-    }
-
     public void sendMessageToUsers(@NonNull Message message) {
-        for (String key : contacts.keySet()) {
+        String[] keys;
+
+        synchronized (contacts) {
+            keys = contacts.keySet().toArray(new String[0]);
+        }
+
+        for (String key : keys) {
             sendMessageToConcreteUser(key, message);
         }
     }
@@ -144,11 +143,12 @@ public class LocalNetworkAdmin extends LocalNetwork {
                         String senderId = String.valueOf(new Random().nextInt());
                         LocalMessageDealing messageDealing = new LocalMessageDealing(socket,
                                 LocalNetworkAdmin.this, senderId);
-                        contacts.put(senderId, socket);
-                        executor.submit(messageDealing);
-                        if (contacts.size() == 2) {
-                            handshake();
-                            break;
+                        synchronized (contacts) {
+                            contacts.put(senderId, socket);
+                            executor.submit(messageDealing);
+                            if (contacts.size() == 2) {
+                                break;
+                            }
                         }
                     }
                 }
@@ -172,6 +172,39 @@ public class LocalNetworkAdmin extends LocalNetwork {
                 }
             }
         }
+    }
+
+    public boolean hasSpeedTest() {
+        return greenSpeedTesting || redSpeedTesting;
+    }
+
+    public void speedTest(LocalGameRoles role) {
+        timeSpeedTest = System.currentTimeMillis();
+        if (role == LocalGameRoles.ROLE_GREEN) {
+            greenSpeedTesting = true;
+            sendMessageToConcreteUser(greenId, HANDSHAKE);
+        } else {
+            redSpeedTesting = true;
+            sendMessageToConcreteUser(redId, HANDSHAKE);
+        }
+    }
+
+    public void finishSpeedTest() {
+        long speedTestTime = System.currentTimeMillis() - timeSpeedTest;
+        long millis = speedTestTime % Constants.SECOND;
+        long seconds = speedTestTime / Constants.SECOND;
+        StringBuilder res = new StringBuilder(String.valueOf(millis));
+        while (res.length() < 3) {
+            res.insert(0, "0");
+        }
+        res.insert(0, ".");
+        res.insert(0, seconds);
+        if (greenSpeedTesting) {
+            manager.getActivity().setGreenStatus(res.toString());
+        } else {
+            manager.getActivity().setRedStatus(res.toString());
+        }
+        greenSpeedTesting = redSpeedTesting = false;
     }
 
     @Override

@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -47,10 +48,30 @@ public class JuryActivity extends AppCompatActivity {
         int secondTimer = getIntent().getIntExtra("secondTimer", 20);
         manager = new LocalAdminGameManager(this, firstTimer, secondTimer);
 
+        ImageView redTeam = findViewById(R.id.redTeamStatus);
+        redTeam.setOnClickListener(v -> {
+            if (currentLocation == LocalGameLocation.NOT_STARTED &&
+                    !manager.getNetwork().hasSpeedTest()) {
+                manager.getNetwork().speedTest(LocalGameRoles.ROLE_RED);
+            } else {
+                makeToast("Невозможно провести тестирование скорости в данный момент.");
+            }
+        });
+
+        ImageView greenTeam = findViewById(R.id.greenTeamStatus);
+        greenTeam.setOnClickListener(v -> {
+            if (currentLocation == LocalGameLocation.NOT_STARTED &&
+                    !manager.getNetwork().hasSpeedTest()) {
+                manager.getNetwork().speedTest(LocalGameRoles.ROLE_GREEN);
+            } else {
+                makeToast("Невозможно провести тестирование скорости в данный момент.");
+            }
+        });
+
         statusText = findViewById(R.id.gameStatusInfo);
         mainButton = findViewById(R.id.mainButton);
         mainButton.setOnLongClickListener(v -> {
-            if (!manager.getLogic().toNextState()) {
+            if (!manager.getLogic().toNextState() || manager.getNetwork().hasSpeedTest()) {
                 Toast.makeText(JuryActivity.this, getString(R.string.cannot_switch),
                         Toast.LENGTH_LONG).show();
             }
@@ -98,7 +119,8 @@ public class JuryActivity extends AppCompatActivity {
     }
 
     public void onIpReceived(String ip) {
-        statusText.setText(ip);
+        String text = "Ваш IP:\n" + ip;
+        statusText.setText(text);
         manager.getNetwork().startServer();
     }
 

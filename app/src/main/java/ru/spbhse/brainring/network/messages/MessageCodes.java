@@ -33,8 +33,8 @@ public class MessageCodes {
     /** From player to server. Ready to get next question */
     public static final int READY_FOR_QUESTION = 14;
     // for local game only
-    /** From server to player. First handshake to determine color */
-    public static final int INITIAL_HANDSHAKE = 15;
+    ///** From server to player. First handshake to determine color */
+    //public static final int INITIAL_HANDSHAKE = 15;
     /** From player to server. Player has green table */
     public static final int I_AM_GREEN = 16;
     /** From player to server. Player has red table */

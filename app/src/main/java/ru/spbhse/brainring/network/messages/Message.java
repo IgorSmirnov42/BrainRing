@@ -19,7 +19,6 @@ import ru.spbhse.brainring.network.messages.messageTypes.HandshakeMessage;
 import ru.spbhse.brainring.network.messages.messageTypes.IAmGreenMessage;
 import ru.spbhse.brainring.network.messages.messageTypes.IAmRedMessage;
 import ru.spbhse.brainring.network.messages.messageTypes.IncorrectOpponentAnswerMessage;
-import ru.spbhse.brainring.network.messages.messageTypes.InitialHandshakeMessage;
 import ru.spbhse.brainring.network.messages.messageTypes.OpponentIsAnsweringMessage;
 import ru.spbhse.brainring.network.messages.messageTypes.QuestionMessage;
 import ru.spbhse.brainring.network.messages.messageTypes.ReadyForQuestionMessage;
@@ -98,8 +97,6 @@ public abstract class Message {
                     return new IAmGreenMessage();
                 case MessageCodes.I_AM_RED:
                     return new IAmRedMessage();
-                case MessageCodes.INITIAL_HANDSHAKE:
-                    return new InitialHandshakeMessage();
             }
         }
         throw new IllegalArgumentException("Unexpected message code");
