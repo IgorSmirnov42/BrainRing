@@ -118,11 +118,7 @@ public class LocalGameAdminLogic {
         }
         // Start of a new round
         if (location == LocalGameLocation.COUNTDOWN) {
-            if (timer != null) {
-                timer.cancel();
-                timer = null;
-            }
-            toLocation(LocalGameLocation.NOT_STARTED);
+            newQuestion();
             return true;
         }
         return false;
