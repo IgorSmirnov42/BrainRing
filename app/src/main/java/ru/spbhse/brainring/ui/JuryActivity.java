@@ -81,28 +81,32 @@ public class JuryActivity extends AppCompatActivity {
 
         Button minusGreenButton = findViewById(R.id.minusGreenTeamButton);
         minusGreenButton.setOnLongClickListener(v -> {
-            manager.getLogic().minusPoint(1);
+            manager.getLogic().minusPoint(LocalGameRoles.ROLE_GREEN);
+            greenTeamScore.setText(manager.getLogic().getGreenScore());
             return true;
         });
         minusGreenButton.setOnClickListener(longerClick);
 
         Button plusGreenButton = findViewById(R.id.plusGreenTeamButton);
         plusGreenButton.setOnLongClickListener(v -> {
-            manager.getLogic().plusPoint(1);
+            manager.getLogic().plusPoint(LocalGameRoles.ROLE_GREEN);
+            greenTeamScore.setText(manager.getLogic().getGreenScore());
             return true;
         });
         plusGreenButton.setOnClickListener(longerClick);
 
         Button minusRedButton = findViewById(R.id.minusRedTeamButton);
         minusRedButton.setOnLongClickListener(v -> {
-            manager.getLogic().minusPoint(2);
+            manager.getLogic().minusPoint(LocalGameRoles.ROLE_RED);
+            redTeamScore.setText(manager.getLogic().getRedScore());
             return true;
         });
         minusRedButton.setOnClickListener(longerClick);
 
         Button plusRedButton = findViewById(R.id.plusRedTeamButton);
         plusRedButton.setOnLongClickListener(v -> {
-            manager.getLogic().plusPoint(2);
+            manager.getLogic().plusPoint(LocalGameRoles.ROLE_RED);
+            redTeamScore.setText(manager.getLogic().getRedScore());
             return true;
         });
         plusRedButton.setOnClickListener(longerClick);

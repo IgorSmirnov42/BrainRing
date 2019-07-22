@@ -60,7 +60,7 @@ public class LocalNetworkAdmin extends LocalNetwork {
 
     /** Sets green player id. If both players shared their ids starts game cycle */
     public void setGreenPlayer(@NonNull String userId) {
-        if (greenId != null) { // TODO: fix
+        if (greenId != null) { // TODO: fix and close connection
             return;
         }
         if (handshaked) {
@@ -77,7 +77,7 @@ public class LocalNetworkAdmin extends LocalNetwork {
 
     /** Sets red player id. If both players shared their ids starts game cycle */
     public void setRedPlayer(@NonNull String userId) {
-        if (redId != null) { // TODO : fix
+        if (redId != null) { // TODO : fix and close connection
             return;
         }
         if (handshaked) {

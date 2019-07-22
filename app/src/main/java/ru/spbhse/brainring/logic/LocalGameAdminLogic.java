@@ -157,6 +157,9 @@ public class LocalGameAdminLogic {
             timer.cancel();
             timer = null;
         }
+        if (green == null || red == null) {
+            return;
+        }
         UserScore user = getThisUser(userId);
         if (location == LocalGameLocation.READING_QUESTION) {
             user.status.setAlreadyAnswered(true);
@@ -266,16 +269,16 @@ public class LocalGameAdminLogic {
     }
 
     /** Determines if jury can change score now and pluses point if possible */
-    public void plusPoint(int userNumber) {
+    public void plusPoint(LocalGameRoles user) {
         if (canChangeScore()) {
-            (userNumber == 1 ? green : red).score++;
+            (user == LocalGameRoles.ROLE_GREEN ? green : red).score++;
         }
     }
 
     /** Determines if jury can change score now and minuses point if possible */
-    public void minusPoint(int userNumber) {
+    public void minusPoint(LocalGameRoles user) {
         if (canChangeScore()) {
-            (userNumber == 1 ? green : red).score--;
+            (user == LocalGameRoles.ROLE_GREEN ? green : red).score--;
         }
     }
 
