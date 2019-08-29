@@ -1,18 +1,26 @@
 package ru.spbhse.brainring.logic;
 
-import android.media.MediaPlayer;
 import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.widget.Toast;
 
 import ru.spbhse.brainring.R;
-import ru.spbhse.brainring.controllers.Controller;
-import ru.spbhse.brainring.controllers.OnlineController;
 import ru.spbhse.brainring.files.ComplainedQuestion;
+import ru.spbhse.brainring.logic.timers.OnlineGameTimer;
+import ru.spbhse.brainring.logic.timers.OnlineShowingAnswerTimer;
+import ru.spbhse.brainring.logic.timers.OnlineWritingTimer;
+import ru.spbhse.brainring.managers.OnlineGameManager;
 import ru.spbhse.brainring.network.messages.Message;
-import ru.spbhse.brainring.network.messages.MessageGenerator;
+import ru.spbhse.brainring.network.messages.messageTypes.AnswerReadyMessage;
+import ru.spbhse.brainring.network.messages.messageTypes.AnswerWrittenMessage;
+import ru.spbhse.brainring.network.messages.messageTypes.FalseStartMessage;
+import ru.spbhse.brainring.network.messages.messageTypes.HandshakeMessage;
+import ru.spbhse.brainring.network.messages.messageTypes.ReadyForQuestionMessage;
+import ru.spbhse.brainring.network.messages.messageTypes.TimeLimitMessage;
 import ru.spbhse.brainring.ui.GameActivityLocation;
+import ru.spbhse.brainring.utils.Constants;
+import ru.spbhse.brainring.utils.SoundPlayer;
 
 /**
  * Realizing user logic in online mode.
@@ -20,7 +28,9 @@ import ru.spbhse.brainring.ui.GameActivityLocation;
  * timer to show answer, timer on thinking)
  * Depends on user actions (pushed buttons) and server commands (answering opponent, new question etc)
  */
-public class OnlineGameUserLogic {
+public class OnlineGameUserLogic implements PlayerLogic {
+    private OnlineGameManager manager;
+    private SoundPlayer player = new SoundPlayer();
     private String currentQuestionText;
     /** Id of question from database. Need for complaining */
     private int currentQuestionId;
@@ -47,30 +57,22 @@ public class OnlineGameUserLogic {
     private static final int SECOND_COUNTDOWN = 20;
     /** Time when timer starts showing left time to think */
     private static final int SENDING_COUNTDOWN = 5;
-    private static final int SECOND = 1000;
 
-    private static final byte[] FALSE_START;
-    private static final byte[] HANDSHAKE;
-    private static final byte[] READY_FOR_QUESTION;
-
-    static {
-        HANDSHAKE = MessageGenerator.create()
-                .writeInt(Message.HANDSHAKE)
-                .toByteArray();
-        FALSE_START = MessageGenerator.create()
-                .writeInt(Message.FALSE_START)
-                .toByteArray();
-        READY_FOR_QUESTION = MessageGenerator.create()
-                .writeInt(Message.READY_FOR_QUESTION)
-                .toByteArray();
-    }
+    private static final Message FALSE_START = new FalseStartMessage();
+    private static final Message HANDSHAKE = new HandshakeMessage();
+    private static final Message READY_FOR_QUESTION = new ReadyForQuestionMessage();
 
     private CountDownTimer timer;
 
+    public OnlineGameUserLogic(OnlineGameManager onlineGameManager) {
+        manager = onlineGameManager;
+    }
+
     /** Returns question data in format that is comfortable for complaining */
-    public ComplainedQuestion getQuestionData() {
-        return new ComplainedQuestion(currentQuestionText,
-                currentQuestionAnswer, currentQuestionId);
+    @NonNull
+    @Override
+    public ComplainedQuestion getCurrentQuestionData() {
+        return new ComplainedQuestion(currentQuestionText, currentQuestionAnswer, currentQuestionId);
     }
 
     /**
@@ -81,8 +83,8 @@ public class OnlineGameUserLogic {
      * 3. User did false start before
      */
     public void onForbiddenToAnswer() {
-        Toast.makeText(OnlineController.getOnlineGameActivity(),
-                OnlineController.getOnlineGameActivity().getString(R.string.forbidden_answer),
+        Toast.makeText(manager.getActivity(),
+                manager.getActivity().getString(R.string.forbidden_answer),
                 Toast.LENGTH_SHORT).show();
     }
 
@@ -90,10 +92,10 @@ public class OnlineGameUserLogic {
     private void onFalseStart() {
         if (!alreadyAnswered) {
             alreadyAnswered = true;
-            OnlineController.NetworkController.sendMessageToServer(FALSE_START);
+            manager.getNetwork().sendMessageToServer(FALSE_START);
         }
-        Toast.makeText(OnlineController.getOnlineGameActivity(), 
-                OnlineController.getOnlineGameActivity().getString(R.string.false_start),
+        Toast.makeText(manager.getActivity(),
+                manager.getActivity().getString(R.string.false_start),
                 Toast.LENGTH_SHORT).show();
     }
 
@@ -107,7 +109,7 @@ public class OnlineGameUserLogic {
             timer = null;
         }
         readyForQuestion = true;
-        OnlineController.NetworkController.sendMessageToServer(READY_FOR_QUESTION);
+        manager.getNetwork().sendMessageToServer(READY_FOR_QUESTION);
     }
 
     /**
@@ -116,34 +118,11 @@ public class OnlineGameUserLogic {
      */
     public void onTimeStart() {
         timeStarted = true;
-        new Thread(() -> {
-            MediaPlayer player = MediaPlayer.create(OnlineController.getOnlineGameActivity(),
-                    R.raw.start);
-            player.setOnCompletionListener(MediaPlayer::release);
-            player.start();
-        }).start();
-        OnlineController.OnlineUIController.setAnswerButtonText(OnlineController.getOnlineGameActivity()
+        player.play(manager.getActivity(), R.raw.start);
+        manager.getActivity().setAnswerButtonText(manager.getActivity()
                 .getString(R.string.button_push_text));
         startQuestionTime = System.currentTimeMillis();
-        timer = new CountDownTimer(FIRST_COUNTDOWN * SECOND,
-                SECOND) {
-            @Override
-            public void onTick(long millisUntilFinished) {
-                if (timer == this) {
-                    if (millisUntilFinished <= SENDING_COUNTDOWN * SECOND) {
-                        onReceivingTick(millisUntilFinished / SECOND);
-                    }
-                }
-            }
-
-            @Override
-            public void onFinish() {
-                if (timer == this) {
-                    Log.d(Controller.APP_TAG, "Finish first timer");
-                    sendTimeLimitedAnswer(1);
-                }
-            }
-        };
+        timer = new OnlineGameTimer(FIRST_COUNTDOWN, SENDING_COUNTDOWN, 1, this);
         timer.start();
     }
 
@@ -151,14 +130,9 @@ public class OnlineGameUserLogic {
      * Reacts on tick that means that {@code secondsLeft} time is left.
      * Plays sound, shows time on a screen
      */
-    private void onReceivingTick(long secondsLeft) {
-        new Thread(() -> {
-            MediaPlayer player = MediaPlayer.create(OnlineController.getOnlineGameActivity(),
-                    R.raw.countdown);
-            player.setOnCompletionListener(MediaPlayer::release);
-            player.start();
-        }).start();
-        OnlineController.OnlineUIController.setTime(String.valueOf(secondsLeft));
+    public void onReceivingTick(long secondsLeft) {
+        player.play(manager.getActivity(), R.raw.countdown);
+        manager.getActivity().setTime(String.valueOf(secondsLeft));
     }
 
     /**
@@ -167,34 +141,23 @@ public class OnlineGameUserLogic {
      */
     public void onAllowedToAnswer() {
         alreadyAnswered = true;
-        Log.d(Controller.APP_TAG,"Allowed to answer");
-        OnlineController.OnlineUIController.setLocation(GameActivityLocation.WRITE_ANSWER);
-        timer = new CountDownTimer(TIME_TO_WRITE_ANSWER * SECOND, SECOND) {
-            @Override
-            public void onTick(long millisUntilFinished) {
-            }
-
-            @Override
-            public void onFinish() {
-                if (timer == this) {
-                    answerIsWritten(OnlineController.OnlineUIController.getWhatWritten());
-                }
-            }
-        };
+        Log.d(Constants.APP_TAG,"Allowed to answer");
+        manager.getActivity().setLocation(GameActivityLocation.WRITE_ANSWER);
+        timer = new OnlineWritingTimer(TIME_TO_WRITE_ANSWER, this);
         timer.start();
     }
 
     /** Gets question and prints it on the screen. Sends handshake to server if needed */
     public void onReceivingQuestion(int questionId, @NonNull String question) {
-        if (!OnlineController.NetworkController.iAmServer()) {
-            OnlineController.NetworkController.sendMessageToServer(HANDSHAKE);
+        if (!manager.getNetwork().iAmServer()) {
+            manager.getNetwork().sendMessageToServer(HANDSHAKE);
         }
         currentQuestionId = questionId;
         currentQuestionText = question;
         currentQuestionAnswer = null;
-        OnlineController.OnlineUIController.onNewQuestion();
-        OnlineController.OnlineUIController.setQuestionText(question);
-        OnlineController.OnlineUIController.setLocation(GameActivityLocation.SHOW_QUESTION);
+        manager.getActivity().onNewQuestion();
+        manager.getActivity().setQuestionText(question);
+        manager.getActivity().setLocation(GameActivityLocation.SHOW_QUESTION);
 
         questionReceived = true;
         timeStarted = false;
@@ -206,40 +169,17 @@ public class OnlineGameUserLogic {
      * Shows opponent's answer, starts timer on {@code SECOND_COUNTDOWN} seconds
      */
     public void onIncorrectOpponentAnswer(@NonNull String opponentAnswer) {
-        OnlineController.OnlineUIController.setTime("");
-        OnlineController.OnlineUIController.setOpponentAnswer(opponentAnswer);
-        OnlineController.OnlineUIController.setLocation(GameActivityLocation.SHOW_QUESTION);
+        manager.getActivity().setTime("");
+        manager.getActivity().setOpponentAnswer(opponentAnswer);
+        manager.getActivity().setLocation(GameActivityLocation.SHOW_QUESTION);
         startQuestionTime = System.currentTimeMillis();
-        timer = new CountDownTimer(SECOND_COUNTDOWN * SECOND,
-                SECOND) {
-            @Override
-            public void onTick(long millisUntilFinished) {
-                if (timer == this) {
-                    if (millisUntilFinished <= SENDING_COUNTDOWN * SECOND) {
-                        onReceivingTick(millisUntilFinished / SECOND);
-                    }
-                }
-            }
-
-            @Override
-            public void onFinish() {
-                if (timer == this) {
-                    Log.d(Controller.APP_TAG, "Finish second timer");
-                    sendTimeLimitedAnswer(2);
-                }
-            }
-        };
+        timer = new OnlineGameTimer(SECOND_COUNTDOWN, SENDING_COUNTDOWN, 2, this);
         timer.start();
     }
 
     /** Signalizes server that user haven't pushed the button */
-    private void sendTimeLimitedAnswer(int roundNumber) {
-        OnlineController.NetworkController.sendMessageToServer(
-                MessageGenerator.create()
-                        .writeInt(Message.TIME_LIMIT)
-                        .writeInt(roundNumber)
-                        .toByteArray()
-        );
+    public void sendTimeLimitedAnswer(int roundNumber) {
+        manager.getNetwork().sendMessageToServer(new TimeLimitMessage(roundNumber));
     }
 
     /** Shows answer and score on the screen, plays sound */
@@ -257,38 +197,23 @@ public class OnlineGameUserLogic {
         }
         currentQuestionAnswer = correctAnswer;
 
-        new Thread(() -> {
-            MediaPlayer player = MediaPlayer.create(OnlineController.getOnlineGameActivity(),
-                    R.raw.beep);
-            player.setOnCompletionListener(MediaPlayer::release);
-            player.start();
-        }).start();
+        player.play(manager.getActivity(), R.raw.beep);
 
-        if (OnlineController.NetworkController.iAmServer()) {
-            OnlineController.OnlineUIController.setScore(firstUserScore, secondUserScore);
+        if (manager.getNetwork().iAmServer()) {
+            manager.getActivity().setScore(String.valueOf(firstUserScore),
+                    String.valueOf(secondUserScore));
         } else {
-            OnlineController.OnlineUIController.setScore(secondUserScore, firstUserScore);
+            manager.getActivity().setScore(String.valueOf(secondUserScore),
+                    String.valueOf(firstUserScore));
         }
 
-        timer = new CountDownTimer(TIME_TO_SHOW_ANSWER * SECOND,
-                TIME_TO_SHOW_ANSWER * SECOND) {
-            @Override
-            public void onTick(long millisUntilFinished) {
-            }
-
-            @Override
-            public void onFinish() {
-                if (timer == this) {
-                    readyForQuestion();
-                }
-            }
-        };
+        timer = new OnlineShowingAnswerTimer(TIME_TO_SHOW_ANSWER, this);
         timer.start();
 
-        OnlineController.OnlineUIController.setQuestionResult(questionMessage);
-        OnlineController.OnlineUIController.setComment(comment);
-        OnlineController.OnlineUIController.setAnswer(correctAnswer);
-        OnlineController.OnlineUIController.setLocation(GameActivityLocation.SHOW_ANSWER);
+        manager.getActivity().setQuestionResult(questionMessage);
+        manager.getActivity().setCommentText(comment);
+        manager.getActivity().setAnswerText(correctAnswer);
+        manager.getActivity().setLocation(GameActivityLocation.SHOW_ANSWER);
     }
 
     /** Reacts on opponent's pushing */
@@ -297,13 +222,14 @@ public class OnlineGameUserLogic {
             timer.cancel();
             timer = null;
         }
-        OnlineController.OnlineUIController.setLocation(GameActivityLocation.OPPONENT_IS_ANSWERING);
+        manager.getActivity().setLocation(GameActivityLocation.OPPONENT_IS_ANSWERING);
     }
 
     /**
      * Sends request to server trying to answer
      * Blocked in case of false start and if already answered
      */
+    @Override
     public void answerButtonPushed() {
         if (questionReceived && !timeStarted) {
             onFalseStart();
@@ -318,28 +244,19 @@ public class OnlineGameUserLogic {
             timer = null;
         }
         long time = System.currentTimeMillis() - startQuestionTime;
-        OnlineController.NetworkController.sendMessageToServer(
-                MessageGenerator.create()
-                        .writeInt(Message.ANSWER_IS_READY)
-                        .writeLong(time)
-                        .toByteArray()
-        );
+        manager.getNetwork().sendMessageToServer(new AnswerReadyMessage(time));
     }
 
     /** Sends written answer to server */
+    @Override
     public void answerIsWritten(@NonNull String answer) {
         if (timer != null) {
             timer.cancel();
             timer = null;
         }
-        OnlineController.OnlineUIController.setTime("");
-        OnlineController.OnlineUIController.setLocation(GameActivityLocation.SHOW_QUESTION);
-        OnlineController.NetworkController.sendMessageToServer(
-                MessageGenerator.create()
-                        .writeInt(Message.ANSWER_IS_WRITTEN)
-                        .writeString(answer)
-                        .toByteArray()
-        );
+        manager.getActivity().setTime("");
+        manager.getActivity().setLocation(GameActivityLocation.SHOW_QUESTION);
+        manager.getNetwork().sendMessageToServer(new AnswerWrittenMessage(answer));
     }
 
     /** Finishes user-logic part of game. Cancels all timers */
@@ -350,5 +267,14 @@ public class OnlineGameUserLogic {
         }
         currentQuestionAnswer = null;
         currentQuestionText = null;
+        player.finish();
+    }
+
+    public CountDownTimer getTimer() {
+        return timer;
+    }
+
+    public OnlineGameManager getManager() {
+        return manager;
     }
 }

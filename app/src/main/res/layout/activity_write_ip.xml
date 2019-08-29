@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/constraint"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:keepScreenOn="true"
+    tools:context=".ui.WriteIPActivity">
+
+    <Button
+        android:id="@+id/readyButton"
+        android:layout_width="265dp"
+        android:layout_height="107dp"
+        android:background="@drawable/simple_button"
+        android:text="Подтвердить"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/serverIP" />
+
+    <TextView
+        android:id="@+id/writeIP"
+        android:layout_width="245dp"
+        android:layout_height="110dp"
+        android:gravity="center"
+        android:text="Введите IP ведущего\n(отображается на телефоне ведущего)"
+        android:textAlignment="center"
+        android:textAppearance="@style/GrayText"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toTopOf="@+id/serverIP"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/serverIP"
+        android:layout_width="304dp"
+        android:layout_height="82dp"
+        android:ems="10"
+        android:hint="IP ведущего"
+        android:inputType="textPersonName"
+        app:layout_constraintBottom_toTopOf="@+id/readyButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/writeIP" />
+
+</android.support.constraint.ConstraintLayout>

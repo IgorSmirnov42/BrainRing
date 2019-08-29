@@ -14,16 +14,15 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import ru.spbhse.brainring.R;
-import ru.spbhse.brainring.controllers.Controller;
 import ru.spbhse.brainring.controllers.DatabaseController;
-import ru.spbhse.brainring.controllers.GameController;
-import ru.spbhse.brainring.controllers.TrainingController;
 import ru.spbhse.brainring.database.DatabaseTable;
 import ru.spbhse.brainring.database.QuestionDatabase;
 import ru.spbhse.brainring.logic.TrainingPlayerLogic;
+import ru.spbhse.brainring.utils.Constants;
 
 /** This activity maintains training game */
 public class TrainingGameActivity extends GameActivity {
+    private TrainingPlayerLogic logic;
     private QuestionDatabase dataBase;
     private boolean toClear = false;
     private static DatabaseTable gameTable;
@@ -34,10 +33,10 @@ public class TrainingGameActivity extends GameActivity {
         super.onCreate(savedInstanceState);
         drawLocation();
 
-        TrainingController.setUI(TrainingGameActivity.this);
+        logic = new TrainingPlayerLogic(this);
+        playerLogic = logic;
 
-        dataBase = QuestionDatabase.getInstance(TrainingGameActivity.this);
-        DatabaseController.setDatabase(dataBase);
+        dataBase = QuestionDatabase.getInstance(this);
 
         String packageAddress = getIntent().getStringExtra(Intent.EXTRA_TITLE);
         try {
@@ -54,8 +53,6 @@ public class TrainingGameActivity extends GameActivity {
         if (spinner == null) {
             throw new IllegalStateException();
         }
-        GameController gameController = TrainingController.TrainingLogicController.getInstance();
-        setGameController(gameController);
         setMyNick(getString(R.string.right_answers));
         setOpponentNick(getString(R.string.wrong_answers));
 
@@ -65,9 +62,9 @@ public class TrainingGameActivity extends GameActivity {
     /** {@inheritDoc} */
     @Override
     protected void onStop() {
-        Log.d(Controller.APP_TAG, "Stop training game");
+        Log.d(Constants.APP_TAG, "Stop training game");
         super.onStop();
-        TrainingController.TrainingLogicController.finishGame();
+        logic.finishGame();
         if (toClear) {
             dataBase.deleteEntries(gameTable);
         }
@@ -98,13 +95,8 @@ public class TrainingGameActivity extends GameActivity {
         if (currentLocation == GameActivityLocation.SHOW_ANSWER) {
             Button continueGameButton = findViewById(R.id.continueGameButton);
             continueGameButton.setOnClickListener(v ->
-                    TrainingController.TrainingLogicController.newQuestion());
+                    logic.newQuestion());
         }
-    }
-
-    /** Sets GameController */
-    public void setGameController(GameController gameController) {
-        this.gameController = gameController;
     }
 
     /** Reacts on finishing the game */
@@ -139,17 +131,17 @@ public class TrainingGameActivity extends GameActivity {
         protected String doInBackground(Void... voids) {
             DatabaseTable gameTable = trainingGameActivity.get().getGameTable();
             dataBase.createTable(gameTable);
-            TrainingController.createTrainingGame();
+            DatabaseController.generateNewSequence();
             int readingTime = trainingGameActivity.get().getIntent().
                     getIntExtra(Intent.EXTRA_TEXT, TrainingPlayerLogic.DEFAULT_READING_TIME);
-            TrainingController.TrainingLogicController.setReadingTime(readingTime);
+            trainingGameActivity.get().logic.setReadingTime(readingTime);
             return "finished";
         }
 
         @Override
         protected void onPostExecute(String result) {
             spinner.setVisibility(View.INVISIBLE);
-            TrainingController.TrainingLogicController.newQuestion();
+            trainingGameActivity.get().logic.newQuestion();
         }
     }
 

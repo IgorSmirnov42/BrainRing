@@ -1,94 +1,45 @@
 package ru.spbhse.brainring.network;
 
-import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.util.Log;
 
-import com.google.android.gms.games.Games;
-import com.google.android.gms.games.GamesCallbackStatusCodes;
-import com.google.android.gms.games.multiplayer.realtime.Room;
-import com.google.android.gms.games.multiplayer.realtime.RoomConfig;
-import com.google.android.gms.games.multiplayer.realtime.RoomUpdateCallback;
-
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
 import java.io.IOException;
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.SocketException;
+import java.util.Enumeration;
+import java.util.Random;
 
-import ru.spbhse.brainring.controllers.Controller;
-import ru.spbhse.brainring.controllers.LocalController;
+import ru.spbhse.brainring.managers.LocalAdminGameManager;
 import ru.spbhse.brainring.network.messages.Message;
-import ru.spbhse.brainring.network.messages.MessageGenerator;
+import ru.spbhse.brainring.network.messages.messageTypes.HandshakeMessage;
+import ru.spbhse.brainring.utils.Constants;
+import ru.spbhse.brainring.utils.LocalGameRoles;
 
 /**
  * Class with methods to interact with network
  * Used by admin in a local network mode
  */
 public class LocalNetworkAdmin extends LocalNetwork {
+    private LocalAdminGameManager manager;
     private String redId;
     private String greenId;
-    private static final byte[] HANDSHAKE;
-    private static final int HANDSHAKE_DELAY = 1000;
-
-    static {
-        HANDSHAKE = MessageGenerator.create()
-                .writeInt(Message.HANDSHAKE)
-                .toByteArray();
-    }
+    private ServerSocket serverSocket;
+    private static final Message HANDSHAKE = new HandshakeMessage();
+    private boolean greenSpeedTesting = false;
+    private boolean redSpeedTesting = false;
+    private long timeSpeedTest;
 
     /**
      * Creates new instance. Fills {@code mRoomUpdateCallback} with an instance that
      *      on connected room starts game
      */
-    public LocalNetworkAdmin() {
-        super();
-        mRoomUpdateCallback = new RoomUpdateCallback() {
-            @Override
-            public void onRoomCreated(int i, @Nullable Room room) {
-                Log.d(Controller.APP_TAG, "Room was created");
-                LocalNetworkAdmin.this.room = room;
-            }
-
-            @Override
-            public void onJoinedRoom(int i, @Nullable Room room) {
-                Log.d(Controller.APP_TAG, "Joined room");
-                LocalNetworkAdmin.this.room = room;
-            }
-
-            @Override
-            public void onLeftRoom(int i, @NonNull String s) {
-                Log.d(Controller.APP_TAG, "Left room");
-                if (!gameIsFinished) {
-                    LocalController.finishLocalGame(true);
-                }
-            }
-
-            /** Gets participant id. If both players are p2p connected starts handshake process */
-            @Override
-            public void onRoomConnected(int code, @Nullable Room room) {
-                Log.d(Controller.APP_TAG, "Connected to room");
-                if (room == null) {
-                    Log.wtf(Controller.APP_TAG, "onRoomConnected got null as room");
-                    return;
-                }
-                LocalNetworkAdmin.this.room = room;
-                if (code == GamesCallbackStatusCodes.OK) {
-                    Log.d(Controller.APP_TAG,"Connected");
-                } else {
-                    Log.d(Controller.APP_TAG,"Connecting error");
-                }
-                Games.getPlayersClient(LocalController.getJuryActivity(), googleSignInAccount)
-                        .getCurrentPlayerId()
-                        .addOnSuccessListener(myPlayerId -> {
-                            myParticipantId = room.getParticipantId(myPlayerId);
-                            serverRoomConnected = true;
-                            if (p2pConnected == 2) {
-                                handshake();
-                            }
-                        });
-            }
-        };
+    public LocalNetworkAdmin(LocalAdminGameManager manager) {
+        super(manager);
+        this.manager = manager;
     }
 
     /** Decodes byte message received by server and calls needed functions in LocalController */
@@ -97,93 +48,60 @@ public class LocalNetworkAdmin extends LocalNetwork {
         if (gameIsFinished) {
             return;
         }
-        Log.d(Controller.APP_TAG, "Received message as admin!");
-        try (DataInputStream is = new DataInputStream(new ByteArrayInputStream(buf))) {
-            int identifier = is.readInt();
-            Log.d(Controller.APP_TAG, "Identifier is " + identifier);
-
-            switch(identifier) {
-                case Message.I_AM_GREEN:
-                    setGreenPlayer(userId);
-                    break;
-                case Message.I_AM_RED:
-                    setRedPlayer(userId);
-                    break;
-                case Message.ANSWER_IS_READY:
-                    LocalController.LocalAdminLogicController.onAnswerIsReady(userId);
-                    break;
-                case Message.HANDSHAKE:
-                    LocalController.LocalAdminLogicController.onHandshakeAccept(userId);
-                    break;
-            }
+        Log.d(Constants.APP_TAG, "Received message as admin!");
+        try {
+            Message message = Message.readMessage(buf);
+            manager.getProcessor().process(message, userId);
         } catch (IOException e) {
+            Log.e(Constants.APP_TAG, "Error while reading message");
             e.printStackTrace();
         }
     }
 
     /** Sets green player id. If both players shared their ids starts game cycle */
-    private void setGreenPlayer(@NonNull String userId) {
+    public void setGreenPlayer(@NonNull String userId) {
+        if (greenId != null) { // TODO: fix and close connection
+            return;
+        }
         if (handshaked) {
-            Log.d(Controller.APP_TAG, "Handshake is done");
+            Log.d(Constants.APP_TAG, "Handshake is done");
             return;
         }
         greenId = userId;
+        manager.getActivity().setGreenStatus("Connected");
         if (redId != null) {
             handshaked = true;
-            LocalController.LocalNetworkAdminController.startGameCycle();
+            manager.getLogic().startGameCycle(greenId, redId);
         }
     }
 
     /** Sets red player id. If both players shared their ids starts game cycle */
-    private void setRedPlayer(@NonNull String userId) {
+    public void setRedPlayer(@NonNull String userId) {
+        if (redId != null) { // TODO : fix and close connection
+            return;
+        }
         if (handshaked) {
-            Log.d(Controller.APP_TAG, "Handshake is done");
+            Log.d(Constants.APP_TAG, "Handshake is done");
             return;
         }
         redId = userId;
+        manager.getActivity().setRedStatus("Connected");
         if (greenId != null) {
             handshaked = true;
-            LocalController.LocalNetworkAdminController.startGameCycle();
+            manager.getLogic().startGameCycle(greenId, redId);
         }
     }
 
-    /** Starts quick game with two auto matched players */
-    @Override
-    public void startQuickGame() {
-        mRealTimeMultiplayerClient = Games.getRealTimeMultiplayerClient(
-                LocalController.getJuryActivity(), googleSignInAccount);
-        final int MIN_OPPONENTS = 2, MAX_OPPONENTS = 2;
-        Bundle autoMatchCriteria = RoomConfig.createAutoMatchCriteria(MIN_OPPONENTS,
-                MAX_OPPONENTS, ROLE_ADMIN);
+    public void sendMessageToUsers(@NonNull Message message) {
+        String[] keys;
 
-        mRoomConfig = RoomConfig.builder(mRoomUpdateCallback)
-                .setOnMessageReceivedListener(mOnRealTimeMessageReceivedListener)
-                .setRoomStatusUpdateCallback(mRoomStatusUpdateCallback)
-                .setAutoMatchCriteria(autoMatchCriteria)
-                .build();
-
-        Games.getRealTimeMultiplayerClient(LocalController.getJuryActivity(), googleSignInAccount)
-                .create(mRoomConfig);
-    }
-
-    /**
-     * Sends empty message to players in order to determine which of them is green/red
-     * Waits while the answer isn't received
-     * After execution starts game cycle
-     */
-    @Override
-    protected void handshake() {
-        if (handshaked) {
-            return;
+        synchronized (contacts) {
+            keys = contacts.keySet().toArray(new String[0]);
         }
-        Log.d(Controller.APP_TAG, "Start handshake");
-        byte[] message = MessageGenerator.create()
-                .writeInt(Message.INITIAL_HANDSHAKE)
-                .toByteArray();
-        sendMessageToOthers(message);
-        // Sometimes first message doesn't reach opponent for some reason
-        // so we have to send it one more time
-        new Handler().postDelayed(this::handshake, HANDSHAKE_DELAY);
+
+        for (String key : keys) {
+            sendMessageToConcreteUser(key, message);
+        }
     }
 
     /**
@@ -191,24 +109,110 @@ public class LocalNetworkAdmin extends LocalNetwork {
      * Called before each question
      */
     public void regularHandshake() {
-        sendMessageToOthers(HANDSHAKE);
+        sendMessageToUsers(HANDSHAKE);
+    }
+
+    public void getIp() {
+        executor.submit(() -> {
+            try {
+                for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
+                    NetworkInterface intf = en.nextElement();
+                    for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements();) {
+                        InetAddress inetAddress = enumIpAddr.nextElement();
+                        if (!inetAddress.isLoopbackAddress() && inetAddress instanceof Inet4Address) {
+                            String ip = inetAddress.getHostAddress();
+                            Log.d(Constants.APP_TAG, "ip is " + ip + " " + inetAddress.isAnyLocalAddress() + " " + inetAddress.isLinkLocalAddress() + " " + inetAddress.isLoopbackAddress() + " " + (inetAddress instanceof Inet4Address));
+                            manager.getActivity().runOnUiThread(() -> manager.getActivity().onIpReceived(ip));
+                            return;
+                        }
+                    }
+                }
+            } catch (SocketException ex) {
+                Log.e(Constants.APP_TAG, ex.toString());
+            }
+        });
+    }
+
+    public void startServer() {
+        executor.submit(() -> {
+            try {
+                serverSocket = new ServerSocket(Constants.LOCAL_PORT);
+                while (!Thread.interrupted()) {
+                    Socket socket = serverSocket.accept();
+                    if (socket != null) {
+                        String senderId = String.valueOf(new Random().nextInt());
+                        LocalMessageDealing messageDealing = new LocalMessageDealing(socket,
+                                LocalNetworkAdmin.this, senderId);
+                        synchronized (contacts) {
+                            contacts.put(senderId, socket);
+                            executor.submit(messageDealing);
+                            if (contacts.size() == 2) {
+                                break;
+                            }
+                        }
+                    }
+                }
+            } catch (IOException e) {
+                Log.wtf(Constants.APP_TAG, "IO exception starting server");
+                e.printStackTrace();
+                getUiHandler().post(() -> manager.finishGame());
+            }
+        });
     }
 
     @Override
-    protected void leaveRoom() {
-        if (room != null) {
-            Log.d(Controller.APP_TAG,"Leaving room");
-            Games.getRealTimeMultiplayerClient(LocalController.getJuryActivity(),
-                    googleSignInAccount).leave(mRoomConfig, room.getRoomId());
-            room = null;
+    public void finish() {
+        if (!gameIsFinished) {
+            super.finish();
+            if (serverSocket != null) {
+                try {
+                    serverSocket.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 
-    public String getGreenId() {
-        return greenId;
+    public boolean hasSpeedTest() {
+        return greenSpeedTesting || redSpeedTesting;
     }
 
-    public String getRedId() {
-        return redId;
+    public void speedTest(LocalGameRoles role) {
+        timeSpeedTest = System.currentTimeMillis();
+        if (role == LocalGameRoles.ROLE_GREEN) {
+            greenSpeedTesting = true;
+            sendMessageToConcreteUser(greenId, HANDSHAKE);
+        } else {
+            redSpeedTesting = true;
+            sendMessageToConcreteUser(redId, HANDSHAKE);
+        }
+    }
+
+    public void finishSpeedTest() {
+        long speedTestTime = System.currentTimeMillis() - timeSpeedTest;
+        long millis = speedTestTime % Constants.SECOND;
+        long seconds = speedTestTime / Constants.SECOND;
+        StringBuilder res = new StringBuilder(String.valueOf(millis));
+        while (res.length() < 3) {
+            res.insert(0, "0");
+        }
+        res.insert(0, ".");
+        res.insert(0, seconds);
+        if (greenSpeedTesting) {
+            manager.getActivity().setGreenStatus(res.toString());
+        } else {
+            manager.getActivity().setRedStatus(res.toString());
+        }
+        greenSpeedTesting = redSpeedTesting = false;
+    }
+
+    @Override
+    public void onDisconnected(String disconnectedId) {
+        manager.finishGame();
+    }
+
+    public LocalAdminGameManager getManager() {
+        return manager;
     }
 }
