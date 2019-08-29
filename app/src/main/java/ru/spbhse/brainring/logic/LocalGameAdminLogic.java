@@ -149,10 +149,6 @@ public class LocalGameAdminLogic {
      * Determines false starts
      */
     public void onAnswerIsReady(@NonNull String userId) {
-        if (timer != null) {
-            timer.cancel();
-            timer = null;
-        }
         if (green == null || red == null) {
             return;
         }
@@ -175,6 +171,10 @@ public class LocalGameAdminLogic {
         if (user.status.getAlreadyAnswered() || location != LocalGameLocation.COUNTDOWN) {
             manager.getNetwork().sendMessageToConcreteUser(userId, FORBID_ANSWER);
         } else {
+            if (timer != null) {
+                timer.cancel();
+                timer = null;
+            }
             user.status.setAlreadyAnswered(true);
             answeringUserId = userId;
             player.play(manager.getActivity(), R.raw.answering);
