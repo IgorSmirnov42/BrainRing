@@ -9,7 +9,6 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -48,30 +47,10 @@ public class JuryActivity extends AppCompatActivity {
         int secondTimer = getIntent().getIntExtra("secondTimer", 20);
         manager = new LocalAdminGameManager(this, firstTimer, secondTimer);
 
-        ImageView redTeam = findViewById(R.id.redTeamStatus);
-        redTeam.setOnClickListener(v -> {
-            if (currentLocation == LocalGameLocation.NOT_STARTED &&
-                    !manager.getNetwork().hasSpeedTest()) {
-                manager.getNetwork().speedTest(LocalGameRoles.ROLE_RED);
-            } else {
-                makeToast("Невозможно провести тестирование скорости в данный момент.");
-            }
-        });
-
-        ImageView greenTeam = findViewById(R.id.greenTeamStatus);
-        greenTeam.setOnClickListener(v -> {
-            if (currentLocation == LocalGameLocation.NOT_STARTED &&
-                    !manager.getNetwork().hasSpeedTest()) {
-                manager.getNetwork().speedTest(LocalGameRoles.ROLE_GREEN);
-            } else {
-                makeToast("Невозможно провести тестирование скорости в данный момент.");
-            }
-        });
-
         statusText = findViewById(R.id.gameStatusInfo);
         mainButton = findViewById(R.id.mainButton);
         mainButton.setOnLongClickListener(v -> {
-            if (!manager.getLogic().toNextState() || manager.getNetwork().hasSpeedTest()) {
+            if (!manager.getLogic().toNextState() /*|| manager.getNetwork().hasSpeedTest()*/) {
                 Toast.makeText(JuryActivity.this, getString(R.string.cannot_switch),
                         Toast.LENGTH_LONG).show();
             }
@@ -167,11 +146,12 @@ public class JuryActivity extends AppCompatActivity {
     }
 
     /** Reacts on pressing the answer button from some team*/
-    public void onReceivingAnswer(LocalGameRoles color) {
+    public void onReceivingAnswer(LocalGameRoles color, String time) {
         runOnUiThread(() -> {
             judging = true;
             Intent intent = new Intent(JuryActivity.this, JudgingActivity.class);
             intent.putExtra("color", color);
+            intent.putExtra("time", time);
             startActivityForResult(intent, RC_ANSWER_JUDGED);
         });
     }
@@ -217,9 +197,7 @@ public class JuryActivity extends AppCompatActivity {
     public void onBackPressed() {
         new AlertDialog.Builder(this).setTitle(getString(R.string.out_of_local))
                 .setMessage(getString(R.string.want_out))
-                .setPositiveButton(getString(R.string.yes), (dialog, which) -> {
-                    manager.finishGame();
-                })
+                .setPositiveButton(getString(R.string.yes), (dialog, which) -> manager.finishGame())
                 .setNegativeButton(getString(R.string.no), (dialog, which) -> {
                 })
                 .show();

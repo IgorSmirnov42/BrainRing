@@ -39,4 +39,8 @@ public class MessageCodes {
     public static final int I_AM_GREEN = 16;
     /** From player to server. Player has red table */
     public static final int I_AM_RED = 17;
+    /** From server to player */
+    public static final int TELL_YOUR_TIME = 18;
+    /** From player to server */
+    public static final int MY_TIME_IS = 19;
 }

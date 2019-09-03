@@ -24,6 +24,7 @@ public class JudgingActivity extends AppCompatActivity {
         setContentView(R.layout.activity_judging);
 
         LocalGameRoles colorName = (LocalGameRoles) getIntent().getSerializableExtra("color");
+        String time = getIntent().getStringExtra("time");
         String playerName;
         TextView answering = findViewById(R.id.answeringId);
         int color;
@@ -34,7 +35,7 @@ public class JudgingActivity extends AppCompatActivity {
             color = ContextCompat.getColor(this, R.color.colorJungleGreen);
             playerName = getString(R.string.green);
         }
-        String text = getString(R.string.pressed) + " " + playerName + " " + getString(R.string.button);
+        String text = getString(R.string.pressed) + " " + playerName + " " + getString(R.string.button) + "\n" + time + " sec";
         answering.setText(text);
         answering.setTextColor(color);
 

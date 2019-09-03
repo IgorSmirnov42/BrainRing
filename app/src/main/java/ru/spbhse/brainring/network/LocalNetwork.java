@@ -32,7 +32,7 @@ public abstract class LocalNetwork {
     }
 
     /** Reacts on received message */
-    protected abstract void onMessageReceived(@NonNull byte[] buf, @NonNull String userId);
+    protected abstract void onMessageReceived(@NonNull byte[] buf, @NonNull String userId, long timeReceived);
 
     public void sendMessageToConcreteUser(@NonNull String userId, @NonNull Message message) {
         executor.submit(() -> {

@@ -19,9 +19,11 @@ import ru.spbhse.brainring.network.messages.messageTypes.HandshakeMessage;
 import ru.spbhse.brainring.network.messages.messageTypes.IAmGreenMessage;
 import ru.spbhse.brainring.network.messages.messageTypes.IAmRedMessage;
 import ru.spbhse.brainring.network.messages.messageTypes.IncorrectOpponentAnswerMessage;
+import ru.spbhse.brainring.network.messages.messageTypes.MyTimeIsMessage;
 import ru.spbhse.brainring.network.messages.messageTypes.OpponentIsAnsweringMessage;
 import ru.spbhse.brainring.network.messages.messageTypes.QuestionMessage;
 import ru.spbhse.brainring.network.messages.messageTypes.ReadyForQuestionMessage;
+import ru.spbhse.brainring.network.messages.messageTypes.TellYourTimeMessage;
 import ru.spbhse.brainring.network.messages.messageTypes.TimeLimitMessage;
 import ru.spbhse.brainring.network.messages.messageTypes.TimeStartMessage;
 import ru.spbhse.brainring.utils.Constants;
@@ -97,6 +99,10 @@ public abstract class Message {
                     return new IAmGreenMessage();
                 case MessageCodes.I_AM_RED:
                     return new IAmRedMessage();
+                case MessageCodes.MY_TIME_IS:
+                    return new MyTimeIsMessage(inputStream);
+                case MessageCodes.TELL_YOUR_TIME:
+                    return new TellYourTimeMessage();
             }
         }
         throw new IllegalArgumentException("Unexpected message code");

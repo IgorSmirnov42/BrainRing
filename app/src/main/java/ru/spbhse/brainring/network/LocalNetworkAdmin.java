@@ -15,9 +15,7 @@ import java.util.Random;
 
 import ru.spbhse.brainring.managers.LocalAdminGameManager;
 import ru.spbhse.brainring.network.messages.Message;
-import ru.spbhse.brainring.network.messages.messageTypes.HandshakeMessage;
 import ru.spbhse.brainring.utils.Constants;
-import ru.spbhse.brainring.utils.LocalGameRoles;
 
 /**
  * Class with methods to interact with network
@@ -28,10 +26,6 @@ public class LocalNetworkAdmin extends LocalNetwork {
     private String redId;
     private String greenId;
     private ServerSocket serverSocket;
-    private static final Message HANDSHAKE = new HandshakeMessage();
-    private boolean greenSpeedTesting = false;
-    private boolean redSpeedTesting = false;
-    private long timeSpeedTest;
 
     /**
      * Creates new instance. Fills {@code mRoomUpdateCallback} with an instance that
@@ -44,14 +38,14 @@ public class LocalNetworkAdmin extends LocalNetwork {
 
     /** Decodes byte message received by server and calls needed functions in LocalController */
     @Override
-    protected void onMessageReceived(@NonNull byte[] buf, @NonNull String userId) {
+    protected void onMessageReceived(@NonNull byte[] buf, @NonNull String userId, long timeReceived) {
         if (gameIsFinished) {
             return;
         }
         Log.d(Constants.APP_TAG, "Received message as admin!");
         try {
             Message message = Message.readMessage(buf);
-            manager.getProcessor().process(message, userId);
+            manager.getProcessor().process(message, userId, timeReceived);
         } catch (IOException e) {
             Log.e(Constants.APP_TAG, "Error while reading message");
             e.printStackTrace();
@@ -102,14 +96,6 @@ public class LocalNetworkAdmin extends LocalNetwork {
         for (String key : keys) {
             sendMessageToConcreteUser(key, message);
         }
-    }
-
-    /**
-     * Sends {@code HANDSHAKE} message to others to check that both players are connected
-     * Called before each question
-     */
-    public void regularHandshake() {
-        sendMessageToUsers(HANDSHAKE);
     }
 
     public void getIp() {
@@ -172,39 +158,6 @@ public class LocalNetworkAdmin extends LocalNetwork {
                 }
             }
         }
-    }
-
-    public boolean hasSpeedTest() {
-        return greenSpeedTesting || redSpeedTesting;
-    }
-
-    public void speedTest(LocalGameRoles role) {
-        timeSpeedTest = System.currentTimeMillis();
-        if (role == LocalGameRoles.ROLE_GREEN) {
-            greenSpeedTesting = true;
-            sendMessageToConcreteUser(greenId, HANDSHAKE);
-        } else {
-            redSpeedTesting = true;
-            sendMessageToConcreteUser(redId, HANDSHAKE);
-        }
-    }
-
-    public void finishSpeedTest() {
-        long speedTestTime = System.currentTimeMillis() - timeSpeedTest;
-        long millis = speedTestTime % Constants.SECOND;
-        long seconds = speedTestTime / Constants.SECOND;
-        StringBuilder res = new StringBuilder(String.valueOf(millis));
-        while (res.length() < 3) {
-            res.insert(0, "0");
-        }
-        res.insert(0, ".");
-        res.insert(0, seconds);
-        if (greenSpeedTesting) {
-            manager.getActivity().setGreenStatus(res.toString());
-        } else {
-            manager.getActivity().setRedStatus(res.toString());
-        }
-        greenSpeedTesting = redSpeedTesting = false;
     }
 
     @Override

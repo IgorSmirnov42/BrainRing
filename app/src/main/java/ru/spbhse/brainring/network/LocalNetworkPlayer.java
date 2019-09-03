@@ -41,7 +41,7 @@ public class LocalNetworkPlayer extends LocalNetwork {
      * If it is a first message to player, sends response if green
      */
     @Override
-    protected void onMessageReceived(@NonNull byte[] buf, @NonNull String userId) {
+    protected void onMessageReceived(@NonNull byte[] buf, @NonNull String userId, long timeReceived) {
         Log.d(Constants.APP_TAG,"RECEIVED MESSAGE AS PLAYER!");
         if (gameIsFinished) {
             return;
@@ -49,7 +49,7 @@ public class LocalNetworkPlayer extends LocalNetwork {
 
         try {
             Message message = Message.readMessage(buf);
-            manager.getProcessor().process(message, userId);
+            manager.getProcessor().process(message, userId, timeReceived);
         } catch (IOException e) {
             Log.e(Constants.APP_TAG, "Error while reading message");
             e.printStackTrace();

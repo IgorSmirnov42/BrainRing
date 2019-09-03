@@ -234,6 +234,7 @@ public class QuestionDatabase extends SQLiteOpenHelper {
      */
     @NonNull
     public Question getQuestion(@NonNull DatabaseTable table, int id) {
+        Log.d(Constants.APP_TAG, "Want to get question " + id);
         String selectQuestion = "SELECT * FROM " + table.getTableName() +
                 " WHERE " + DatabaseTable._ID + "=" + (id + 1) + ";";
         Cursor cursor = db.rawQuery(selectQuestion, null);
@@ -259,6 +260,7 @@ public class QuestionDatabase extends SQLiteOpenHelper {
 
                 passCriterion = cursor.getString(cursor.getColumnIndex(DatabaseTable.COLUMN_PASS_CRITERIA)).
                         replaceFirst("Зачёт:", "").replaceAll(";", "/");
+                Log.d(Constants.APP_TAG, "See question id " + cursor.getInt(cursor.getColumnIndex(DatabaseTable._ID)));
             } while (cursor.moveToNext());
         }
         cursor.close();
@@ -267,7 +269,7 @@ public class QuestionDatabase extends SQLiteOpenHelper {
             passCriterion = null;
         }
 
-        return new Question(question, answer, passCriterion, comment, id);
+        return new Question(question, answer, passCriterion, comment, id + 1);
     }
 
     /** Returns base table */

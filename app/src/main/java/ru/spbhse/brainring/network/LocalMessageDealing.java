@@ -30,7 +30,7 @@ public class LocalMessageDealing implements Runnable {
                     break;
                 }
                 if (read != 0) {
-                    network.getUiHandler().post(() -> network.onMessageReceived(buf, senderId));
+                    network.getUiHandler().post(() -> network.onMessageReceived(buf, senderId, System.currentTimeMillis()));
                 }
             } catch (IOException e) {
                 Log.wtf(Constants.APP_TAG, "Error while reading from input stream socket");

@@ -6,6 +6,7 @@ import android.util.Log;
 import ru.spbhse.brainring.managers.LocalPlayerGameManager;
 import ru.spbhse.brainring.network.messages.Message;
 import ru.spbhse.brainring.network.messages.MessageCodes;
+import ru.spbhse.brainring.network.messages.messageTypes.MyTimeIsMessage;
 import ru.spbhse.brainring.utils.Constants;
 
 public class LocalPlayerMessageProcessor {
@@ -15,7 +16,7 @@ public class LocalPlayerMessageProcessor {
         this.manager = manager;
     }
 
-    public void process(@NonNull Message message, @NonNull String senderId) {
+    public void process(@NonNull Message message, @NonNull String senderId, long timeReceived) {
         switch (message.getMessageCode()) {
             case MessageCodes.FORBIDDEN_TO_ANSWER:
                 manager.getLogic().onForbiddenToAnswer();
@@ -32,8 +33,12 @@ public class LocalPlayerMessageProcessor {
             case MessageCodes.HANDSHAKE:
                 manager.getNetwork().sendMessageToConcreteUser(senderId, message);
                 break;
+            case MessageCodes.TELL_YOUR_TIME:
+                manager.getNetwork().sendMessageToConcreteUser(senderId,
+                        new MyTimeIsMessage(timeReceived));
+                break;
             default:
-                Log.wtf(Constants.APP_TAG, "Unexpected message received");
+                Log.e(Constants.APP_TAG, "Unexpected message received " + message.getMessageCode());
         }
     }
 }
