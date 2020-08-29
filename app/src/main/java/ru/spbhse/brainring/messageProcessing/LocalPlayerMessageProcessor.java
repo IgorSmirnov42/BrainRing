@@ -30,9 +30,6 @@ public class LocalPlayerMessageProcessor {
             case MessageCodes.TIME_START:
                 manager.getLogic().onTimeStart();
                 break;
-            case MessageCodes.HANDSHAKE:
-                manager.getNetwork().sendMessageToConcreteUser(senderId, message);
-                break;
             case MessageCodes.TELL_YOUR_TIME:
                 manager.getNetwork().sendMessageToConcreteUser(senderId,
                         new MyTimeIsMessage(timeReceived));

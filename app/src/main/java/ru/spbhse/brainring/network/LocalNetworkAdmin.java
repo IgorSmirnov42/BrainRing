@@ -126,6 +126,7 @@ public class LocalNetworkAdmin extends LocalNetwork {
                 while (!Thread.interrupted()) {
                     Socket socket = serverSocket.accept();
                     if (socket != null) {
+                        socket.setTcpNoDelay(true);
                         String senderId = String.valueOf(new Random().nextInt());
                         LocalMessageDealing messageDealing = new LocalMessageDealing(socket,
                                 LocalNetworkAdmin.this, senderId);

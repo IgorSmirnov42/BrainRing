@@ -36,7 +36,7 @@ public class LocalGameAdminLogic {
     private int handshakeAccepted = 0;
     private long roundStartTime;
 
-    private static final int REQUESTS_NUM = 100;
+    private static final int REQUESTS_NUM = 500;
 
     private ArrayList<TimeUser> waitingList = new ArrayList<>();
     private CountDownTimer judgingTimer;
@@ -125,7 +125,7 @@ public class LocalGameAdminLogic {
             roundStartTime = System.currentTimeMillis();
             timer.start();
             player.play(manager.getActivity(), R.raw.start);
-            manager.getNetwork().sendMessageToUsers(TIME_START);
+            //manager.getNetwork().sendMessageToUsers(TIME_START);
             return true;
         }
         // Start of a new round
@@ -204,8 +204,6 @@ public class LocalGameAdminLogic {
             return;
         }
         UserScore user = getThisUser(userId);
-        Log.d(Constants.APP_TAG, "User is ready " +
-                ((System.currentTimeMillis() - roundStartTime) - getAverageTimeInsideRound(user, time)));
         if (location == LocalGameLocation.READING_QUESTION ||
                 (location == LocalGameLocation.COUNTDOWN && getMaximalTime(user, time) < 0
                         && !user.status.getAlreadyAnswered())) {
@@ -227,8 +225,14 @@ public class LocalGameAdminLogic {
                 getMinimalTime(user, time) > timer.getTotalTime()) {
             forbidAnswer(userId);
         } else {
+            timer.cancel();
             Log.d(Constants.APP_TAG, "Average time is " + getAverageTimeInsideRound(user, time));
+            Log.d(Constants.APP_TAG, "Current time is " + (System.currentTimeMillis() - roundStartTime));
             waitingList.add(new TimeUser(getAverageTimeInsideRound(user, time), userId));
+            if (getOtherUser(userId).status.getAlreadyAnswered()) {
+                judge();
+                return;
+            }
             if (judgingTimer == null) {
                 judgingTimer = new CountDownTimer(judgingDelay, judgingDelay) {
                     @Override
@@ -247,6 +251,8 @@ public class LocalGameAdminLogic {
     }
 
     private void judge() {
+        Log.d(Constants.APP_TAG, "Judged at " + (System.currentTimeMillis() - roundStartTime) + "; " +
+                "list size is " + waitingList.size());
         judgingTimer = null;
         if (waitingList.isEmpty()) {
             Log.wtf(Constants.APP_TAG, "judge() was called but list is empty");
@@ -294,6 +300,7 @@ public class LocalGameAdminLogic {
                 .setNegativeButton("Заново", (dialog, id) -> newQuestion());
         builder.create();
         builder.show();
+
     }
 
     public void onTimeReceived(@NonNull String userId, long timeOther, long currentTime) {
@@ -310,6 +317,8 @@ public class LocalGameAdminLogic {
             user.dif = newDif;
             Log.d(Constants.APP_TAG, "Recalculated eps " + userId + " new eps is " + user.eps);
         }
+        Log.d(Constants.APP_TAG, "New time is " +
+                (System.currentTimeMillis() - user.lastSendTime));
         user.toJudge = (int) max(user.toJudge, System.currentTimeMillis() - user.lastSendTime);
         --user.needRequests;
         if (user.needRequests <= 0) {

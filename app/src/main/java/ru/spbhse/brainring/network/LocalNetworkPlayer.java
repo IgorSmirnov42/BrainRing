@@ -85,6 +85,7 @@ public class LocalNetworkPlayer extends LocalNetwork {
         executor.submit(() -> {
             try {
                 Socket socket = new Socket(serverIp, Constants.LOCAL_PORT);
+                socket.setTcpNoDelay(true);
                 if (socket.isConnected()) {
                     LocalMessageDealing messageDealing = new LocalMessageDealing(socket,
                             LocalNetworkPlayer.this, "server");
