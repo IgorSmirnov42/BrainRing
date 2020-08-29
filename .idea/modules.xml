@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/BrainRing.iml" filepath="$PROJECT_DIR$/BrainRing.iml" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/BrainRing.iml" filepath="$PROJECT_DIR$/BrainRing.iml" group="BrainRing" />
+      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" group="BrainRing/app" />
     </modules>
   </component>
 </project>

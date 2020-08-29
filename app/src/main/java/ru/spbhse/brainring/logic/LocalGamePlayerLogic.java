@@ -1,16 +1,17 @@
 package ru.spbhse.brainring.logic;
 
+import android.util.Log;
+
 import ru.spbhse.brainring.R;
 import ru.spbhse.brainring.managers.LocalPlayerGameManager;
-import ru.spbhse.brainring.network.messages.Message;
 import ru.spbhse.brainring.network.messages.messageTypes.AnswerReadyMessage;
+import ru.spbhse.brainring.utils.Constants;
 import ru.spbhse.brainring.utils.SoundPlayer;
 
 /** Class realizing player's logic in local network mode */
 public class LocalGamePlayerLogic {
     private LocalPlayerGameManager manager;
     private SoundPlayer player = new SoundPlayer();
-    private static final Message PUSHED_BUTTON = new AnswerReadyMessage(0);
 
     public LocalGamePlayerLogic(LocalPlayerGameManager manager) {
         this.manager = manager;
@@ -45,6 +46,7 @@ public class LocalGamePlayerLogic {
      * Called when team pushed the button
      */
     public void answerButtonPushed() {
-        manager.getNetwork().sendMessageToServer(PUSHED_BUTTON);
+        Log.d(Constants.APP_TAG, "Button pushed at " + System.currentTimeMillis());
+        manager.getNetwork().sendMessageToServer(new AnswerReadyMessage(System.currentTimeMillis()));
     }
 }

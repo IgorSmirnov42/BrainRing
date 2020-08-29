@@ -8,6 +8,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import ru.spbhse.brainring.R;
+import ru.spbhse.brainring.utils.Constants;
 import ru.spbhse.brainring.utils.LocalGameRoles;
 
 /** This activity is for selecting user role in local game mode, and selecting time spent on answer */
@@ -22,6 +23,9 @@ public class SelectLocalGameModeActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_local_game_settings);
+
+        TextView version = findViewById(R.id.version);
+        version.setText(Constants.LocalNetworkVersion);
 
         SeekBar firstBar = findViewById(R.id.firstCounterBar);
         firstBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {

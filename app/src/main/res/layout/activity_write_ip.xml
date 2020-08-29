@@ -23,16 +23,15 @@
 
     <TextView
         android:id="@+id/writeIP"
-        android:layout_width="252dp"
-        android:layout_height="61dp"
+        android:layout_width="245dp"
+        android:layout_height="110dp"
         android:gravity="center"
-        android:text="Введите IP ведущего"
+        android:text="Введите IP ведущего\n(отображается на телефоне ведущего)"
         android:textAlignment="center"
         android:textAppearance="@style/GrayText"
         android:textSize="18sp"
         app:layout_constraintBottom_toTopOf="@+id/serverIP"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 

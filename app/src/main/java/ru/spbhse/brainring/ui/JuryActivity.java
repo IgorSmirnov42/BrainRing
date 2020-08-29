@@ -50,7 +50,7 @@ public class JuryActivity extends AppCompatActivity {
         statusText = findViewById(R.id.gameStatusInfo);
         mainButton = findViewById(R.id.mainButton);
         mainButton.setOnLongClickListener(v -> {
-            if (!manager.getLogic().toNextState()) {
+            if (!manager.getLogic().toNextState() /*|| manager.getNetwork().hasSpeedTest()*/) {
                 Toast.makeText(JuryActivity.this, getString(R.string.cannot_switch),
                         Toast.LENGTH_LONG).show();
             }
@@ -60,28 +60,32 @@ public class JuryActivity extends AppCompatActivity {
 
         Button minusGreenButton = findViewById(R.id.minusGreenTeamButton);
         minusGreenButton.setOnLongClickListener(v -> {
-            manager.getLogic().minusPoint(1);
+            manager.getLogic().minusPoint(LocalGameRoles.ROLE_GREEN);
+            greenTeamScore.setText(manager.getLogic().getGreenScore());
             return true;
         });
         minusGreenButton.setOnClickListener(longerClick);
 
         Button plusGreenButton = findViewById(R.id.plusGreenTeamButton);
         plusGreenButton.setOnLongClickListener(v -> {
-            manager.getLogic().plusPoint(1);
+            manager.getLogic().plusPoint(LocalGameRoles.ROLE_GREEN);
+            greenTeamScore.setText(manager.getLogic().getGreenScore());
             return true;
         });
         plusGreenButton.setOnClickListener(longerClick);
 
         Button minusRedButton = findViewById(R.id.minusRedTeamButton);
         minusRedButton.setOnLongClickListener(v -> {
-            manager.getLogic().minusPoint(2);
+            manager.getLogic().minusPoint(LocalGameRoles.ROLE_RED);
+            redTeamScore.setText(manager.getLogic().getRedScore());
             return true;
         });
         minusRedButton.setOnClickListener(longerClick);
 
         Button plusRedButton = findViewById(R.id.plusRedTeamButton);
         plusRedButton.setOnLongClickListener(v -> {
-            manager.getLogic().plusPoint(2);
+            manager.getLogic().plusPoint(LocalGameRoles.ROLE_RED);
+            redTeamScore.setText(manager.getLogic().getRedScore());
             return true;
         });
         plusRedButton.setOnClickListener(longerClick);
@@ -98,7 +102,8 @@ public class JuryActivity extends AppCompatActivity {
     }
 
     public void onIpReceived(String ip) {
-        statusText.setText(ip);
+        String text = "Ваш IP:\n" + ip;
+        statusText.setText(text);
         manager.getNetwork().startServer();
     }
 
@@ -141,11 +146,12 @@ public class JuryActivity extends AppCompatActivity {
     }
 
     /** Reacts on pressing the answer button from some team*/
-    public void onReceivingAnswer(LocalGameRoles color) {
+    public void onReceivingAnswer(LocalGameRoles color, String time) {
         runOnUiThread(() -> {
             judging = true;
             Intent intent = new Intent(JuryActivity.this, JudgingActivity.class);
             intent.putExtra("color", color);
+            intent.putExtra("time", time);
             startActivityForResult(intent, RC_ANSWER_JUDGED);
         });
     }
@@ -191,9 +197,7 @@ public class JuryActivity extends AppCompatActivity {
     public void onBackPressed() {
         new AlertDialog.Builder(this).setTitle(getString(R.string.out_of_local))
                 .setMessage(getString(R.string.want_out))
-                .setPositiveButton(getString(R.string.yes), (dialog, which) -> {
-                    manager.finishGame();
-                })
+                .setPositiveButton(getString(R.string.yes), (dialog, which) -> manager.finishGame())
                 .setNegativeButton(getString(R.string.no), (dialog, which) -> {
                 })
                 .show();

@@ -41,7 +41,7 @@ public class LocalNetworkPlayer extends LocalNetwork {
      * If it is a first message to player, sends response if green
      */
     @Override
-    protected void onMessageReceived(@NonNull byte[] buf, @NonNull String userId) {
+    protected void onMessageReceived(@NonNull byte[] buf, @NonNull String userId, long timeReceived) {
         Log.d(Constants.APP_TAG,"RECEIVED MESSAGE AS PLAYER!");
         if (gameIsFinished) {
             return;
@@ -49,7 +49,7 @@ public class LocalNetworkPlayer extends LocalNetwork {
 
         try {
             Message message = Message.readMessage(buf);
-            manager.getProcessor().process(message, userId);
+            manager.getProcessor().process(message, userId, timeReceived);
         } catch (IOException e) {
             Log.e(Constants.APP_TAG, "Error while reading message");
             e.printStackTrace();
@@ -69,7 +69,6 @@ public class LocalNetworkPlayer extends LocalNetwork {
         }
     }
 
-
     /**
      * Sends message to server
      * If server is not known, does nothing
@@ -86,11 +85,15 @@ public class LocalNetworkPlayer extends LocalNetwork {
         executor.submit(() -> {
             try {
                 Socket socket = new Socket(serverIp, Constants.LOCAL_PORT);
+                socket.setTcpNoDelay(true);
                 if (socket.isConnected()) {
                     LocalMessageDealing messageDealing = new LocalMessageDealing(socket,
                             LocalNetworkPlayer.this, "server");
-                    contacts.put("server", socket);
+                    synchronized (contacts) {
+                        contacts.put("server", socket);
+                    }
                     executor.submit(messageDealing);
+                    doInitialHandshake("server");
                 } else {
                     throw new ConnectException();
                 }
@@ -105,11 +108,6 @@ public class LocalNetworkPlayer extends LocalNetwork {
     @Override
     public void onDisconnected(String disconnectedId) {
         manager.finishGame();
-    }
-
-    @Override
-    public void handshake() {
-        Log.wtf(Constants.APP_TAG, "Handshake was called for player");
     }
 
     @Override

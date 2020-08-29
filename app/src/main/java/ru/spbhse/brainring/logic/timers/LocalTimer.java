@@ -17,10 +17,12 @@ public class LocalTimer extends CountDownTimer {
     private LocalGameAdminLogic logic;
     private int fault;
     private int sendingCountdown;
+    private long totalTime;
 
     public LocalTimer(int totalTimeSec, int faultMillis, int sendingCountdownSec,
                       LocalGameAdminLogic logic) {
         super(totalTimeSec * Constants.SECOND + faultMillis, Constants.SECOND);
+        totalTime = totalTimeSec * Constants.SECOND;
         fault = faultMillis;
         sendingCountdown = sendingCountdownSec;
         this.logic = logic;
@@ -44,5 +46,9 @@ public class LocalTimer extends CountDownTimer {
             logic.getPlayer().play(logic.getManager().getActivity(), R.raw.beep);
             logic.newQuestion();
         }
+    }
+
+    public long getTotalTime() {
+        return totalTime;
     }
 }

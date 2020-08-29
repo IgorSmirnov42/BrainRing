@@ -4,6 +4,7 @@ import android.util.Log;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.net.SocketException;
 
 import ru.spbhse.brainring.utils.Constants;
 
@@ -20,6 +21,12 @@ public class LocalMessageDealing implements Runnable {
 
     @Override
     public void run() {
+        try {
+            socket.setTcpNoDelay(true);
+        } catch (SocketException e) {
+            Log.e(Constants.APP_TAG, "Cannot set no delay " + e.getMessage());
+            e.printStackTrace();
+        }
         while (!socket.isClosed()) {
             byte[] buf = new byte[1024];
             try {
@@ -30,7 +37,7 @@ public class LocalMessageDealing implements Runnable {
                     break;
                 }
                 if (read != 0) {
-                    network.getUiHandler().post(() -> network.onMessageReceived(buf, senderId));
+                    network.getUiHandler().post(() -> network.onMessageReceived(buf, senderId, System.currentTimeMillis()));
                 }
             } catch (IOException e) {
                 Log.wtf(Constants.APP_TAG, "Error while reading from input stream socket");
