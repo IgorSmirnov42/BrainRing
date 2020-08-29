@@ -103,9 +103,9 @@ class Answer {
         }
     }
 
-    /** Calculates allowed levenshtein distance such as answers with that distance will be accepted*/
+    /** Calculates allowed levenshtein distance such as answers with that distance will be accepted */
     private static int allowedDistance(@NonNull String answer) {
-        return answer.length() / 5;
+        return answer.length() / 3;
     }
 
     /** Calculates levenshtein distance between two strings */

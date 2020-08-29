@@ -8,5 +8,5 @@ public class Constants {
     public static String APP_TAG = "BrainRing";
     public static final int LOCAL_PORT = 10239;
 
-    public static final String LocalNetworkVersion = "1.1.0";
+    public static final String LocalNetworkVersion = "1.2.0";
 }
